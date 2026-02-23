@@ -1,0 +1,7 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" rx="28" fill="#EAF3EF"/>
+  <path d="M90 600L360 180L600 510L860 130L1110 560" stroke="#94B7A4" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="620" cy="330" r="90" fill="#1F6E43"/>
+  <circle cx="620" cy="330" r="38" fill="#FFFFFF"/>
+  <text x="420" y="620" fill="#315642" font-size="50" font-family="Arial, sans-serif" font-weight="700">Mapa del comedor</text>
+</svg>

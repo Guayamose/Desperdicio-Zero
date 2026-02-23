@@ -1,0 +1,125 @@
+<% content_for :hero do %>
+<section class="kitchen-header-hero">
+  <div class="container">
+    <div class="kitchen-header-grid">
+      <div>
+        <%= link_to public_tenants_path, class: "btn btn-secondary btn-sm", style: "margin-bottom: 1.5rem; border-radius: 99px; padding: 0.5rem 1.25rem;" do %>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 0.5rem;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          Volver al listado
+        <% end %>
+        <h1 style="font-family: 'Outfit', sans-serif; font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; line-height: 1; letter-spacing: -0.04em; margin-bottom: 1rem;">
+          <%= @tenant.name %>
+        </h1>
+        <div style="display: flex; align-items: center; gap: 1rem; color: var(--text-muted); font-size: 1.125rem;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span><%= present_or_dash([@tenant.address, @tenant.city].compact.join(", ")) %></span>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <%= status_pill(@tenant.status) %>
+      </div>
+    </div>
+  </div>
+</section>
+<% end %>
+
+<div class="container">
+  <div class="info-grid-premium">
+    <article class="info-card-premium">
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        Contacto
+      </h3>
+      <div class="meta-item" style="margin-bottom: 0.75rem;">
+        <strong>Email:</strong> <%= present_or_dash(@tenant.contact_email) %>
+      </div>
+      <div class="meta-item">
+        <strong>Teléfono:</strong> <%= present_or_dash(@tenant.contact_phone) %>
+      </div>
+    </article>
+
+    <article class="info-card-premium">
+      <h3>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Horario
+      </h3>
+      <% hours = @tenant.operating_hours_json.is_a?(Hash) ? @tenant.operating_hours_json : {} %>
+      <% if hours.present? %>
+        <div style="font-size: 0.9375rem; color: var(--text-muted);">
+          <% hours.each do |day, period| %>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+              <span style="font-weight: 700; color: var(--text);"><%= day.to_s.capitalize %>:</span>
+              <span><%= period %></span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="muted">No configurado.</p>
+      <% end %>
+    </article>
+
+    <article class="info-card-premium">
+      <div class="map-shell" style="height: 150px; border-radius: 16px; margin-bottom: 1.5rem;">
+        <% if (map_url = tenant_map_embed_url(@tenant)).present? %>
+          <iframe style="width: 100%; height: 100%; border: 0; border-radius: 16px;" src="<%= map_url %>" loading="lazy"></iframe>
+        <% else %>
+          <div style="width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+            Mapa no disponible
+          </div>
+        <% end %>
+      </div>
+      <% if (map_link = tenant_map_link(@tenant)).present? %>
+        <%= link_to map_link, target: "_blank", class: "btn btn-secondary", style: "width: 100%; justify-content: center; border-radius: 12px; height: 44px; font-weight: 700;" do %>
+          Abrir en navegador
+        <% end %>
+      <% end %>
+    </article>
+  </div>
+
+  <section class="menu-today-highlight">
+    <div style="max-width: 700px;">
+      <span style="font-weight: 800; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.2em; display: block; margin-bottom: 1rem;">PLATO PRINCIPAL PARA HOY</span>
+      
+      <% if @today_menu.present? %>
+        <h2 style="font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; color: #064e3b;">
+          <%= @today_menu.title %>
+        </h2>
+        <p style="font-size: 1.25rem; color: #065f46; line-height: 1.6; margin-bottom: 2.5rem;">
+          <%= present_or_dash(@today_menu.description) %>
+        </p>
+
+        <% if @today_menu.daily_menu_items.any? %>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+            <% @today_menu.daily_menu_items.each do |item| %>
+              <div style="background: rgba(255,255,255,0.5); padding: 1.5rem; border-radius: 20px; border: 1px solid white;">
+                <h4 style="margin: 0 0 0.5rem 0; font-size: 1.125rem; font-weight: 800; color: #064e3b;"><%= item.name %></h4>
+                <p style="font-size: 0.875rem; color: #047857; margin: 0;"><%= truncate(item.description, length: 60) %></p>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <div style="padding: 2rem 0;">
+          <h2 style="font-family: 'Outfit', sans-serif; font-size: 2rem; color: var(--text-muted); opacity: 0.5;">
+            Menú no disponible aún
+          </h2>
+          <p style="margin-top: 1rem;">Vuelve más tarde para consultar lo que se cocinará hoy.</p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <% if @recent_menus.any? %>
+    <section style="margin-bottom: 5rem;">
+      <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 800; margin-bottom: 2rem;">Historial de menús</h3>
+      <div style="display: flex; gap: 1.5rem; overflow-x: auto; padding-bottom: 1rem;">
+        <% @recent_menus.each do |menu| %>
+          <article style="flex: 0 0 280px; background: white; border: 1px solid var(--line-light); padding: 1.5rem; border-radius: 24px;">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);"><%= ui_date(menu.menu_date) %></span>
+            <h4 style="margin: 0.5rem 0 0 0; font-size: 1.125rem; font-weight: 800;"><%= menu.title %></h4>
+          </article>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

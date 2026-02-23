@@ -1,0 +1,94 @@
+<section class="page-header page-header-loose">
+  <div>
+    <p class="eyebrow">Menu diario</p>
+    <h1 class="page-title"><%= @tenant.name %></h1>
+    <p class="page-subtitle">Consulta de menu para <%= ui_date(Date.current) %></p>
+  </div>
+  <div class="toolbar">
+    <%= status_pill(@menu.present? ? @menu.status : "inactive") %>
+    <%= link_to "Volver al comedor", public_tenant_path(@tenant.slug), class: "btn btn-secondary btn-sm" %>
+    <%= link_to "Todos los comedores", public_tenants_path, class: "btn btn-secondary btn-sm" %>
+  </div>
+</section>
+
+<section class="split-panel">
+  <article class="panel">
+    <% if @menu.present? %>
+      <div class="title-row mb-sm">
+        <h2><%= @menu.title %></h2>
+        <%= status_pill(@menu.status) %>
+      </div>
+
+      <p><%= present_or_dash(@menu.description) %></p>
+
+      <% if @menu.allergens_json.present? %>
+        <p class="help-text"><strong>Alergenos:</strong> <%= Array(@menu.allergens_json).join(", ") %></p>
+      <% end %>
+
+      <h3 class="section-title mt-md">Platos del menu</h3>
+      <% if @menu.daily_menu_items.any? %>
+        <ol class="list-clean menu-list-numbered">
+          <% @menu.daily_menu_items.each_with_index do |item, index| %>
+            <li class="menu-item">
+              <div class="menu-item-head">
+                <strong><%= item.name %></strong>
+                <span class="help-text">Plato <%= index + 1 %></span>
+              </div>
+              <p><%= present_or_dash(item.description) %></p>
+              <% if item.ingredients_json.present? %>
+                <p class="help-text">Ingredientes: <%= Array(item.ingredients_json).join(", ") %></p>
+              <% end %>
+              <% if item.allergens_json.present? %>
+                <p class="help-text">Alergenos: <%= Array(item.allergens_json).join(", ") %></p>
+              <% end %>
+            </li>
+          <% end %>
+        </ol>
+      <% else %>
+        <div class="empty-state">El menu esta publicado pero todavia no tiene platos detallados.</div>
+      <% end %>
+    <% else %>
+      <div class="empty-state">No hay menu publicado para hoy en este comedor.</div>
+    <% end %>
+  </article>
+
+  <article class="panel panel-soft">
+    <h2>Comedor y ubicacion</h2>
+    <div class="media-card">
+      <div class="media-card-visual">
+        <%= tenant_placeholder_image(@tenant, alt: "Imagen de referencia de #{@tenant.name}") %>
+      </div>
+      <div class="media-card-body">
+        <strong><%= @tenant.name %></strong>
+        <p class="muted"><%= present_or_dash([@tenant.city, @tenant.region, @tenant.country].compact.join(", ")) %></p>
+      </div>
+    </div>
+
+    <div class="map-shell">
+      <% if (map_url = tenant_map_embed_url(@tenant)).present? %>
+        <iframe class="map-frame" src="<%= map_url %>" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <% else %>
+        <%= map_placeholder_image %>
+      <% end %>
+    </div>
+    <div class="actions mt-sm">
+      <% if (map_link = tenant_map_link(@tenant)).present? %>
+        <%= link_to "Abrir en OpenStreetMap", map_link, target: "_blank", rel: "noreferrer", class: "btn btn-secondary btn-sm" %>
+      <% end %>
+    </div>
+
+    <h3 class="section-title mt-md">Historial reciente</h3>
+    <% if @recent_menus.any? %>
+      <ul class="list-clean">
+        <% @recent_menus.each do |menu| %>
+          <li class="menu-item">
+            <strong><%= menu.title %></strong>
+            <p class="help-text"><%= ui_date(menu.menu_date) %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="empty-state">No hay menus historicos publicados.</div>
+    <% end %>
+  </article>
+</section>
