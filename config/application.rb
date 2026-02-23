@@ -15,6 +15,12 @@ module DesperdicioZero
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w(assets tasks))
+    config.middleware.use Rack::Attack
+    config.i18n.default_locale = :es
+    config.i18n.available_locales = %i[es en]
+    config.i18n.fallbacks = [ :en ]
+    config.time_zone = "Madrid"
+    config.active_job.queue_adapter = :sidekiq
 
     # Configuration for the application, engines, and railties goes here.
     #

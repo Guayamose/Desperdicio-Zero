@@ -1,0 +1,18 @@
+es:
+  hello: "Hola mundo"
+
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d %b"
+
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%d/%m %H:%M"
+
+  helpers:
+    submit:
+      create: "Crear %{model}"
+      update: "Guardar %{model}"
+      submit: "Guardar %{model}"
