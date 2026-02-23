@@ -33,16 +33,8 @@ module TenantPortal
     end
 
     def update
-      new_role = params.dig(:membership, :role)
-      new_active = params.dig(:membership, :active)
-
-      if new_role.present?
-        @membership.update!(role: new_role)
-      elsif new_active.present?
-        @membership.update!(active: new_active == "true")
-      end
-
-      redirect_to tenant_employees_path, notice: "Empleado actualizado"
+      @membership.update!(role: params.dig(:membership, :role))
+      redirect_to tenant_employees_path, notice: "Rol actualizado"
     rescue ActiveRecord::RecordInvalid
       redirect_to tenant_employees_path, alert: "No se pudo actualizar el empleado"
     end

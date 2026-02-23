@@ -20,7 +20,6 @@
           <th>Nombre</th>
           <th>Email</th>
           <th>Rol</th>
-          <th>Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -44,21 +43,6 @@
                       options_for_select([["Personal", "tenant_staff"], ["Administrador", "tenant_manager"]], membership.role),
                       style: "padding: 0.25rem 0.5rem; font-size: 0.8rem;" %>
                 <%= f.submit "Cambiar", class: "btn btn-secondary btn-sm" %>
-              <% end %>
-            </td>
-            <td>
-              <% if membership.user.blocked_at.present? %>
-                <%= status_pill("blocked") %>
-              <% elsif membership.active %>
-                <%= form_with url: tenant_employee_path(membership), method: :patch do |f| %>
-                  <%= hidden_field_tag "membership[active]", "false" %>
-                  <%= f.submit "Desactivar", class: "btn btn-sm", style: "background: transparent; border: 1px solid var(--line); color: var(--text-muted);" %>
-                <% end %>
-              <% else %>
-                <%= form_with url: tenant_employee_path(membership), method: :patch do |f| %>
-                  <%= hidden_field_tag "membership[active]", "true" %>
-                  <%= f.submit "Activar", class: "btn btn-secondary btn-sm" %>
-                <% end %>
               <% end %>
             </td>
             <td style="text-align: right;">
