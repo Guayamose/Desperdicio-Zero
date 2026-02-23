@@ -10,7 +10,7 @@ class PublicPortalTest < ActionDispatch::IntegrationTest
 
     get public_tenants_path
     assert_response :success
-    assert_includes response.body, "Comedores sociales disponibles"
+    assert_includes response.body, "Directorio de Comedores Sociales"
 
     get public_tenant_path(tenant.slug)
     assert_response :success
