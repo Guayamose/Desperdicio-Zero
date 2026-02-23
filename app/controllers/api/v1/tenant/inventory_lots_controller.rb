@@ -56,11 +56,17 @@ module Api
         end
 
         def resolve_product
-          return Product.find(inventory_lot_params[:product_id]) if inventory_lot_params[:product_id].present?
+          if inventory_lot_params[:product_id].present?
+            product = Product.find(inventory_lot_params[:product_id])
+            apply_manual_name!(product)
+            return product
+          end
 
           if inventory_lot_params[:barcode].present?
             result = Inventory::BarcodeLookupService.new.call(inventory_lot_params[:barcode])
-            return result.product if result.product.present?
+            product = result.product
+            apply_manual_name!(product)
+            return product if product.present?
           end
 
           Product.create!(
@@ -68,6 +74,16 @@ module Api
             barcode: inventory_lot_params[:barcode].presence,
             source: :manual
           )
+        end
+
+        def apply_manual_name!(product)
+          return if product.blank?
+
+          manual_name = inventory_lot_params[:product_name].to_s.strip
+          return if manual_name.blank?
+          return if product.name == manual_name
+
+          product.update!(name: manual_name)
         end
       end
     end
