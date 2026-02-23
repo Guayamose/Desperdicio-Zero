@@ -4,6 +4,12 @@
     <h1 class="page-title">Empleados de <%= current_tenant.name %></h1>
     <p class="page-subtitle">Miembros asignados a este comedor.</p>
   </div>
+  <div class="toolbar">
+    <%= link_to new_tenant_employee_path, class: "btn btn-primary" do %>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Nuevo empleado
+    <% end %>
+  </div>
 </section>
 
 <section class="panel" style="padding: 1.5rem;">
@@ -15,25 +21,54 @@
           <th>Email</th>
           <th>Rol</th>
           <th>Estado</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <% @memberships.each do |membership| %>
           <tr>
             <td style="padding: 1.25rem 1rem;">
-              <div style="font-weight: 700; color: var(--text);"><%= membership.user.full_name %></div>
+              <div style="font-weight: 700; color: var(--text);">
+                <%= membership.user.full_name %>
+                <% if membership.user == current_user %>
+                  <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 4px;">(tú)</span>
+                <% end %>
+              </div>
             </td>
             <td>
               <span style="color: var(--text-muted);"><%= membership.user.email %></span>
             </td>
-            <td><%= status_pill(membership.role) %></td>
+            <td>
+              <%= form_with url: tenant_employee_path(membership), method: :patch, style: "display: flex; gap: 0.5rem; align-items: center;" do |f| %>
+                <%= select_tag "membership[role]",
+                      options_for_select([["Personal", "tenant_staff"], ["Administrador", "tenant_manager"]], membership.role),
+                      style: "padding: 0.25rem 0.5rem; font-size: 0.8rem;" %>
+                <%= f.submit "Cambiar", class: "btn btn-secondary btn-sm" %>
+              <% end %>
+            </td>
             <td>
               <% if membership.user.blocked_at.present? %>
                 <%= status_pill("blocked") %>
               <% elsif membership.active %>
-                <%= status_pill("active") %>
+                <%= form_with url: tenant_employee_path(membership), method: :patch do |f| %>
+                  <%= hidden_field_tag "membership[active]", "false" %>
+                  <%= f.submit "Desactivar", class: "btn btn-sm", style: "background: transparent; border: 1px solid var(--line); color: var(--text-muted);" %>
+                <% end %>
               <% else %>
-                <%= status_pill("inactive") %>
+                <%= form_with url: tenant_employee_path(membership), method: :patch do |f| %>
+                  <%= hidden_field_tag "membership[active]", "true" %>
+                  <%= f.submit "Activar", class: "btn btn-secondary btn-sm" %>
+                <% end %>
+              <% end %>
+            </td>
+            <td style="text-align: right;">
+              <% unless membership.user == current_user %>
+                <%= button_to tenant_employee_path(membership), method: :delete,
+                      data: { turbo_confirm: "¿Eliminar a #{membership.user.full_name} del comedor?" },
+                      class: "btn btn-sm",
+                      style: "background: transparent; border: none; color: var(--danger);" do %>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <% end %>
               <% end %>
             </td>
           </tr>

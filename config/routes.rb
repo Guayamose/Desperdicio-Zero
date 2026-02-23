@@ -88,7 +88,7 @@ Rails.application.routes.draw do
     get "alerts/expirations", to: "alerts#expirations", as: :alerts_expirations
 
     # Empleados del comedor (solo tenant_manager).
-    resources :employees, only: [ :index ]
+    resources :employees, only: [ :index, :new, :create, :update, :destroy ]
   end
 
   # --------------------------------------------------------------------------
