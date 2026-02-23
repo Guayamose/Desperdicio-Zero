@@ -1,0 +1,59 @@
+<section class="page-header page-header-loose">
+  <div>
+    <p class="eyebrow">Acceso privado</p>
+    <h1 class="page-title">Iniciar sesion</h1>
+    <p class="page-subtitle">Accede al panel interno de comedores y administracion global.</p>
+  </div>
+</section>
+
+<section class="auth-shell">
+  <article class="auth-card">
+    <h2>Credenciales</h2>
+    <p class="muted">Introduce tus credenciales para acceder al panel privado.</p>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="field">
+        <%= f.label :email, "Email" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+      </div>
+
+      <div class="field">
+        <%= f.label :password, "Contrasena" %>
+        <%= f.password_field :password, autocomplete: "current-password" %>
+      </div>
+
+      <% if devise_mapping.rememberable? %>
+        <div class="field field-inline">
+          <%= f.check_box :remember_me %>
+          <%= f.label :remember_me, "Recordarme" %>
+        </div>
+      <% end %>
+
+      <div class="actions">
+        <%= f.submit "Entrar", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+
+    <div class="auth-links">
+      <%= render "devise/shared/links" %>
+    </div>
+  </article>
+
+  <article class="auth-card auth-side">
+    <h3>Accesos de demo</h3>
+    <ul class="list-clean">
+      <li class="menu-item">
+        <strong>Admin</strong>
+        <p class="help-text">admin@socialkitchen.local</p>
+      </li>
+      <li class="menu-item">
+        <strong>Manager</strong>
+        <p class="help-text">manager+comedor-central@socialkitchen.local</p>
+      </li>
+      <li class="menu-item">
+        <strong>Password</strong>
+        <p class="help-text">ChangeMe123!</p>
+      </li>
+    </ul>
+  </article>
+</section>
