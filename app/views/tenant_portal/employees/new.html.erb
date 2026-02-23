@@ -1,0 +1,42 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Gestión de Personal</span>
+    <h1 class="page-title">Nuevo empleado</h1>
+    <p class="page-subtitle">Se generará una contraseña temporal que deberás entregar al empleado.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <%= form_with model: @user, url: tenant_employees_path do |f| %>
+    <% if @user.errors.any? %>
+      <div class="flash alert"><%= @user.errors.full_messages.join(", ") %></div>
+    <% end %>
+
+    <section class="panel panel-soft">
+      <h2>Datos del empleado</h2>
+      <div class="form-grid">
+        <div class="field">
+          <%= f.label :full_name, "Nombre completo" %>
+          <%= f.text_field :full_name %>
+        </div>
+
+        <div class="field">
+          <%= f.label :email, "Email" %>
+          <%= f.email_field :email %>
+        </div>
+
+        <div class="field">
+          <%= label_tag "membership_role", "Rol" %>
+          <%= select_tag "membership[role]",
+                options_for_select([["Personal", "tenant_staff"], ["Administrador", "tenant_manager"]]),
+                class: "select" %>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <%= f.submit "Crear empleado", class: "btn btn-primary" %>
+      <%= link_to "Cancelar", tenant_employees_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</section>

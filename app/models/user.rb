@@ -32,6 +32,10 @@ class User < ApplicationRecord
     memberships.active.where(tenant_id: tenant.id).exists?
   end
 
+  def tenant_manager_in?(tenant)
+    memberships.active.tenant_manager.where(tenant_id: tenant.id).exists?
+  end
+
   def anonymize_personal_data!
     update!(
       full_name: "Deleted User",
