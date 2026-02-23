@@ -1,0 +1,38 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Usuarios</h1>
+    <p class="page-subtitle">Gestion de cuentas internas, bloqueos y roles de administracion.</p>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Crear usuario", new_admin_user_path, class: "btn btn-primary btn-sm" %>
+  </div>
+</section>
+
+<section class="panel panel-soft">
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Bloqueado</th>
+          <th>Admin global</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td><strong><%= user.full_name %></strong></td>
+            <td><%= user.email %></td>
+            <td><%= status_pill(user.blocked_at.present? ? "blocked" : "active") %></td>
+            <td><%= status_pill(user.system_admin? ? "system_admin" : "inactive") %></td>
+            <td>
+              <%= link_to "Ver", admin_user_path(user), class: "btn btn-secondary btn-sm" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

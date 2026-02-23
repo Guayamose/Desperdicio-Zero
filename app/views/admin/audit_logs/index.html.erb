@@ -1,0 +1,35 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Audit logs</h1>
+    <p class="page-subtitle">Ultimos 200 eventos relevantes de seguridad y operacion.</p>
+  </div>
+</section>
+
+<section class="panel panel-soft">
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Accion</th>
+          <th>Actor</th>
+          <th>Tenant</th>
+          <th>Entidad</th>
+          <th>IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @audit_logs.each do |log| %>
+          <tr>
+            <td><%= ui_datetime(log.created_at) %></td>
+            <td><strong><%= log.action %></strong></td>
+            <td><%= log.actor&.email || "sistema" %></td>
+            <td><%= log.tenant&.name || "global" %></td>
+            <td><%= [log.entity_type, log.entity_id].compact.join("#") %></td>
+            <td><%= present_or_dash(log.ip_address) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

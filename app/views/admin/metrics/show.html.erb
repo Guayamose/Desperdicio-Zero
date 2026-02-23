@@ -1,0 +1,62 @@
+<section class="page-header page-header-loose">
+  <div>
+    <p class="eyebrow">Administracion global</p>
+    <h1 class="page-title">Metricas de la plataforma</h1>
+    <p class="page-subtitle">Visibilidad del estado operativo, seguridad y uso en todos los tenants.</p>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Comedores", admin_tenants_path, class: "btn btn-secondary btn-sm" %>
+    <%= link_to "Usuarios", admin_users_path, class: "btn btn-secondary btn-sm" %>
+    <%= link_to "Auditoria", admin_audit_logs_path, class: "btn btn-secondary btn-sm" %>
+  </div>
+</section>
+
+<section class="grid-4 metric-grid">
+  <% @metrics.each do |key, value| %>
+    <article class="metric-card">
+      <div class="metric-label"><%= key.to_s.humanize %></div>
+      <div class="metric-value"><%= value %></div>
+      <p class="metric-caption">Actualizado en <%= ui_datetime(Time.current) %></p>
+    </article>
+  <% end %>
+</section>
+
+<section class="split-panel">
+  <article class="panel">
+    <h2>Distribucion relativa</h2>
+    <% max_value = @metrics.values.max.to_f.nonzero? || 1.0 %>
+    <div class="chart-list">
+      <% @metrics.each do |key, value| %>
+        <div class="chart-row">
+          <div class="chart-label"><%= key.to_s.humanize %></div>
+          <div class="chart-bar">
+            <progress class="chart-progress" max="<%= max_value %>" value="<%= value.to_f %>"><%= value %></progress>
+          </div>
+          <div class="chart-value"><%= value %></div>
+        </div>
+      <% end %>
+    </div>
+  </article>
+
+  <article class="panel panel-soft">
+    <h2>Lectura rapida</h2>
+    <ul class="list-clean">
+      <li class="menu-item">
+        <strong>Tenants activos</strong>
+        <p class="muted"><%= @metrics[:active_tenants] %> de <%= @metrics[:tenants] %> en estado operativo.</p>
+      </li>
+      <li class="menu-item">
+        <strong>Usuarios bloqueados</strong>
+        <p class="muted"><%= @metrics[:blocked_users] %> cuentas marcadas para revision.</p>
+      </li>
+      <li class="menu-item">
+        <strong>Salud de inventario</strong>
+        <p class="muted"><%= @metrics[:expired_lots] %> lotes vencidos registrados actualmente.</p>
+      </li>
+      <li class="menu-item">
+        <strong>Fallbacks de menu IA</strong>
+        <p class="muted"><%= @metrics[:menu_fallbacks] %> eventos en los ultimos 7 dias.</p>
+      </li>
+    </ul>
+  </article>
+</section>

@@ -1,0 +1,44 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Administracion de comedores</h1>
+    <p class="page-subtitle">Alta, mantenimiento y estado operativo de tenants.</p>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Nuevo comedor", new_admin_tenant_path, class: "btn btn-primary btn-sm" %>
+  </div>
+</section>
+
+<section class="panel panel-soft">
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Slug</th>
+          <th>Estado</th>
+          <th>Ciudad</th>
+          <th>Contacto</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @tenants.each do |tenant| %>
+          <tr>
+            <td><strong><%= tenant.name %></strong></td>
+            <td><%= tenant.slug %></td>
+            <td><%= status_pill(tenant.status) %></td>
+            <td><%= present_or_dash(tenant.city) %></td>
+            <td><%= present_or_dash(tenant.contact_email) %></td>
+            <td>
+              <div class="actions">
+                <%= link_to "Ver", admin_tenant_path(tenant), class: "btn btn-secondary btn-sm" %>
+                <%= link_to "Editar", edit_admin_tenant_path(tenant), class: "btn btn-secondary btn-sm" %>
+                <%= button_to "Eliminar", admin_tenant_path(tenant), method: :delete, data: { turbo_confirm: "Eliminar comedor?" }, class: "btn btn-danger btn-sm", form: { class: "inline-form" } %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>

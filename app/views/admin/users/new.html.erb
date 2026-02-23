@@ -1,0 +1,64 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Crear usuario</h1>
+    <p class="page-subtitle">Alta de usuario interno y asignacion opcional a un comedor.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <%= form_with model: [ :admin, @user ], url: admin_users_path do |f| %>
+    <% if @user.errors.any? %>
+      <div class="flash alert"><%= @user.errors.full_messages.join(", ") %></div>
+    <% end %>
+
+    <section class="panel panel-soft">
+      <h2>Datos de cuenta</h2>
+      <div class="form-grid">
+        <div class="field">
+          <%= f.label :full_name, "Nombre completo" %>
+          <%= f.text_field :full_name %>
+        </div>
+
+        <div class="field">
+          <%= f.label :email, "Email" %>
+          <%= f.email_field :email %>
+        </div>
+
+        <div class="field">
+          <%= f.label :locale, "Idioma" %>
+          <%= f.select :locale, [["Espanol", "es"], ["English", "en"]] %>
+        </div>
+
+        <div class="field">
+          <%= f.label :gdpr_consent_at, "Consentimiento GDPR" %>
+          <%= f.datetime_field :gdpr_consent_at %>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel panel-soft">
+      <h2>Asignacion tenant</h2>
+      <div class="form-grid">
+        <div class="field">
+          <%= label_tag "membership_tenant_id", "Comedor" %>
+          <%= select_tag "membership[tenant_id]", options_from_collection_for_select(@tenants, :id, :name), include_blank: "Sin asignar" %>
+        </div>
+
+        <div class="field">
+          <%= label_tag "membership_role", "Rol en comedor" %>
+          <%= select_tag "membership[role]", options_for_select(Membership.roles.keys) %>
+        </div>
+      </div>
+
+      <div class="field">
+        <%= label_tag :system_admin, "Administrador global" %>
+        <%= check_box_tag :system_admin, "1" %>
+      </div>
+    </section>
+
+    <div class="actions">
+      <%= f.submit "Crear usuario", class: "btn btn-primary" %>
+      <%= link_to "Cancelar", admin_users_path, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</section>

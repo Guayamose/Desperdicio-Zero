@@ -1,0 +1,66 @@
+<%= form_with model: [ :admin, @tenant ] do |f| %>
+  <% if @tenant.errors.any? %>
+    <div class="flash alert"><%= @tenant.errors.full_messages.join(", ") %></div>
+  <% end %>
+
+  <section class="panel panel-soft">
+    <h2>Identidad y estado</h2>
+    <div class="form-grid">
+      <div class="field">
+        <%= f.label :name, "Nombre" %>
+        <%= f.text_field :name, placeholder: "Nombre del comedor" %>
+      </div>
+      <div class="field">
+        <%= f.label :slug, "Slug" %>
+        <%= f.text_field :slug, placeholder: "comedor-centro" %>
+      </div>
+      <div class="field">
+        <%= f.label :status, "Estado" %>
+        <%= f.select :status, Tenant.statuses.keys %>
+      </div>
+      <div class="field">
+        <%= f.label :contact_email, "Email de contacto" %>
+        <%= f.email_field :contact_email %>
+      </div>
+      <div class="field">
+        <%= f.label :contact_phone, "Telefono" %>
+        <%= f.text_field :contact_phone %>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel panel-soft">
+    <h2>Ubicacion</h2>
+    <div class="form-grid">
+      <div class="field">
+        <%= f.label :address, "Direccion" %>
+        <%= f.text_field :address %>
+      </div>
+      <div class="field">
+        <%= f.label :city, "Ciudad" %>
+        <%= f.text_field :city %>
+      </div>
+      <div class="field">
+        <%= f.label :region, "Region" %>
+        <%= f.text_field :region %>
+      </div>
+      <div class="field">
+        <%= f.label :country, "Pais" %>
+        <%= f.text_field :country %>
+      </div>
+      <div class="field">
+        <%= f.label :latitude, "Latitud" %>
+        <%= f.number_field :latitude, step: 0.000001 %>
+      </div>
+      <div class="field">
+        <%= f.label :longitude, "Longitud" %>
+        <%= f.number_field :longitude, step: 0.000001 %>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <%= f.submit @tenant.persisted? ? "Guardar cambios" : "Crear comedor", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_tenants_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

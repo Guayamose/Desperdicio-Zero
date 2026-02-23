@@ -1,0 +1,40 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title"><%= @tenant.name %></h1>
+    <p class="page-subtitle">Detalle administrativo del tenant <code><%= @tenant.slug %></code>.</p>
+  </div>
+  <div class="toolbar">
+    <%= status_pill(@tenant.status) %>
+    <%= link_to "Editar", edit_admin_tenant_path(@tenant), class: "btn btn-secondary btn-sm" %>
+    <%= link_to "Volver", admin_tenants_path, class: "btn btn-secondary btn-sm" %>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="detail-grid">
+    <div class="detail-item">
+      <div class="detail-label">Slug</div>
+      <div class="detail-value"><%= @tenant.slug %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Estado</div>
+      <div class="detail-value"><%= status_pill(@tenant.status) %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Direccion</div>
+      <div class="detail-value"><%= present_or_dash(@tenant.address) %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Ubicacion</div>
+      <div class="detail-value"><%= present_or_dash([@tenant.city, @tenant.region, @tenant.country].compact.join(", ")) %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Email</div>
+      <div class="detail-value"><%= present_or_dash(@tenant.contact_email) %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Telefono</div>
+      <div class="detail-value"><%= present_or_dash(@tenant.contact_phone) %></div>
+    </div>
+  </div>
+</section>

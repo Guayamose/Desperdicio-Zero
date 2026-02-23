@@ -1,0 +1,62 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title"><%= @user.full_name %></h1>
+    <p class="page-subtitle"><%= @user.email %></p>
+  </div>
+  <div class="toolbar">
+    <%= status_pill(@user.blocked_at.present? ? "blocked" : "active") %>
+    <%= status_pill(@user.system_admin? ? "system_admin" : "inactive") %>
+    <%= link_to "Volver", admin_users_path, class: "btn btn-secondary btn-sm" %>
+  </div>
+</section>
+
+<section class="split-panel">
+  <article class="panel">
+    <h2>Datos de cuenta</h2>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-label">Locale</div>
+        <div class="detail-value"><%= @user.locale %></div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Consentimiento GDPR</div>
+        <div class="detail-value"><%= ui_datetime(@user.gdpr_consent_at) %></div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Bloqueado</div>
+        <div class="detail-value"><%= ui_datetime(@user.blocked_at) %></div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Ultima actividad</div>
+        <div class="detail-value"><%= ui_datetime(@user.last_seen_at) %></div>
+      </div>
+    </div>
+
+    <div class="actions mt-md">
+      <% unless @user.blocked_at.present? %>
+        <%= button_to "Bloquear", block_admin_user_path(@user), method: :patch, data: { turbo_confirm: "Bloquear usuario?" }, class: "btn btn-danger btn-sm", form: { class: "inline-form" } %>
+      <% end %>
+      <%= button_to "Anonimizar GDPR", anonymize_admin_user_path(@user), method: :patch, data: { turbo_confirm: "Anonimizar datos personales?" }, class: "btn btn-secondary btn-sm", form: { class: "inline-form" } %>
+      <%= link_to "Exportar datos GDPR", export_admin_user_path(@user), class: "btn btn-secondary btn-sm" %>
+    </div>
+  </article>
+
+  <article class="panel">
+    <h2>Membresias</h2>
+    <% if @user.memberships.any? %>
+      <ul class="list-clean">
+        <% @user.memberships.each do |membership| %>
+          <li class="menu-item">
+            <div class="menu-item-head">
+              <strong><%= membership.tenant.name %></strong>
+              <%= status_pill(membership.role) %>
+            </div>
+            <p class="muted">Activo: <%= yes_no(membership.active) %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="empty-state">No tiene membresias activas.</div>
+    <% end %>
+  </article>
+</section>
