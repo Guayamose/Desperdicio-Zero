@@ -7,8 +7,7 @@ class GenerateDailyMenuJob
     tenant = Tenant.find(tenant_id)
     user = User.find_by(id: user_id)
     Menus::GenerateDailyMenuService.new(tenant: tenant, user: user).call(
-      date: date.present? ? Date.parse(date) : Date.current,
-      allow_async_retry: false
+      date: date.present? ? Date.parse(date) : Date.current
     )
   end
 end

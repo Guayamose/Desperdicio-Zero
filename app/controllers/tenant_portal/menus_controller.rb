@@ -1,6 +1,6 @@
 module TenantPortal
   class MenusController < TenantPortal::BaseController
-    before_action :set_menu, only: [ :show, :edit, :update, :publish ]
+    before_action :set_menu, only: [ :show, :edit, :update, :publish, :destroy ]
 
     def index
       @menus = tenant_scope(DailyMenu).includes(:daily_menu_items).order(menu_date: :desc)
@@ -55,11 +55,16 @@ module TenantPortal
         return
       end
 
+      if menu.persisted?
+        redirect_to tenant_menu_path(menu), alert: "Ya existe un menu para #{I18n.l(menu_date)}. Solo se permite un menu por dia."
+        return
+      end
+
       generated_menu = Menus::GenerateDailyMenuService.new(tenant: current_tenant, user: current_user).call(
         date: menu_date,
         selected_lot_ids: selected_lot_ids
       )
-      redirect_to tenant_menu_path(generated_menu), notice: "Generacion completada"
+      redirect_to tenant_menu_path(generated_menu), notice: "Preview generado. Revisa el resumen y confirma para publicarlo."
     rescue Date::Error
       redirect_to tenant_menus_path, alert: "Fecha invalida"
     end
@@ -70,6 +75,19 @@ module TenantPortal
 
       AuditLogger.log!(action: "menu.published", actor: current_user, tenant: current_tenant, entity: @menu, metadata: {}, ip_address: request.remote_ip)
       redirect_to tenant_menu_path(@menu), notice: "Menu publicado"
+    end
+
+    def destroy
+      authorize @menu
+
+      if @menu.published?
+        redirect_to tenant_menu_path(@menu), alert: "No se puede eliminar un menu ya publicado."
+        return
+      end
+
+      @menu.destroy!
+      AuditLogger.log!(action: "menu.deleted", actor: current_user, tenant: current_tenant, entity: @menu, metadata: {}, ip_address: request.remote_ip)
+      redirect_to tenant_menus_path, notice: "Menu eliminado"
     end
 
     private
@@ -83,7 +101,6 @@ module TenantPortal
         :menu_date,
         :title,
         :description,
-        :status,
         allergens_json: [],
         daily_menu_items_attributes: [ :id, :name, :description, :position, :_destroy, { ingredients_json: [], allergens_json: [] } ]
       ).to_h

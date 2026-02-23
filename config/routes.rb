@@ -70,8 +70,8 @@ Rails.application.routes.draw do
     # Escaneo: solo formulario + creacion.
     resources :scans, only: [ :new, :create ]
 
-    # Menus internos: sin destroy por ahora.
-    resources :menus, only: [ :index, :show, :new, :create, :edit, :update ] do
+    # Menus internos.
+    resources :menus, only: [ :index, :show, :new, :create, :edit, :update, :destroy ] do
       # member = opera sobre un menu concreto (requiere :id en URL)
       # POST /tenant/menus/:id/publish
       post :publish, on: :member
@@ -96,6 +96,10 @@ Rails.application.routes.draw do
   # - Controller: busca en app/controllers/admin/*
   # - Helpers: prefijo admin_*
   namespace :admin do
+    # Landing del panel admin (placeholder inicial).
+    root to: "dashboard#show"
+    resource :dashboard, only: [ :show ], controller: :dashboard
+
     # CRUD completo de tenants para admin global.
     resources :tenants
 

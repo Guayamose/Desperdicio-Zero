@@ -5,7 +5,7 @@
 <%= form_with model: [ :tenant, @inventory_lot ],
   data: {
     controller: "inventory-form",
-    inventory_form_scan_url_value: api_v1_tenant_inventory_scan_path
+    inventory_form_scan_url_value: api_v1_tenant_scan_path
   } do |f| %>
   <% if @inventory_lot.errors.any? %>
     <div class="flash alert"><%= @inventory_lot.errors.full_messages.join(", ") %></div>

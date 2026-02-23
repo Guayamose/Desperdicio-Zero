@@ -15,10 +15,6 @@
         <%= f.text_field :title, placeholder: "Ejemplo: Menu solidario del dia" %>
       </div>
       <div class="field">
-        <%= f.label :status, "Estado" %>
-        <%= f.select :status, DailyMenu.statuses.keys %>
-      </div>
-      <div class="field">
         <%= f.label :allergens_json, "Alergenos (separados por coma)" %>
         <%= text_field_tag "daily_menu[allergens_json][]", Array(@menu.allergens_json).join(", "), placeholder: "gluten, frutos secos" %>
       </div>

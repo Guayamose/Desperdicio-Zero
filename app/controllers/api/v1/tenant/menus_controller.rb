@@ -9,6 +9,14 @@ module Api
           menu = current_tenant.daily_menus.find_or_initialize_by(menu_date: menu_date)
           authorize menu, :create?
 
+          if menu.persisted?
+            return render_error(
+              code: "menu_already_exists",
+              message: "Only one menu per day is allowed",
+              status: :conflict
+            )
+          end
+
           generated = Menus::GenerateDailyMenuService.new(tenant: current_tenant, user: current_user).call(date: menu_date)
           render_resource(generated.as_json(include: :daily_menu_items), status: :created)
         rescue Date::Error
@@ -50,7 +58,6 @@ module Api
           raw = params.require(:daily_menu).permit(
             :title,
             :description,
-            :status,
             allergens_json: [],
             daily_menu_items_attributes: [ :id, :name, :description, :position, :_destroy, { ingredients_json: [], allergens_json: [] } ]
           ).to_h

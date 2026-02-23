@@ -9,7 +9,7 @@ module Menus
       @ai_client = ai_client
     end
 
-    def call(date: Date.current, allow_async_retry: true, selected_lot_ids: nil)
+    def call(date: Date.current, selected_lot_ids: nil)
       lots = selected_lots(selected_lot_ids)
       ingredients = self.class.ingredients_for(lots)
 
@@ -51,8 +51,6 @@ module Menus
           latency_ms: duration_ms(started_at),
           error_code: e.class.name
         )
-
-        enqueue_async_retry(date) if allow_async_retry
 
         AuditLogger.log!(
           action: "menu.fallback",
@@ -137,7 +135,7 @@ module Menus
       @tenant.daily_menus.find_or_initialize_by(menu_date: date).tap do |menu|
         menu.assign_attributes(
           title: "Menu pendiente de confirmacion",
-          description: "No se pudo generar automaticamente con IA. Edita manualmente este borrador y vuelve a intentar.",
+          description: "No se pudo generar con IA. Edita manualmente este borrador y confirma cuando este listo.",
           status: :draft,
           generated_by: :manual,
           created_by: @user
@@ -150,10 +148,5 @@ module Menus
       ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).to_i
     end
 
-    def enqueue_async_retry(date)
-      GenerateDailyMenuJob.perform_async(@tenant.id, @user&.id, date.to_s)
-    rescue StandardError
-      nil
-    end
   end
 end
