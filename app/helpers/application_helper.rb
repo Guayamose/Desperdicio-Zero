@@ -103,7 +103,7 @@ module ApplicationHelper
     when :tenant
       return [] unless current_tenant
 
-      [
+      items = [
         [ "Resumen", tenant_dashboard_path ],
         [ "Inventario", tenant_inventory_lots_path ],
         [ "Escaneo", new_tenant_scan_path ],
@@ -111,6 +111,8 @@ module ApplicationHelper
         [ "Generador IA", generate_tenant_menus_path(date: Date.current) ],
         [ "Alertas", tenant_alerts_expirations_path ]
       ]
+      items << [ "Empleados", tenant_employees_path ] if current_user&.tenant_manager_in?(current_tenant)
+      items
     else
       []
     end

@@ -86,6 +86,9 @@ Rails.application.routes.draw do
     # Vista de alertas de caducidad.
     # Helper: tenant_alerts_expirations_path
     get "alerts/expirations", to: "alerts#expirations", as: :alerts_expirations
+
+    # Empleados del comedor (solo tenant_manager).
+    resources :employees, only: [ :index ]
   end
 
   # --------------------------------------------------------------------------

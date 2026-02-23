@@ -1,0 +1,50 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Gestión de Personal</span>
+    <h1 class="page-title">Empleados de <%= current_tenant.name %></h1>
+    <p class="page-subtitle">Miembros asignados a este comedor.</p>
+  </div>
+</section>
+
+<section class="panel" style="padding: 1.5rem;">
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @memberships.each do |membership| %>
+          <tr>
+            <td style="padding: 1.25rem 1rem;">
+              <div style="font-weight: 700; color: var(--text);"><%= membership.user.full_name %></div>
+            </td>
+            <td>
+              <span style="color: var(--text-muted);"><%= membership.user.email %></span>
+            </td>
+            <td><%= status_pill(membership.role) %></td>
+            <td>
+              <% if membership.user.blocked_at.present? %>
+                <%= status_pill("blocked") %>
+              <% elsif membership.active %>
+                <%= status_pill("active") %>
+              <% else %>
+                <%= status_pill("inactive") %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @memberships.empty? %>
+    <div class="empty-state" style="margin-top: 2rem;">
+      No hay empleados registrados en este comedor.
+    </div>
+  <% end %>
+</section>
