@@ -1,0 +1,125 @@
+<%= form_with model: [ :tenant, @menu ], url: @menu.persisted? ? tenant_menu_path(@menu) : tenant_menus_path do |f| %>
+  <% if @menu.errors.any? %>
+    <div class="flash alert"><%= @menu.errors.full_messages.join(", ") %></div>
+  <% end %>
+
+  <section class="panel panel-soft">
+    <h2>Datos generales</h2>
+    <div class="form-grid">
+      <div class="field">
+        <%= f.label :menu_date, "Fecha" %>
+        <%= f.date_field :menu_date %>
+      </div>
+      <div class="field">
+        <%= f.label :title, "Titulo" %>
+        <%= f.text_field :title, placeholder: "Ejemplo: Menu solidario del dia" %>
+      </div>
+      <div class="field">
+        <%= f.label :status, "Estado" %>
+        <%= f.select :status, DailyMenu.statuses.keys %>
+      </div>
+      <div class="field">
+        <%= f.label :allergens_json, "Alergenos (separados por coma)" %>
+        <%= text_field_tag "daily_menu[allergens_json][]", Array(@menu.allergens_json).join(", "), placeholder: "gluten, frutos secos" %>
+      </div>
+    </div>
+
+    <div class="field">
+      <%= f.label :description, "Descripcion" %>
+      <%= f.text_area :description, rows: 3, placeholder: "Resumen del menu, criterios nutricionales o notas operativas" %>
+    </div>
+  </section>
+
+  <section class="panel" data-controller="menu-items">
+    <div class="title-row mb-sm">
+      <h2>Platos (<span data-menu-items-target="count"></span>)</h2>
+      <button type="button" class="btn btn-secondary btn-sm" data-action="menu-items#add">Anadir plato</button>
+    </div>
+
+    <div data-menu-items-target="container">
+      <% @menu.daily_menu_items.each_with_index do |item, idx| %>
+        <div class="menu-item" data-menu-item>
+          <div class="menu-item-head">
+            <strong>Plato <%= idx + 1 %></strong>
+            <button type="button" class="btn btn-danger btn-sm" data-action="menu-items#remove">Quitar</button>
+          </div>
+
+          <%= f.fields_for :daily_menu_items, item do |item_form| %>
+            <div class="form-grid">
+              <div class="field">
+                <%= item_form.label :name, "Nombre" %>
+                <%= item_form.text_field :name, placeholder: "Nombre del plato" %>
+              </div>
+              <div class="field">
+                <%= item_form.label :position, "Posicion" %>
+                <%= item_form.number_field :position, value: item.position || idx, min: 0 %>
+              </div>
+            </div>
+
+            <div class="field">
+              <%= item_form.label :description, "Descripcion" %>
+              <%= item_form.text_area :description, rows: 2, placeholder: "Preparacion o detalle del plato" %>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <%= item_form.label :ingredients_json, "Ingredientes (coma)" %>
+                <%= text_field_tag "daily_menu[daily_menu_items_attributes][#{idx}][ingredients_json][]", Array(item.ingredients_json).join(", "), placeholder: "arroz, cebolla, tomate" %>
+              </div>
+              <div class="field">
+                <%= item_form.label :allergens_json, "Alergenos (coma)" %>
+                <%= text_field_tag "daily_menu[daily_menu_items_attributes][#{idx}][allergens_json][]", Array(item.allergens_json).join(", "), placeholder: "gluten, lacteos" %>
+              </div>
+            </div>
+
+            <%= item_form.hidden_field :id if item.persisted? %>
+            <%= item_form.hidden_field :_destroy, value: "0" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <template data-menu-items-target="template">
+      <div class="menu-item" data-menu-item>
+        <div class="menu-item-head">
+          <strong>Nuevo plato</strong>
+          <button type="button" class="btn btn-danger btn-sm" data-action="menu-items#remove">Quitar</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>Nombre</label>
+            <input type="text" name="daily_menu[daily_menu_items_attributes][NEW_RECORD][name]" placeholder="Nombre del plato">
+          </div>
+          <div class="field">
+            <label>Posicion</label>
+            <input type="number" min="0" value="0" name="daily_menu[daily_menu_items_attributes][NEW_RECORD][position]">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Descripcion</label>
+          <textarea rows="2" name="daily_menu[daily_menu_items_attributes][NEW_RECORD][description]" placeholder="Preparacion o detalle del plato"></textarea>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>Ingredientes (coma)</label>
+            <input type="text" name="daily_menu[daily_menu_items_attributes][NEW_RECORD][ingredients_json][]" placeholder="arroz, zanahoria, cebolla">
+          </div>
+          <div class="field">
+            <label>Alergenos (coma)</label>
+            <input type="text" name="daily_menu[daily_menu_items_attributes][NEW_RECORD][allergens_json][]" placeholder="gluten, soja">
+          </div>
+        </div>
+
+        <input type="hidden" name="daily_menu[daily_menu_items_attributes][NEW_RECORD][_destroy]" value="0">
+      </div>
+    </template>
+  </section>
+
+  <div class="actions">
+    <%= f.submit @menu.persisted? ? "Guardar cambios" : "Crear menu", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", tenant_menus_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

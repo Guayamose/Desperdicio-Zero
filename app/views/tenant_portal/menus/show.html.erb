@@ -1,0 +1,77 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow"><%= ui_date(@menu.menu_date) %></span>
+    <h1 class="page-title"><%= @menu.title %></h1>
+    <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+      <%= status_pill(@menu.status) %>
+      <%= status_pill(@menu.generated_by) %>
+    </div>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Regresar", tenant_menus_path, class: "btn btn-secondary" %>
+    <%= link_to "Editar", edit_tenant_menu_path(@menu), class: "btn btn-secondary" %>
+    <% unless @menu.published? %>
+      <%= button_to publish_tenant_menu_path(@menu), method: :post, class: "btn btn-primary" do %>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Publicar Menú
+      <% end %>
+    <% end %>
+  </div>
+</section>
+
+<section class="split-panel">
+  <div class="stack" style="display: flex; flex-direction: column; gap: 2rem;">
+    <article class="panel">
+      <h2 style="margin-bottom: 1.5rem;">Platos Propuestos</h2>
+      <% if @menu.daily_menu_items.any? %>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <% @menu.daily_menu_items.each do |item| %>
+            <div class="menu-item" style="border-left: 4px solid var(--primary);">
+              <div class="menu-item-head">
+                <h3 style="margin: 0;"><%= item.name %></h3>
+              </div>
+              <p style="margin-bottom: 1rem;"><%= item.description %></p>
+              
+              <div style="display: flex; gap: 2rem; border-top: 1px solid var(--line-light); padding-top: 1rem;">
+                <% if item.ingredients_json.present? %>
+                  <div>
+                    <span class="context-label">Ingredientes</span>
+                    <p style="font-size: 0.875rem; margin-top: 0.25rem;"><%= Array(item.ingredients_json).join(", ") %></p>
+                  </div>
+                <% end %>
+                <% if item.allergens_json.present? %>
+                  <div>
+                    <span class="context-label" style="color: var(--danger);">Alérgenos</span>
+                    <p style="font-size: 0.875rem; margin-top: 0.25rem; color: var(--danger); font-weight: 600;"><%= Array(item.allergens_json).join(", ") %></p>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state">No hay platos registrados en este menú.</div>
+      <% end %>
+    </article>
+  </div>
+
+  <div class="stack" style="display: flex; flex-direction: column; gap: 2rem;">
+    <article class="panel panel-soft">
+      <h3>Nota del Chef</h3>
+      <p style="font-style: italic;"><%= present_or_dash(@menu.description) %></p>
+      
+      <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--line);">
+        <h4 style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">ALÉRGENOS GENERALES</h4>
+        <% if @menu.allergens_json.present? %>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            <% Array(@menu.allergens_json).each do |allergen| %>
+              <span class="status-pill status-danger" style="background: var(--danger-soft); color: var(--danger);"><%= allergen %></span>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="help-text">Sin alérgenos detectados.</p>
+        <% end %>
+      </div>
+    </article>
+  </div>
+</section>

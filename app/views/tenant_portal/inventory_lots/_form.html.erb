@@ -1,0 +1,117 @@
+<% selected_product = @selected_product || @inventory_lot.product %>
+<% barcode_value = @prefill_barcode.presence || params.dig(:inventory_lot, :barcode).presence %>
+<% product_name_value = @prefill_product_name.presence || params.dig(:inventory_lot, :product_name).presence || selected_product&.name %>
+
+<%= form_with model: [ :tenant, @inventory_lot ],
+  data: {
+    controller: "inventory-form",
+    inventory_form_scan_url_value: api_v1_tenant_inventory_scan_path
+  } do |f| %>
+  <% if @inventory_lot.errors.any? %>
+    <div class="flash alert"><%= @inventory_lot.errors.full_messages.join(", ") %></div>
+  <% end %>
+
+  <div class="panel panel-soft">
+    <h2>Producto</h2>
+    <div class="form-grid">
+      <div class="field">
+        <%= f.label :product_id, "Producto existente" %>
+        <%= f.collection_select :product_id,
+          Product.order(:name),
+          :id,
+          :name,
+          { include_blank: "Seleccionar", selected: selected_product&.id },
+          { data: { inventory_form_target: "product" } } %>
+        <span class="help-text">Selecciona un producto ya registrado o usa barcode/manual.</span>
+      </div>
+
+      <div class="field">
+        <%= f.label :barcode, "Codigo de barras" %>
+        <div class="input-inline">
+          <%= f.text_field :barcode,
+            value: barcode_value,
+            placeholder: "Ejemplo: 8412345678901",
+            inputmode: "numeric",
+            autocomplete: "off",
+            data: {
+              inventory_form_target: "barcode",
+              action: "blur->inventory-form#lookup"
+            } %>
+          <button type="button" class="btn btn-secondary btn-sm" data-action="inventory-form#lookup">
+            Autorrellenar
+          </button>
+        </div>
+        <p class="help-text" data-inventory-form-target="status">Escanea o escribe un codigo para completar datos automaticamente.</p>
+      </div>
+
+      <div class="field field-full">
+        <%= f.label :product_name, "Nombre manual (opcional)" %>
+        <%= f.text_field :product_name,
+          value: product_name_value,
+          placeholder: "Usado si el producto no existe en catalogo",
+          data: { inventory_form_target: "productName" } %>
+      </div>
+    </div>
+
+    <div class="product-preview <%= selected_product.present? ? "" : "is-hidden" %>" data-inventory-form-target="preview">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Producto</div>
+          <div class="detail-value" data-inventory-form-target="previewName"><%= selected_product&.name || "-" %></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Marca</div>
+          <div class="detail-value" data-inventory-form-target="previewBrand"><%= selected_product&.brand.presence || "-" %></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Categoria</div>
+          <div class="detail-value" data-inventory-form-target="previewCategory"><%= selected_product&.category.presence || "-" %></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Alergenos</div>
+          <div class="detail-value" data-inventory-form-target="previewAllergens"><%= selected_product.present? ? (Array(selected_product.allergens_json).presence&.join(", ") || "Ninguno") : "-" %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-soft">
+    <h2>Stock</h2>
+    <div class="form-grid">
+      <div class="field">
+        <%= f.label :quantity, "Cantidad" %>
+        <%= f.number_field :quantity, step: 0.01 %>
+      </div>
+      <div class="field">
+        <%= f.label :unit, "Unidad" %>
+        <%= f.select :unit, InventoryLot.units.keys %>
+      </div>
+      <div class="field">
+        <%= f.label :expires_on, "Caducidad" %>
+        <%= f.date_field :expires_on %>
+      </div>
+      <div class="field">
+        <%= f.label :received_on, "Recepcion" %>
+        <%= f.date_field :received_on %>
+      </div>
+      <div class="field">
+        <%= f.label :status %>
+        <%= f.select :status, InventoryLot.statuses.keys %>
+      </div>
+      <div class="field">
+        <%= f.label :source, "Origen" %>
+        <%= f.select :source, InventoryLot.sources.keys %>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.label :notes, "Notas" %>
+    <%= f.text_area :notes, rows: 3, placeholder: "Observaciones sobre estado, almacenamiento o trazabilidad" %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit @inventory_lot.persisted? ? "Guardar cambios" : "Crear lote", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", tenant_inventory_lots_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

@@ -1,0 +1,140 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow" style="color: var(--primary); font-weight: 800;">GESTIÓN OPERATIVA</span>
+    <h1 class="page-title"><%= current_tenant.name %></h1>
+  </div>
+  <div class="toolbar">
+    <%= link_to new_tenant_scan_path, class: "btn btn-primary" do %>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+      Escanear Lote
+    <% end %>
+  </div>
+</section>
+
+<section class="metric-grid">
+  <article class="metric-card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div class="metric-label">Stock Actual</div>
+        <div class="metric-value"><%= @inventory_count %></div>
+      </div>
+      <div style="color: var(--primary); opacity: 0.5;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-4-9 4v8l9 4 9-4V8z"></path><path d="M3 8l9 4 9-4"></path><path d="M12 12v10"></path></svg>
+      </div>
+    </div>
+    <p class="metric-caption">Lotes registrados</p>
+  </article>
+
+  <article class="metric-card" style="border-bottom: 4px solid var(--danger);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div class="metric-label" style="color: var(--danger);">Críticos</div>
+        <div class="metric-value" style="color: var(--danger);"><%= @expiring_count %></div>
+      </div>
+      <div style="color: var(--danger); opacity: 0.5;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </div>
+    </div>
+    <p class="metric-caption">Vencen en < 48h</p>
+  </article>
+
+  <article class="metric-card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div class="metric-label">Menús OK</div>
+        <div class="metric-value"><%= @today_menu.present? ? "1" : "0" %></div>
+      </div>
+      <div style="color: var(--secondary); opacity: 0.5;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </div>
+    </div>
+    <p class="metric-caption">Estado de hoy</p>
+  </article>
+
+  <article class="metric-card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div class="metric-label">Latencia IA</div>
+        <div class="metric-value"><%= @latest_generation&.latency_ms || "---" %><small style="font-size: 0.8rem; margin-left: 2px;">ms</small></div>
+      </div>
+      <div style="color: var(--accent); opacity: 0.5;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+      </div>
+    </div>
+    <p class="metric-caption">Última generación</p>
+  </article>
+</section>
+
+<section class="split-panel">
+  <div class="panel-stack">
+    <article class="hero-surface panel" style="padding: 3rem; background: var(--surface); border-width: 2px; border-color: var(--primary-soft);">
+      <div style="display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;">
+        <div>
+          <span class="status-pill status-positive" style="margin-bottom: 1rem;">MENÚ RECOMENDADO</span>
+          <% if @today_menu.present? %>
+            <h2 style="font-size: 3rem; margin: 0.5rem 0; line-height: 1;"><%= @today_menu.title %></h2>
+            <p style="font-size: 1.25rem; color: var(--text-muted); margin: 1.5rem 0 2rem;"><%= truncate(@today_menu.description, length: 140) %></p>
+            <div class="actions">
+              <%= link_to tenant_menu_path(@today_menu), class: "btn btn-primary" do %>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                Gestionar Menú
+              <% end %>
+            </div>
+          <% else %>
+            <h2 style="font-size: 3rem; margin: 0.5rem 0; line-height: 1;">Diseña el día</h2>
+            <p style="font-size: 1.25rem; color: var(--text-muted); margin: 1.5rem 0 2rem;">No hay menú para hoy. Deja que la IA analice el stock crítico.</p>
+            <%= link_to generate_tenant_menus_path(date: Date.current), class: "btn btn-primary btn-lg" do %>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4m0 14v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m14 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83M12 7a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5z"></path></svg>
+              Generar con IA
+            <% end %>
+          <% end %>
+        </div>
+        <div style="width: 200px; height: 200px; background: var(--primary-soft); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+           <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
+        </div>
+      </div>
+    </article>
+
+    <div class="grid-2">
+      <%= link_to tenant_inventory_lots_path, class: "panel panel-soft", style: "text-decoration: none; color: inherit; transition: var(--transition);" do %>
+        <div style="color: var(--primary); margin-bottom: 1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+        </div>
+        <h3 style="margin: 0;">Consultar Almacén</h3>
+        <p class="help-text">Visualiza todo el stock disponible y trazabilidad.</p>
+      <% end %>
+
+      <%= link_to tenant_alerts_expirations_path, class: "panel panel-soft", style: "text-decoration: none; color: inherit; transition: var(--transition);" do %>
+        <div style="color: var(--danger); margin-bottom: 1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        </div>
+        <h3 style="margin: 0;">Centro de Alertas</h3>
+        <p class="help-text">Gestiona los avisos de caducidad inminente.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <article class="panel" style="padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
+    <div style="padding: 2rem; background: var(--surface);">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <h3 style="margin: 0;">Tu Comedor</h3>
+      </div>
+      <p class="help-text"><%= current_tenant.city %>, <%= current_tenant.country %></p>
+    </div>
+    
+    <div style="height: 340px; background: var(--line-light); position: relative;">
+      <% if (map_url = tenant_map_embed_url(current_tenant)).present? %>
+        <iframe width="100%" height="100%" frameborder="0" style="border:0; filter: grayscale(0.2) contrast(1.1);" src="<%= map_url %>" allowfullscreen></iframe>
+      <% else %>
+        <div class="empty-state" style="height: 100%; display: flex; align-items: center; justify-content: center; border: 0;">
+          Ubicación no configurada
+        </div>
+      <% end %>
+    </div>
+    
+    <div style="padding: 1.5rem; border-top: 1px solid var(--line); display: grid; gap: 0.75rem;">
+      <%= link_to "Ajustes de Ubicación", "#", class: "btn btn-secondary", style: "width: 100%; justify-content: center;" %>
+    </div>
+  </article>
+</section>

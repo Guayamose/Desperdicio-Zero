@@ -1,0 +1,56 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Escaneo de productos</h1>
+    <p class="page-subtitle">Escanea con lector o camara y pasa al lote con datos autorellenados desde OpenFoodFacts.</p>
+  </div>
+</section>
+
+<section class="split-panel" data-controller="barcode-scanner" data-barcode-scanner-auto-submit-value="true">
+  <article class="panel">
+    <%= form_with url: tenant_scans_path, method: :post, data: { barcode_scanner_target: "form" } do |f| %>
+      <div class="form-grid">
+        <div class="field">
+          <%= f.label :barcode, "Codigo de barras" %>
+          <%= f.text_field :barcode, required: true, placeholder: "Escanea o escribe el codigo", inputmode: "numeric", autocomplete: "off", data: { barcode_scanner_target: "barcode" } %>
+        </div>
+
+        <div class="field">
+          <%= f.label :source, "Fuente" %>
+          <%= f.select :source, [["USB / Manual", "usb"], ["Camara", "camera"]], {}, data: { barcode_scanner_target: "source" } %>
+        </div>
+      </div>
+
+      <p class="help-text" data-barcode-scanner-target="status">Listo para escanear.</p>
+
+      <div class="actions">
+        <%= f.submit "Buscar producto", class: "btn btn-primary" %>
+        <button type="button" class="btn btn-secondary" data-action="barcode-scanner#scanWithCamera">Leer con camara (auto)</button>
+        <%= link_to "Ir a inventario", tenant_inventory_lots_path, class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </article>
+
+  <article class="panel">
+    <h2>Guia rapida</h2>
+    <ul class="list-clean">
+      <li class="menu-item">
+        <strong>1. Selecciona fuente</strong>
+        <p class="muted">USB/manual para lector fisico o camara para dispositivos moviles.</p>
+      </li>
+      <li class="menu-item">
+        <strong>2. Escanea el codigo</strong>
+        <p class="muted">El sistema busca primero en cache local y despues consulta OpenFoodFacts.</p>
+      </li>
+      <li class="menu-item">
+        <strong>3. Completa y guarda el lote</strong>
+        <p class="muted">Tras detectar codigo, se abre el formulario de lote con producto precargado.</p>
+      </li>
+    </ul>
+
+    <div class="media-card mt-sm">
+      <div class="media-card-visual" data-barcode-scanner-target="preview">
+        <%= image_tag "placeholders/kitchen-03.svg", alt: "Placeholder de escaneo" %>
+      </div>
+    </div>
+  </article>
+</section>

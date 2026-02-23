@@ -1,0 +1,59 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Alertas de caducidad</h1>
+    <p class="page-subtitle">Priorizacion para consumo o descarte segun ventana de vencimiento.</p>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Inventario", tenant_inventory_lots_path, class: "btn btn-secondary btn-sm" %>
+  </div>
+</section>
+
+<section class="grid-2">
+  <article class="panel">
+    <div class="title-row mb-sm">
+      <h2>Caducan en 48h</h2>
+      <span class="status-pill status-warning">Prioridad alta</span>
+    </div>
+
+    <% if @expiring_lots.any? %>
+      <ul class="list-clean">
+        <% @expiring_lots.each do |lot| %>
+          <li class="menu-item">
+            <div class="menu-item-head">
+              <strong><%= lot.product.name %></strong>
+              <%= status_pill(lot.status) %>
+            </div>
+            <p>Caduca: <%= ui_date(lot.expires_on) %></p>
+            <p class="help-text">Cantidad: <%= lot.quantity %> <%= lot.unit %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="empty-state">No hay lotes en riesgo inmediato.</div>
+    <% end %>
+  </article>
+
+  <article class="panel">
+    <div class="title-row mb-sm">
+      <h2>Lotes vencidos</h2>
+      <%= status_pill("expired") %>
+    </div>
+
+    <% if @expired_lots.any? %>
+      <ul class="list-clean">
+        <% @expired_lots.each do |lot| %>
+          <li class="menu-item">
+            <div class="menu-item-head">
+              <strong><%= lot.product.name %></strong>
+              <%= status_pill("expired") %>
+            </div>
+            <p>Caducidad: <%= ui_date(lot.expires_on) %></p>
+            <p class="help-text">Estado actual: <%= status_pill(lot.status) %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="empty-state">No hay lotes vencidos.</div>
+    <% end %>
+  </article>
+</section>

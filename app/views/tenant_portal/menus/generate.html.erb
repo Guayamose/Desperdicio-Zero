@@ -1,0 +1,143 @@
+<section class="page-header page-header-loose">
+  <div>
+    <p class="eyebrow">Generador IA</p>
+    <h1 class="page-title">Generar menu del dia</h1>
+    <p class="page-subtitle">
+      Revisa inventario priorizado por caducidad, valida ingredientes y lanza la generacion con OpenAI.
+    </p>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Volver a menus", tenant_menus_path, class: "btn btn-secondary btn-sm" %>
+    <% if @menu_for_date.present? %>
+      <%= link_to "Ver menu #{ui_date(@menu_date)}", tenant_menu_path(@menu_for_date), class: "btn btn-secondary btn-sm" %>
+    <% end %>
+  </div>
+</section>
+
+<section class="grid-4 metric-grid">
+  <article class="metric-card">
+    <div class="metric-label">Fecha objetivo</div>
+    <div class="metric-value"><%= ui_date(@menu_date) %></div>
+    <p class="metric-caption">Dia para el que se generara el menu.</p>
+  </article>
+
+  <article class="metric-card">
+    <div class="metric-label">Lotes candidatos</div>
+    <div class="metric-value"><%= @candidate_lots.size %></div>
+    <p class="metric-caption">Inventario priorizado por caducidad.</p>
+  </article>
+
+  <article class="metric-card">
+    <div class="metric-label">Lotes seleccionados</div>
+    <div class="metric-value"><%= @selected_lots.size %></div>
+    <p class="metric-caption">Se enviaran como ingredientes a IA.</p>
+  </article>
+
+  <article class="metric-card">
+    <div class="metric-label">Ultima ejecucion</div>
+    <div class="metric-value"><%= @latest_generation&.latency_ms || 0 %>ms</div>
+    <p class="metric-caption"><%= @latest_generation.present? ? @latest_generation.status : "Sin ejecuciones" %></p>
+  </article>
+</section>
+
+<section class="split-panel">
+  <article class="panel">
+    <h2>Inventario priorizado</h2>
+
+    <%= form_with url: generate_tenant_menus_path, method: :get, local: true do %>
+      <div class="form-grid">
+        <div class="field">
+          <label for="menu-date">Fecha del menu</label>
+          <%= date_field_tag :date, @menu_date, id: "menu-date" %>
+        </div>
+      </div>
+
+      <% if @candidate_lots.any? %>
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                <th>Usar</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Caduca</th>
+                <th>Prioridad</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @candidate_lots.each do |lot| %>
+                <% days_to_expiry = (lot.expires_on - Date.current).to_i %>
+                <tr>
+                  <td>
+                    <%= check_box_tag "lot_ids[]", lot.id, @selected_lot_ids.include?(lot.id), id: "lot_#{lot.id}" %>
+                  </td>
+                  <td>
+                    <label for="lot_<%= lot.id %>"><strong><%= lot.product.name %></strong></label>
+                    <div class="help-text">Lote #<%= lot.id %></div>
+                  </td>
+                  <td><%= lot.quantity %> <%= lot.unit %></td>
+                  <td><%= ui_date(lot.expires_on) %></td>
+                  <td>
+                    <% if days_to_expiry <= 1 %>
+                      <span class="status-pill status-danger">Critica (<%= days_to_expiry %>d)</span>
+                    <% elsif days_to_expiry <= 2 %>
+                      <span class="status-pill status-warning">Alta (<%= days_to_expiry %>d)</span>
+                    <% else %>
+                      <span class="status-pill status-neutral">Normal (<%= days_to_expiry %>d)</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="empty-state">No hay lotes disponibles para generar menu.</div>
+      <% end %>
+
+      <div class="actions mt-sm">
+        <%= submit_tag "Actualizar preview", class: "btn btn-secondary btn-sm" %>
+      </div>
+    <% end %>
+  </article>
+
+  <article class="panel panel-soft">
+    <h2>Ingredientes que recibira la IA</h2>
+
+    <% if @ingredients_preview.any? %>
+      <ul class="list-clean">
+        <% @ingredients_preview.each_with_index do |ingredient, index| %>
+          <li class="menu-item">
+            <div class="menu-item-head">
+              <strong><%= ingredient[:product] %></strong>
+              <span class="help-text">Ingrediente <%= index + 1 %></span>
+            </div>
+            <p class="muted">
+              <%= ingredient[:quantity] %> <%= ingredient[:unit] %>
+              <% if ingredient[:brand].present? %>
+                - <%= ingredient[:brand] %>
+              <% end %>
+            </p>
+            <p class="help-text">Caduca: <%= ui_date(ingredient[:expiresOn]) %></p>
+            <% if ingredient[:knownAllergens].present? %>
+              <p class="help-text">Alergenos conocidos: <%= ingredient[:knownAllergens].join(", ") %></p>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="empty-state">Selecciona lotes para ver el preview de ingredientes.</div>
+    <% end %>
+
+    <%= form_with url: generate_tenant_menus_path, method: :post, local: true do %>
+      <%= hidden_field_tag :date, @menu_date %>
+      <% @selected_lot_ids.each do |lot_id| %>
+        <%= hidden_field_tag "lot_ids[]", lot_id %>
+      <% end %>
+
+      <div class="actions mt-sm">
+        <%= submit_tag "Generar menu con IA", class: "btn btn-primary", disabled: @selected_lot_ids.empty? %>
+      </div>
+    <% end %>
+  </article>
+</section>

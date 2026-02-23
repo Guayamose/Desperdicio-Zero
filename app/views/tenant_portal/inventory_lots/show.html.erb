@@ -1,0 +1,40 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Lote #<%= @inventory_lot.id %></h1>
+    <p class="page-subtitle"><%= @inventory_lot.product.name %></p>
+  </div>
+  <div class="toolbar">
+    <%= status_pill(@inventory_lot.status) %>
+    <%= link_to "Editar", edit_tenant_inventory_lot_path(@inventory_lot), class: "btn btn-secondary btn-sm" %>
+    <%= link_to "Volver", tenant_inventory_lots_path, class: "btn btn-secondary btn-sm" %>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="detail-grid">
+    <div class="detail-item">
+      <div class="detail-label">Producto</div>
+      <div class="detail-value"><%= @inventory_lot.product.name %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Cantidad</div>
+      <div class="detail-value"><%= @inventory_lot.quantity %> <%= @inventory_lot.unit %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Caducidad</div>
+      <div class="detail-value"><%= ui_date(@inventory_lot.expires_on) %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Recepcion</div>
+      <div class="detail-value"><%= ui_date(@inventory_lot.received_on) %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Origen</div>
+      <div class="detail-value"><%= status_pill(@inventory_lot.source) %></div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-label">Notas</div>
+      <div class="detail-value"><%= present_or_dash(@inventory_lot.notes) %></div>
+    </div>
+  </div>
+</section>
