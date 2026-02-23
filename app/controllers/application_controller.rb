@@ -60,6 +60,11 @@ class ApplicationController < ActionController::Base
     redirect_to root_path, alert: "No tienes permisos de administrador global"
   end
 
+  def after_sign_in_path_for(resource)
+    return admin_root_path if resource.system_admin?
+    super
+  end
+
   def handle_not_authorized
     respond_to do |format|
       format.html { redirect_to root_path, alert: "No autorizado" }
