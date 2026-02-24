@@ -10,5 +10,7 @@ module Public
         menus_today_count: @menus_today.count
       }
     end
+    def privacy
+    end
   end
 end

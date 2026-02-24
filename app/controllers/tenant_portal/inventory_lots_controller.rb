@@ -3,7 +3,22 @@ module TenantPortal
     before_action :set_inventory_lot, only: [ :show, :edit, :update, :destroy ]
 
     def index
-      @inventory_lots = tenant_scope(InventoryLot).includes(:product).order(expires_on: :asc)
+      @inventory_lots = tenant_scope(InventoryLot).includes(:product)
+      
+      direction = params[:direction] == "desc" ? "desc" : "asc"
+      
+      @inventory_lots = case params[:sort]
+                        when "product"
+                          @inventory_lots.order("products.name #{direction}")
+                        when "quantity"
+                          @inventory_lots.order(quantity: direction)
+                        when "status"
+                          @inventory_lots.order(status: direction)
+                        else
+                          direction_default = params[:sort] == "expires_on" ? direction : "asc"
+                          @inventory_lots.order(expires_on: direction_default)
+                        end
+
       authorize InventoryLot
     end
 

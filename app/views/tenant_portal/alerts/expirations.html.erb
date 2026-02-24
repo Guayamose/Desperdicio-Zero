@@ -1,59 +1,99 @@
 <section class="page-header">
   <div>
-    <h1 class="page-title">Alertas de caducidad</h1>
-    <p class="page-subtitle">Priorizacion para consumo o descarte segun ventana de vencimiento.</p>
+    <h1 class="page-title">Centro de Alertas</h1>
+    <p class="page-subtitle">Priorización y gestión de inventario en riesgo.</p>
   </div>
   <div class="toolbar">
-    <%= link_to "Inventario", tenant_inventory_lots_path, class: "btn btn-secondary btn-sm" %>
+    <%= link_to "Ver Inventario Completo", tenant_inventory_lots_path, class: "btn btn-secondary", style: "border-color: var(--line);" %>
   </div>
 </section>
 
+<div class="metric-grid" style="margin-bottom: 3rem;">
+  <div class="metric-card" style="border-left: 4px solid var(--accent); background: linear-gradient(to right, var(--accent-soft) 0%, var(--surface) 20%);">
+    <div class="metric-label" style="color: var(--accent); text-transform: uppercase; font-weight: 800; font-size: 0.75rem;">Atención Requerida</div>
+    <div class="metric-value"><%= @expiring_lots.count %></div>
+    <div class="metric-caption">Lotes que caducan en menos de 48 horas</div>
+  </div>
+
+  <div class="metric-card" style="border-left: 4px solid var(--danger); background: linear-gradient(to right, var(--danger-soft) 0%, var(--surface) 20%);">
+    <div class="metric-label" style="color: var(--danger); text-transform: uppercase; font-weight: 800; font-size: 0.75rem;">Acción Inmediata</div>
+    <div class="metric-value"><%= @expired_lots.count %></div>
+    <div class="metric-caption">Lotes vencidos actualmente en stock</div>
+  </div>
+</div>
+
 <section class="grid-2">
-  <article class="panel">
-    <div class="title-row mb-sm">
-      <h2>Caducan en 48h</h2>
-      <span class="status-pill status-warning">Prioridad alta</span>
+  <article>
+    <div class="title-row" style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 1.25rem; font-family: 'Outfit'; margin: 0;">Caducan en 48h</h2>
+      <span class="status-pill status-warning">Alta Prioridad</span>
     </div>
 
     <% if @expiring_lots.any? %>
-      <ul class="list-clean">
-        <% @expiring_lots.each do |lot| %>
-          <li class="menu-item">
-            <div class="menu-item-head">
-              <strong><%= lot.product.name %></strong>
-              <%= status_pill(lot.status) %>
-            </div>
-            <p>Caduca: <%= ui_date(lot.expires_on) %></p>
-            <p class="help-text">Cantidad: <%= lot.quantity %> <%= lot.unit %></p>
-          </li>
-        <% end %>
-      </ul>
+      <div class="table-shell">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Vence</th>
+              <th>Cant.</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @expiring_lots.each do |lot| %>
+              <tr style="border-bottom: 1px solid var(--line-light); background: var(--surface); transition: var(--transition);" onmouseover="this.style.background='var(--line-light)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 1rem; font-weight: 600; font-size: 0.9rem;"><%= lot.product.name %></td>
+                <td style="padding: 1rem; font-size: 0.9rem; color: var(--text-muted);"><%= ui_date(lot.expires_on) %></td>
+                <td style="padding: 1rem; font-size: 0.9rem;"><%= lot.quantity %> <span style="font-size: 0.75rem; color: var(--text-muted);"><%= lot.unit %></span></td>
+                <td style="padding: 1rem;"><%= status_pill(lot.status) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% else %>
-      <div class="empty-state">No hay lotes en riesgo inmediato.</div>
+      <div class="empty-state" style="background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius-lg); padding: 4rem 2rem;">
+        <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Inventario saludable</p>
+        <span style="font-size: 0.9rem; color: var(--text-muted);">No hay lotes próximos a caducar.</span>
+      </div>
     <% end %>
   </article>
 
-  <article class="panel">
-    <div class="title-row mb-sm">
-      <h2>Lotes vencidos</h2>
-      <%= status_pill("expired") %>
+  <article>
+    <div class="title-row" style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 1.25rem; font-family: 'Outfit'; margin: 0;">Lotes Vencidos</h2>
+      <span class="status-pill status-danger">Crítico</span>
     </div>
 
     <% if @expired_lots.any? %>
-      <ul class="list-clean">
-        <% @expired_lots.each do |lot| %>
-          <li class="menu-item">
-            <div class="menu-item-head">
-              <strong><%= lot.product.name %></strong>
-              <%= status_pill("expired") %>
-            </div>
-            <p>Caducidad: <%= ui_date(lot.expires_on) %></p>
-            <p class="help-text">Estado actual: <%= status_pill(lot.status) %></p>
-          </li>
-        <% end %>
-      </ul>
+      <div class="table-shell" style="border-color: rgba(239, 68, 68, 0.2);">
+        <table style="background: var(--danger-soft);">
+          <thead style="background: rgba(239, 68, 68, 0.05); border-bottom: 1px solid rgba(239, 68, 68, 0.1);">
+            <tr>
+              <th style="color: var(--danger);">Producto</th>
+              <th style="color: var(--danger);">Caducidad</th>
+              <th style="color: var(--danger);">Cant.</th>
+              <th style="text-align: right; color: var(--danger);">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @expired_lots.each do |lot| %>
+              <tr style="border-bottom: 1px solid rgba(239, 68, 68, 0.1);">
+                <td style="padding: 1rem; font-weight: 600; font-size: 0.9rem; color: var(--danger);"><%= lot.product.name %></td>
+                <td style="padding: 1rem; font-size: 0.9rem; color: var(--danger); opacity: 0.8;"><%= ui_date(lot.expires_on) %></td>
+                <td style="padding: 1rem; font-size: 0.9rem; color: var(--danger);"><%= lot.quantity %> <span style="font-size: 0.75rem; opacity: 0.8;"><%= lot.unit %></span></td>
+                <td style="padding: 1rem; text-align: right;"><%= status_pill("expired") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% else %>
-      <div class="empty-state">No hay lotes vencidos.</div>
+      <div class="empty-state" style="background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius-lg); padding: 4rem 2rem;">
+        <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Todo optimizado</p>
+        <span style="font-size: 0.9rem; color: var(--text-muted);">No hay lotes vencidos en el sistema.</span>
+      </div>
     <% end %>
   </article>
 </section>

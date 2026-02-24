@@ -1,67 +1,70 @@
-<section class="page-header">
-  <div>
-    <h1 class="page-title">Escaneo de productos</h1>
-    <p class="page-subtitle">Escanea con lector o camara y pasa al lote con datos autorellenados desde OpenFoodFacts.</p>
+<div class="page-container" style="max-width: 500px; margin: 0 auto; padding: 2rem 1rem;">
+  <div class="header-section" style="margin-bottom: 2rem; text-align: center;">
+    <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; letter-spacing: -0.01em;">Escáner de Producto</h1>
+    <p style="color: var(--text-muted); font-size: 0.9rem;">Lectura automática y registro rápido</p>
   </div>
-</section>
 
-<section class="split-panel" data-controller="barcode-scanner" data-barcode-scanner-auto-submit-value="true">
-  <article class="panel">
-    <%= form_with url: tenant_scans_path, method: :post, data: { barcode_scanner_target: "form" } do |f| %>
-      <div class="media-card" style="margin-bottom: 1rem;">
-        <div class="media-card-visual camera-preview-shell" data-barcode-scanner-target="preview">
-          <div class="camera-idle">
-            <p>Vista de camara inactiva</p>
-            <p class="help-text">Pulsa "Activar camara" para empezar a leer.</p>
+  <div class="card" style="padding: 0; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+    
+    <div data-controller="barcode-scanner" data-barcode-scanner-auto-submit-value="true">
+      <%= form_with url: tenant_scans_path, method: :post, data: { barcode_scanner_target: "form" } do |f| %>
+        
+        <!-- Contenedor del vídeo más compacto para mantener el panel visible -->
+        <div class="camera-live-region" style="background: #000; position: relative; width: 100%; height: 320px; border-bottom: 1px solid var(--line); overflow: hidden;">
+          
+          <!-- ID=camera-scanner-preview ensures Quagga mounts directly here without nesting loops -->
+          <div id="camera-scanner-preview" class="camera-preview-shell" data-barcode-scanner-target="preview" style="position: relative; width: 100%; height: 100%; overflow: hidden;">
+            <div class="camera-idle" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+              <span style="font-size: 0.95rem; color: #fff;">Vista de cámara inactiva</span>
+              <p style="font-size: 0.8rem; color: #ccc; opacity: 0.8;">Pulsa "Activar" para empezar a leer.</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="scan-feedback" data-barcode-scanner-target="scanResult">
-        <span class="scan-feedback-label">Ultimo codigo escaneado</span>
-        <strong class="scan-feedback-code">Aun no se ha detectado ningun codigo</strong>
-      </div>
+        <div style="padding: 1.5rem;">
+          
+          <!-- Indicador de Lectura -->
+          <div class="scan-feedback" data-barcode-scanner-target="scanResult" style="text-align: center; margin-bottom: 1.5rem; border: none; background: var(--line-light);">
+            <span class="scan-feedback-label">Último código escaneado</span>
+            <strong class="scan-feedback-code">Aún no se ha detectado ningún código</strong>
+          </div>
 
-      <div class="form-grid">
-        <div class="field">
-          <%= f.label :barcode, "Codigo de barras" %>
-          <%= f.text_field :barcode, required: true, placeholder: "Escanea o escribe el codigo", inputmode: "numeric", autocomplete: "off", data: { barcode_scanner_target: "barcode" } %>
+          <!-- Controles de Cámara -->
+          <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+            <button type="button" class="btn btn-secondary" style="flex: 1; justify-content: center; background: var(--surface); border: 1px solid var(--line); color: var(--text); padding: 0.6rem;" data-barcode-scanner-target="scanButton" data-action="barcode-scanner#scanWithCamera">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Activar
+            </button>
+            <button type="button" class="btn btn-secondary" style="flex: 1; justify-content: center; background: transparent; border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.6rem;" data-barcode-scanner-target="stopButton" data-action="barcode-scanner#stopCamera" disabled>
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 6px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Detener
+            </button>
+          </div>
+
+          <!-- Input Manual -->
+          <div class="field" style="margin-bottom: 1.5rem;">
+            <div style="position: relative;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              <%= f.text_field :barcode, required: true, class: "input", placeholder: "Ingresa código numérico...", inputmode: "numeric", autocomplete: "off", style: "width: 100%; padding: 0.6rem 0.6rem 0.6rem 2.2rem; border-radius: var(--radius-md); border: 1px solid var(--line); background: transparent; color: var(--text); font-size: 0.95rem; box-sizing: border-box;", data: { barcode_scanner_target: "barcode" } %>
+            </div>
+          </div>
+
+          <!-- Selector Oculto (Requerido por JS) -->
+          <div style="display: none;">
+            <%= f.select :source, [["USB / Manual", "usb"], ["Cámara", "camera"]], {}, data: { barcode_scanner_target: "source" } %>
+          </div>
+
+          <!-- Estado -->
+          <p data-barcode-scanner-target="status" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">Listo para escanear</p>
+
+          <!-- Submit -->
+          <%= f.submit "Consultar Producto", class: "btn btn-primary", style: "width: 100%; justify-content: center; padding: 0.75rem; font-size: 0.95rem; border-radius: var(--radius-md);" %>
         </div>
+      <% end %>
+    </div>
+  </div>
 
-        <div class="field">
-          <%= f.label :source, "Fuente" %>
-          <%= f.select :source, [["USB / Manual", "usb"], ["Camara", "camera"]], {}, data: { barcode_scanner_target: "source" } %>
-        </div>
-      </div>
-
-      <p class="help-text" data-barcode-scanner-target="status">Listo para escanear. Si no abre camara: revisa permisos del navegador y usa HTTPS en movil.</p>
-
-      <div class="actions">
-        <button type="button" class="btn btn-secondary" data-barcode-scanner-target="scanButton" data-action="barcode-scanner#scanWithCamera">Activar camara</button>
-        <button type="button" class="btn btn-secondary" data-barcode-scanner-target="stopButton" data-action="barcode-scanner#stopCamera" disabled>Detener camara</button>
-        <%= f.submit "Buscar producto", class: "btn btn-primary" %>
-        <%= link_to "Ir a inventario", tenant_inventory_lots_path, class: "btn btn-link" %>
-      </div>
+  <div style="text-align: center; margin-top: 1.5rem;">
+    <%= link_to tenant_inventory_lots_path, style: "color: var(--text-muted); text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.25rem;" do %>
+      ← Volver al Inventario
     <% end %>
-  </article>
-
-  <article class="panel">
-    <h2>Guia rapida</h2>
-    <ul class="list-clean">
-      <li class="menu-item">
-        <strong>1. Selecciona fuente</strong>
-        <p class="muted">USB/manual para lector fisico o camara para dispositivos moviles.</p>
-      </li>
-      <li class="menu-item">
-        <strong>2. Escanea el codigo</strong>
-        <p class="muted">El sistema busca primero en cache local y despues consulta OpenFoodFacts.</p>
-      </li>
-      <li class="menu-item">
-        <strong>3. Completa y guarda el lote</strong>
-        <p class="muted">Tras detectar codigo, se abre el formulario de lote con producto precargado.</p>
-      </li>
-    </ul>
-
-    <p class="help-text mt-sm">Compatibilidad: Chrome/Edge/Safari recientes. En movil abre la URL en HTTPS para poder usar camara.</p>
-  </article>
-</section>
+  </div>
+</div>

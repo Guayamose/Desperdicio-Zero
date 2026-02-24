@@ -223,6 +223,33 @@ module ApplicationHelper
     "https://www.openstreetmap.org/?mlat=#{tenant.latitude}&mlon=#{tenant.longitude}#map=14/#{tenant.latitude}/#{tenant.longitude}"
   end
 
+  def sort_link(name, column, **options)
+    is_active = column.to_s == params[:sort]
+    direction = is_active && (params[:direction] == "asc") ? "desc" : "asc"
+    
+    if is_active
+      if params[:direction] == "desc"
+        svg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.25rem;"><polyline points="6 9 12 15 18 9"></polyline></svg>'
+      else
+        svg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.25rem;"><polyline points="18 15 12 9 6 15"></polyline></svg>'
+      end
+    else
+      svg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.25rem; opacity: 0.3;"><polyline points="7 15 12 20 17 15"></polyline><polyline points="7 9 12 4 17 9"></polyline></svg>'
+    end
+    
+    icon = raw(svg)
+    
+    default_options = { 
+      style: "color: inherit; text-decoration: none; display: inline-flex; align-items: center;",
+      data: { turbo_action: "replace" }
+    }
+    
+    query = request.query_parameters.merge(sort: column, direction: direction)
+    link_to(query, **default_options.merge(options)) do
+      safe_join([name, icon])
+    end
+  end
+
   private
 
   def allergen_badge(allergen)

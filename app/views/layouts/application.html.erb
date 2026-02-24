@@ -11,6 +11,7 @@
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <%= yield :head %>
   </head>
 
   <body class="app-area app-area-<%= current_area %>">
@@ -128,6 +129,13 @@
           <ul class="footer-links">
             <li>soporte@socialkitchen.local</li>
             <li>+34 900 100 200</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><%= link_to "Política de Privacidad", privacy_policy_path %></li>
           </ul>
         </section>
       </div>

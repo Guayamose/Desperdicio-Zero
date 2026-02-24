@@ -86,11 +86,11 @@ export default class extends Controller {
         if (this.quaggaDetectedHandler) {
           this.quagga.offDetected(this.quaggaDetectedHandler)
         }
-      } catch (_error) {}
+      } catch (_error) { }
 
       try {
         this.quagga.stop()
-      } catch (_error) {}
+      } catch (_error) { }
     }
 
     this.quagga = null
@@ -105,7 +105,7 @@ export default class extends Controller {
     if (this.videoEl) {
       try {
         this.videoEl.pause()
-      } catch (_error) {}
+      } catch (_error) { }
       this.videoEl.srcObject = null
       this.videoEl = null
     }
@@ -142,18 +142,15 @@ export default class extends Controller {
         type: "LiveStream",
         target: scannerTarget,
         constraints: {
-          facingMode: "environment",
-          width: { min: 640, ideal: 1280 },
-          height: { min: 480, ideal: 720 },
-          aspectRatio: { ideal: 1.777 }
+          facingMode: "environment"
         }
       },
       locator: {
-        patchSize: "x-large",
-        halfSample: false
+        patchSize: "large",
+        halfSample: true
       },
-      numOfWorkers: navigator.hardwareConcurrency ? Math.max(2, Math.min(4, navigator.hardwareConcurrency - 1)) : 2,
-      frequency: 16,
+      numOfWorkers: 1, /* Reduce heavy CPU load which can also cause timeouts */
+      frequency: 10,
       locate: true,
       decoder: {
         readers: [
@@ -189,7 +186,7 @@ export default class extends Controller {
     } catch (_error) {
       try {
         Quagga.stop()
-      } catch (_stopError) {}
+      } catch (_stopError) { }
       this.quagga = null
       this.quaggaDetectedHandler = null
       this.quaggaRunning = false
@@ -376,16 +373,55 @@ export default class extends Controller {
 
   ensureScannerRegion() {
     if (!this.hasPreviewTarget) return
-    this.previewTarget.innerHTML = '<div id="camera-scanner-preview" class="camera-live-region"></div>'
+    // Ensure the container itself exists without destroying Quagga's injection target mid-flight
+    if (!document.getElementById("camera-scanner-preview")) {
+      this.previewTarget.innerHTML = '<div id="camera-scanner-preview" class="camera-live-region" style="position: relative; width: 100%; height: 100%; overflow: hidden;"></div>'
+    } else {
+      // Clear idle message but preserve wrapper
+      const idle = this.previewTarget.querySelector('.camera-idle')
+      if (idle) idle.style.display = 'none'
+    }
+
+    // Inject dynamic CSS constraint so video and canvas sit exactly on top of each other, 
+    // overriding the application CSS 'display: flex' that pushes them side-by-side
+    let style = document.getElementById("quagga-style-override");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "quagga-style-override";
+      style.innerHTML = `
+        #camera-scanner-preview {
+          position: relative !important;
+          display: block !important; 
+        }
+        #camera-scanner-preview video,
+        #camera-scanner-preview canvas.drawingBuffer {
+          position: absolute !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
+        }
+        #camera-scanner-preview canvas.drawingBuffer {
+          z-index: 2 !important;
+        }
+        #camera-scanner-preview video {
+          z-index: 1 !important;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }
 
   renderIdlePreview() {
     if (!this.hasPreviewTarget) return
 
     this.previewTarget.innerHTML = `
-      <div class="camera-idle">
-        <p>Vista de camara inactiva</p>
-        <p class="help-text">Pulsa "Activar camara" para empezar a leer.</p>
+      <div id="camera-scanner-preview" class="camera-live-region" style="position: relative; width: 100%; height: 100%; overflow: hidden;">
+        <div class="camera-idle" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; background: var(--bg);">
+          <span style="font-size: 0.95rem;">Vista de cámara inactiva</span>
+          <p style="font-size: 0.8rem; opacity: 0.8;">Pulsa "Activar" para empezar a leer.</p>
+        </div>
       </div>
     `
   }
@@ -437,7 +473,7 @@ export default class extends Controller {
     }
 
     if (advanced.length > 0) {
-      track.applyConstraints({ advanced }).catch(() => {})
+      track.applyConstraints({ advanced }).catch(() => { })
     }
   }
 }

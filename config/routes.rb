@@ -39,6 +39,8 @@ Rails.application.routes.draw do
     # :slug es un segmento dinamico en la URL.
     # Helper generado: public_tenant_menu_today_path(slug: ...)
     get "comedores/:slug/menu-today", to: "menus#today", as: :public_tenant_menu_today
+
+    get "politica-de-privacidad", to: "home#privacy", as: :privacy_policy
   end
 
   # Redirecciones por compatibilidad con rutas viejas.

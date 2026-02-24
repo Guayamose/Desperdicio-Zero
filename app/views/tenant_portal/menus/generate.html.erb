@@ -119,14 +119,12 @@
 
     <% planning = @planning_preview.is_a?(Hash) ? @planning_preview : {} %>
     <% if planning.present? %>
-      <div class="menu-smart-summary">
-        <div class="menu-smart-summary-card">
-          <h3>Modo sugerido IA</h3>
-          <p><%= planning[:menuGuideline] %></p>
-          <div class="menu-inline-metrics">
-            <span class="menu-inline-metric"><strong><%= planning[:suggestedMode] %></strong></span>
-            <span class="menu-inline-metric"><strong><%= planning[:urgentLots] %></strong> lotes criticos</span>
-          </div>
+      <div class="menu-smart-summary-card" style="margin-bottom: 1rem;">
+        <h3>Modo sugerido IA</h3>
+        <p><%= planning[:menuGuideline] %></p>
+        <div class="menu-inline-metrics">
+          <span class="menu-inline-metric"><strong><%= planning[:suggestedMode] %></strong></span>
+          <span class="menu-inline-metric"><strong><%= planning[:urgentLots] %></strong> lotes criticos</span>
         </div>
       </div>
     <% end %>
