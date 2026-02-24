@@ -12,6 +12,11 @@ module Inventory
 
       product = Product.find_by(barcode: barcode)
       if product
+        refreshed_product = refresh_from_openfoodfacts_if_needed(product, barcode)
+        if refreshed_product.present?
+          return Result.new(product: refreshed_product, source: "openfoodfacts_refresh", success: true)
+        end
+
         maybe_enqueue_sync(product)
         return Result.new(product: product, source: "cache", success: true)
       end
@@ -58,6 +63,28 @@ module Inventory
       return if product.openfoodfacts? && product.last_synced_at.present? && product.last_synced_at > 24.hours.ago
 
       enqueue_sync(product.barcode)
+    end
+
+    def refresh_from_openfoodfacts_if_needed(product, barcode)
+      return nil unless should_refresh_now?(product)
+
+      external_data = @client.fetch_product(barcode)
+      return nil if external_data.blank?
+
+      upsert_openfoodfacts_product(barcode, external_data)
+    rescue StandardError
+      nil
+    end
+
+    def should_refresh_now?(product)
+      return true if placeholder_product_name?(product.name)
+      return false if product.manual?
+
+      product.last_synced_at.blank? || product.last_synced_at <= 24.hours.ago
+    end
+
+    def placeholder_product_name?(value)
+      value.to_s.strip.match?(/\Aproducto\s+\d+\z/i)
     end
 
     def enqueue_sync(barcode)

@@ -8,6 +8,20 @@
 <section class="split-panel" data-controller="barcode-scanner" data-barcode-scanner-auto-submit-value="true">
   <article class="panel">
     <%= form_with url: tenant_scans_path, method: :post, data: { barcode_scanner_target: "form" } do |f| %>
+      <div class="media-card" style="margin-bottom: 1rem;">
+        <div class="media-card-visual camera-preview-shell" data-barcode-scanner-target="preview">
+          <div class="camera-idle">
+            <p>Vista de camara inactiva</p>
+            <p class="help-text">Pulsa "Activar camara" para empezar a leer.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="scan-feedback" data-barcode-scanner-target="scanResult">
+        <span class="scan-feedback-label">Ultimo codigo escaneado</span>
+        <strong class="scan-feedback-code">Aun no se ha detectado ningun codigo</strong>
+      </div>
+
       <div class="form-grid">
         <div class="field">
           <%= f.label :barcode, "Codigo de barras" %>
@@ -20,11 +34,12 @@
         </div>
       </div>
 
-      <p class="help-text" data-barcode-scanner-target="status">Listo para escanear.</p>
+      <p class="help-text" data-barcode-scanner-target="status">Listo para escanear. Si no abre camara: revisa permisos del navegador y usa HTTPS en movil.</p>
 
       <div class="actions">
+        <button type="button" class="btn btn-secondary" data-barcode-scanner-target="scanButton" data-action="barcode-scanner#scanWithCamera">Activar camara</button>
+        <button type="button" class="btn btn-secondary" data-barcode-scanner-target="stopButton" data-action="barcode-scanner#stopCamera" disabled>Detener camara</button>
         <%= f.submit "Buscar producto", class: "btn btn-primary" %>
-        <button type="button" class="btn btn-secondary" data-action="barcode-scanner#scanWithCamera">Leer con camara (auto)</button>
         <%= link_to "Ir a inventario", tenant_inventory_lots_path, class: "btn btn-link" %>
       </div>
     <% end %>
@@ -47,10 +62,6 @@
       </li>
     </ul>
 
-    <div class="media-card mt-sm">
-      <div class="media-card-visual" data-barcode-scanner-target="preview">
-        <%= image_tag "placeholders/kitchen-03.svg", alt: "Placeholder de escaneo" %>
-      </div>
-    </div>
+    <p class="help-text mt-sm">Compatibilidad: Chrome/Edge/Safari recientes. En movil abre la URL en HTTPS para poder usar camara.</p>
   </article>
 </section>

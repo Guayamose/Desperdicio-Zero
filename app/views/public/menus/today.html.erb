@@ -74,11 +74,9 @@
       </div>
 
       <% if @menu.allergens_json.present? %>
-        <h3 class="section-title mt-md">Alergenos generales</h3>
-        <div class="menu-chip-group">
-          <% Array(@menu.allergens_json).each do |allergen| %>
-            <span class="menu-chip menu-chip-danger"><%= allergen %></span>
-          <% end %>
+        <div class="help-text">
+          <strong>Alergenos:</strong>
+          <%= allergen_badges(Array(@menu.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
         </div>
       <% end %>
 
@@ -123,6 +121,10 @@
 
               <% if item.religious_notes.present? %>
                 <p class="menu-note menu-note-warning"><strong>Nota religiosa:</strong> <%= item.religious_notes %></p>
+                <div class="help-text">
+                  <strong>Alergenos:</strong>
+                  <%= allergen_badges(Array(item.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
+                </div>
               <% end %>
             </article>
           <% end %>

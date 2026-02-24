@@ -886,6 +886,25 @@ textarea:focus {
   margin-top: 0.25rem;
 }
 
+.field {
+  margin-bottom: 1.25rem;
+}
+
+.field-inline label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+}
+
 /* Flash Messages */
 .flash-stack {
   display: flex;
@@ -1657,6 +1676,47 @@ textarea:focus {
 
 .menu-usage-list li span {
   color: var(--text-muted);
+.allergen-badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+}
+
+.allergen-badge-group-inline {
+  display: inline-flex;
+  margin-top: 0;
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
+.allergen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid #fecaca;
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.allergen-badge-text-only {
+  padding-left: 0.6rem;
+}
+
+.allergen-icon {
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.allergen-label {
+  white-space: nowrap;
 }
 
 .menu-summary-checklist {
@@ -1742,4 +1802,83 @@ textarea:focus {
   .menu-index-panel {
     padding: 0.9rem;
   }
+}
+
+.camera-preview-shell {
+  min-height: 180px;
+  max-width: 560px;
+  margin: 0 auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.camera-live-region {
+  width: 100%;
+  min-height: 260px;
+}
+
+.camera-idle {
+  color: #e2e8f0;
+  text-align: center;
+  padding: 1rem;
+}
+
+.camera-idle p {
+  margin: 0.25rem 0;
+}
+
+#camera-scanner-preview video {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+
+.camera-live-video {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+.scan-feedback {
+  margin: 0 auto 1rem;
+  max-width: 560px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--line-light);
+  padding: 0.75rem 1rem;
+}
+
+.scan-feedback-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.scan-feedback-code {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.15rem;
+  color: var(--text);
+  letter-spacing: 0.03em;
+}
+
+.scan-feedback.is-success {
+  background: var(--primary-soft);
+  border-color: var(--primary-border);
+}
+
+.scan-feedback.is-success .scan-feedback-label,
+.scan-feedback.is-success .scan-feedback-code {
+  color: var(--primary-hover);
 }

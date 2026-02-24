@@ -1,8 +1,8 @@
 <section class="page-header page-header-loose">
   <div>
     <p class="eyebrow">Acceso privado</p>
-    <h1 class="page-title">Iniciar sesion</h1>
-    <p class="page-subtitle">Accede al panel interno de comedores y administracion global.</p>
+    <h1 class="page-title">Iniciar sesión</h1>
+    <p class="page-subtitle">Accede al panel interno de comedores y administración global.</p>
   </div>
 </section>
 
@@ -18,14 +18,16 @@
       </div>
 
       <div class="field">
-        <%= f.label :password, "Contrasena" %>
+        <%= f.label :password, "Contraseña" %>
         <%= f.password_field :password, autocomplete: "current-password" %>
       </div>
 
       <% if devise_mapping.rememberable? %>
         <div class="field field-inline">
-          <%= f.check_box :remember_me %>
-          <%= f.label :remember_me, "Recordarme" %>
+          <%= f.label :remember_me do %>
+            <%= f.check_box :remember_me %>
+            Recordarme
+          <% end %>
         </div>
       <% end %>
 
@@ -43,16 +45,19 @@
     <h3>Accesos de demo</h3>
     <ul class="list-clean">
       <li class="menu-item">
-        <strong>Admin</strong>
+        <strong>Admin global</strong>
         <p class="help-text">admin@socialkitchen.local</p>
-      </li>
-      <li class="menu-item">
-        <strong>Manager</strong>
-        <p class="help-text">manager+comedor-central@socialkitchen.local</p>
-      </li>
-      <li class="menu-item">
-        <strong>Password</strong>
         <p class="help-text">ChangeMe123!</p>
+      </li>
+      <li class="menu-item">
+        <strong>Manager (Comedor Central)</strong>
+        <p class="help-text">manager@test.com</p>
+        <p class="help-text">manager123</p>
+      </li>
+      <li class="menu-item">
+        <strong>Staff (Comedor Central)</strong>
+        <p class="help-text">staff@test.com</p>
+        <p class="help-text">staff1234</p>
       </li>
     </ul>
   </article>

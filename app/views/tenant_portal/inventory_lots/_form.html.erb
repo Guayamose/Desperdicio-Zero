@@ -5,7 +5,10 @@
 <%= form_with model: [ :tenant, @inventory_lot ],
   data: {
     controller: "inventory-form",
-    inventory_form_scan_url_value: api_v1_tenant_scan_path
+    action: "submit->inventory-form#confirmUnknownBarcode",
+    inventory_form_scan_url_value: api_v1_tenant_scan_path,
+    inventory_form_barcode_check_url_value: api_v1_tenant_barcode_check_path,
+    inventory_form_allergen_icon_map_value: allergen_icon_asset_map.to_json
   } do |f| %>
   <% if @inventory_lot.errors.any? %>
     <div class="flash alert"><%= @inventory_lot.errors.full_messages.join(", ") %></div>
@@ -27,6 +30,7 @@
 
       <div class="field">
         <%= f.label :barcode, "Codigo de barras" %>
+        <%= f.hidden_field :unknown_barcode_confirmed, value: "0", data: { inventory_form_target: "unknownBarcodeConfirmed" } %>
         <div class="input-inline">
           <%= f.text_field :barcode,
             value: barcode_value,
@@ -35,7 +39,7 @@
             autocomplete: "off",
             data: {
               inventory_form_target: "barcode",
-              action: "blur->inventory-form#lookup"
+              action: "input->inventory-form#scheduleBarcodeCheck blur->inventory-form#lookup"
             } %>
           <button type="button" class="btn btn-secondary btn-sm" data-action="inventory-form#lookup">
             Autorrellenar
@@ -69,7 +73,9 @@
         </div>
         <div class="detail-item">
           <div class="detail-label">Alergenos</div>
-          <div class="detail-value" data-inventory-form-target="previewAllergens"><%= selected_product.present? ? (Array(selected_product.allergens_json).presence&.join(", ") || "Ninguno") : "-" %></div>
+          <div class="detail-value" data-inventory-form-target="previewAllergens">
+            <%= selected_product.present? ? allergen_badges(Array(selected_product.allergens_json), empty: "Ninguno") : "-" %>
+          </div>
         </div>
       </div>
     </div>
@@ -111,7 +117,9 @@
   </div>
 
   <div class="actions">
-    <%= f.submit @inventory_lot.persisted? ? "Guardar cambios" : "Crear lote", class: "btn btn-primary" %>
+    <%= f.submit @inventory_lot.persisted? ? "Guardar cambios" : "Crear lote",
+      class: "btn btn-primary",
+      data: { action: "click->inventory-form#confirmUnknownBarcode" } %>
     <%= link_to "Cancelar", tenant_inventory_lots_path, class: "btn btn-secondary" %>
   </div>
 <% end %>

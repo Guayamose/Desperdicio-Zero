@@ -31,6 +31,25 @@ module Api
           }, status: :ok
         end
 
+        def barcode_check
+          authorize Product, :create?
+
+          barcode = sanitize_barcode(params.require(:barcode))
+          if barcode.blank? || barcode.length < 6
+            render_error(code: "invalid_barcode", message: "Barcode is invalid", status: :unprocessable_content)
+            return
+          end
+
+          exists = Integrations::OpenFoodFactsClient.new.fetch_product(barcode).present?
+          render json: {
+            data: {
+              barcode: barcode,
+              exists: exists
+            },
+            requestId: request.request_id
+          }, status: :ok
+        end
+
         private
 
         def sanitize_barcode(value)

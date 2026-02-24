@@ -1,0 +1,15 @@
+Bienvenido/a, <%= @user.full_name %>
+
+Has sido añadido/a como empleado/a en <%= @tenant.name %>.
+
+Tus credenciales de acceso:
+
+  Email:               <%= @user.email %>
+  Contraseña temporal: <%= @temporary_password %>
+
+Esta contraseña es de un solo uso. Al iniciar sesión por primera vez
+se te pedirá que la cambies por una contraseña personal.
+
+Inicia sesión en: <%= @login_url %>
+
+Si no esperabas este mensaje, puedes ignorarlo.

@@ -36,5 +36,18 @@
       <div class="detail-label">Telefono</div>
       <div class="detail-value"><%= present_or_dash(@tenant.contact_phone) %></div>
     </div>
+    <div class="detail-item">
+      <div class="detail-label">Horario</div>
+      <div class="detail-value">
+        <% rows = operating_hours_rows(@tenant.operating_hours_json) %>
+        <% if rows.any? %>
+          <% rows.each do |day, period| %>
+            <div><strong><%= day %>:</strong> <%= period %></div>
+          <% end %>
+        <% else %>
+          -
+        <% end %>
+      </div>
+    </div>
   </div>
 </section>

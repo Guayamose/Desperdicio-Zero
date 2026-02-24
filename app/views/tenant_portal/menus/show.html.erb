@@ -232,11 +232,7 @@
 
     <% if @menu.allergens_json.present? %>
       <h4 class="menu-mini-title">Alergenos generales</h4>
-      <div class="menu-chip-group">
-        <% Array(@menu.allergens_json).each do |allergen| %>
-          <span class="menu-chip menu-chip-danger"><%= allergen %></span>
-        <% end %>
-      </div>
+      <%= allergen_badges(Array(@menu.allergens_json)) %>
     <% end %>
 
     <% waste_plan = @menu.planning_notes_json.is_a?(Hash) ? Array(@menu.planning_notes_json["wasteReductionPlan"]) : [] %>

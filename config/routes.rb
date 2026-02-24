@@ -86,6 +86,14 @@ Rails.application.routes.draw do
     # Vista de alertas de caducidad.
     # Helper: tenant_alerts_expirations_path
     get "alerts/expirations", to: "alerts#expirations", as: :alerts_expirations
+
+    # Empleados del comedor (solo tenant_manager).
+    resources :employees, only: [ :index, :new, :create, :update, :destroy ]
+
+    # Cambio de contraseña obligatorio en primer login.
+    # GET /tenant/password/edit -> edit_tenant_password_path
+    # PATCH /tenant/password    -> tenant_password_path
+    resource :password, only: [ :edit, :update ], controller: :passwords
   end
 
   # --------------------------------------------------------------------------
@@ -148,6 +156,7 @@ Rails.application.routes.draw do
 
           # Endpoint de escaneo de codigo de barras.
           post :scan, to: "scans#create"
+          post :barcode_check, to: "scans#barcode_check"
         end
 
         # Alertas de caducidad.

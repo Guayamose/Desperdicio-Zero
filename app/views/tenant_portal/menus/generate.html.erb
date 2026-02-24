@@ -142,7 +142,10 @@
             <p class="muted"><%= ingredient[:quantity] %> <%= ingredient[:unit] %></p>
             <p class="help-text">Caduca: <%= ui_date(ingredient[:expiresOn]) %></p>
             <% if ingredient[:knownAllergens].present? %>
-              <p class="help-text">Alergenos: <%= ingredient[:knownAllergens].join(", ") %></p>
+              <div class="help-text">
+                <strong>Alergenos:</strong>
+                <%= allergen_badges(Array(ingredient[:knownAllergens]), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
+              </div>
             <% end %>
           </li>
         <% end %>
