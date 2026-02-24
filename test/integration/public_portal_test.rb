@@ -31,5 +31,11 @@ class PublicPortalTest < ActionDispatch::IntegrationTest
 
     get public_tenant_menu_today_path(slug: tenant.slug)
     assert_response :success
+    assert_includes response.body, "Comedor Norte"
+    assert_includes response.body, "Calle Norte 10"
+    assert_includes response.body, "Horario del comedor"
+    assert_includes response.body, "Lunes:"
+    assert_includes response.body, "08:00-16:00"
+    assert_not_includes response.body, "Imagen de referencia de Comedor Norte"
   end
 end

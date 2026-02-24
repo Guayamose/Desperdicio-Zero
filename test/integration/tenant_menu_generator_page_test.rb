@@ -2,7 +2,12 @@ require "test_helper"
 
 class TenantMenuGeneratorPageTest < ActionDispatch::IntegrationTest
   test "tenant user can open generator page and see prioritized inventory" do
-    tenant = Tenant.create!(name: "Comedor Centro", slug: "comedor-centro", status: :active)
+    tenant = Tenant.create!(
+      name: "Comedor Centro",
+      slug: "comedor-centro",
+      status: :active,
+      operating_hours_json: { "lunes" => "08:00-16:00" }
+    )
     user = User.create!(
       full_name: "Manager Centro",
       email: "manager-centro@example.com",

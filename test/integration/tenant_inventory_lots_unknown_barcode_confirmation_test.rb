@@ -20,7 +20,12 @@ class TenantInventoryLotsUnknownBarcodeConfirmationTest < ActionDispatch::Integr
       password_confirmation: "Password123!",
       locale: "es"
     )
-    @tenant = Tenant.create!(name: "Comedor Norte", slug: "comedor-norte", status: :active)
+    @tenant = Tenant.create!(
+      name: "Comedor Norte",
+      slug: "comedor-norte",
+      status: :active,
+      operating_hours_json: { "lunes" => "08:00-16:00" }
+    )
     Membership.create!(user: @user, tenant: @tenant, role: :tenant_manager, active: true)
   end
 

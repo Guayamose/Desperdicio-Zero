@@ -24,7 +24,12 @@ class TenantApiBarcodeCheckTest < ActionDispatch::IntegrationTest
       password_confirmation: "Password123!",
       locale: "es"
     )
-    @tenant = Tenant.create!(name: "Comedor Central", slug: "comedor-central", status: :active)
+    @tenant = Tenant.create!(
+      name: "Comedor Central",
+      slug: "comedor-central",
+      status: :active,
+      operating_hours_json: { "lunes" => "08:00-16:00" }
+    )
     Membership.create!(user: @user, tenant: @tenant, role: :tenant_staff, active: true)
   end
 

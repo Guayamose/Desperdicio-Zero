@@ -23,7 +23,19 @@
         <%= status_pill(@menu.status) %>
       </div>
 
-      <p><%= present_or_dash(@menu.description) %></p>
+<section class="menu-today-page">
+  <header class="menu-today-card menu-today-header">
+    <div>
+      <p class="eyebrow">Menu diario</p>
+      <h1 class="page-title"><%= @tenant.name %></h1>
+      <p class="page-subtitle">Consulta de menu para <%= ui_date(Date.current) %></p>
+    </div>
+    <div class="menu-today-header-toolbar">
+      <%= status_pill(@menu.present? ? @menu.status : "inactive") %>
+      <%= link_to "Volver al comedor", public_tenant_path(@tenant.slug), class: "btn btn-secondary btn-sm" %>
+      <%= link_to "Todos los comedores", public_tenants_path, class: "btn btn-secondary btn-sm" %>
+    </div>
+  </header>
 
       <div class="menu-smart-summary menu-smart-summary-public">
         <div class="menu-smart-summary-card">
@@ -78,7 +90,6 @@
           <strong>Alergenos:</strong>
           <%= allergen_badges(Array(@menu.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
         </div>
-      <% end %>
 
       <h3 class="section-title mt-md">Platos del menu</h3>
       <% if @menu.daily_menu_items.any? %>
@@ -137,43 +148,98 @@
     <% end %>
   </article>
 
-  <article class="panel panel-soft">
-    <h2>Comedor y ubicacion</h2>
-    <div class="media-card">
-      <div class="media-card-visual">
-        <%= tenant_placeholder_image(@tenant, alt: "Imagen de referencia de #{@tenant.name}") %>
-      </div>
-      <div class="media-card-body">
-        <strong><%= @tenant.name %></strong>
-        <p class="muted"><%= present_or_dash([@tenant.city, @tenant.region, @tenant.country].compact.join(", ")) %></p>
-      </div>
-    </div>
+                <p class="menu-today-dish-description"><%= present_or_dash(item.description) %></p>
 
-    <div class="map-shell">
-      <% if (map_url = tenant_map_embed_url(@tenant)).present? %>
-        <iframe class="map-frame" src="<%= map_url %>" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <% else %>
-        <%= map_placeholder_image %>
-      <% end %>
-    </div>
-    <div class="actions mt-sm">
-      <% if (map_link = tenant_map_link(@tenant)).present? %>
-        <%= link_to "Abrir en OpenStreetMap", map_link, target: "_blank", rel: "noreferrer", class: "btn btn-secondary btn-sm" %>
-      <% end %>
-    </div>
+                <% if item.ingredients_json.present? %>
+                  <div class="menu-today-ingredients">
+                    <span class="menu-today-meta-label">Ingredientes</span>
+                    <div class="menu-today-chip-group">
+                      <% Array(item.ingredients_json).each do |ingredient| %>
+                        <span class="menu-today-chip"><%= ingredient %></span>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
 
-    <h3 class="section-title mt-md">Historial reciente</h3>
-    <% if @recent_menus.any? %>
-      <ul class="list-clean">
-        <% @recent_menus.each do |menu| %>
-          <li class="menu-item">
-            <strong><%= menu.title %></strong>
-            <p class="help-text"><%= ui_date(menu.menu_date) %></p>
-          </li>
+                <% if item.allergens_json.present? %>
+                  <div class="menu-today-allergens menu-today-allergens-inline">
+                    <strong>Alergenos:</strong>
+                    <%= allergen_badges(Array(item.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
+                  </div>
+                <% end %>
+              </li>
+            <% end %>
+          </ol>
+        <% else %>
+          <div class="empty-state">El menu esta publicado pero todavia no tiene platos detallados.</div>
         <% end %>
-      </ul>
-    <% else %>
-      <div class="empty-state">No hay menus historicos publicados.</div>
-    <% end %>
-  </article>
+      <% else %>
+        <div class="empty-state">No hay menu publicado para hoy en este comedor.</div>
+      <% end %>
+    </article>
+
+    <aside class="menu-today-side">
+      <article class="menu-today-card menu-today-kitchen">
+        <h2>Comedor y ubicacion</h2>
+
+        <div class="menu-today-facts">
+          <div class="menu-today-fact">
+            <span class="menu-today-fact-label">Nombre</span>
+            <span class="menu-today-fact-value"><%= @tenant.name %></span>
+          </div>
+          <div class="menu-today-fact">
+            <span class="menu-today-fact-label">Calle</span>
+            <span class="menu-today-fact-value"><%= present_or_dash(@tenant.address) %></span>
+          </div>
+          <div class="menu-today-fact">
+            <span class="menu-today-fact-label">Ubicacion completa</span>
+            <span class="menu-today-fact-value"><%= present_or_dash(location_text) %></span>
+          </div>
+        </div>
+
+        <h3 class="menu-today-section-title">Horario del comedor</h3>
+        <% if hours_rows.any? %>
+          <ul class="menu-today-hours-list">
+            <% hours_rows.each do |day, period| %>
+              <li class="menu-today-hours-item">
+                <span class="menu-today-hours-day"><%= "#{day}:" %></span>
+                <span class="menu-today-hours-slot"><%= period %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <div class="empty-state">Horario no disponible.</div>
+        <% end %>
+
+        <div class="map-shell menu-today-map">
+          <% if (map_url = tenant_map_embed_url(@tenant)).present? %>
+            <iframe class="map-frame" src="<%= map_url %>" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <% else %>
+            <%= map_placeholder_image %>
+          <% end %>
+        </div>
+        <div class="menu-today-actions">
+          <% if (map_link = tenant_map_link(@tenant)).present? %>
+            <%= link_to "Abrir en OpenStreetMap", map_link, target: "_blank", rel: "noreferrer", class: "btn btn-secondary btn-sm" %>
+          <% end %>
+        </div>
+      </article>
+
+      <article class="menu-today-card menu-today-history">
+        <h3 class="menu-today-section-title">Historial reciente</h3>
+        <% if @recent_menus.any? %>
+          <ul class="menu-today-history-list">
+            <% @recent_menus.each do |menu| %>
+              <li class="menu-today-history-item">
+                <strong><%= menu.title %></strong>
+                <span class="menu-today-history-date"><%= ui_date(menu.menu_date) %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <div class="empty-state">No hay menus historicos publicados.</div>
+        <% end %>
+      </article>
+    </aside>
+  </div>
 </section>
