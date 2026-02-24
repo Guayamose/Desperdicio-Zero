@@ -89,6 +89,11 @@ Rails.application.routes.draw do
 
     # Empleados del comedor (solo tenant_manager).
     resources :employees, only: [ :index, :new, :create, :update, :destroy ]
+
+    # Cambio de contraseña obligatorio en primer login.
+    # GET /tenant/password/edit -> edit_tenant_password_path
+    # PATCH /tenant/password    -> tenant_password_path
+    resource :password, only: [ :edit, :update ], controller: :passwords
   end
 
   # --------------------------------------------------------------------------
