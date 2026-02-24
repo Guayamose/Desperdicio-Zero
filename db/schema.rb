@@ -38,6 +38,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_24_090506) do
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "servings", default: 1, null: false
+    t.integer "repetitions", default: 1, null: false
+    t.jsonb "nutrition_json", default: {}, null: false
+    t.jsonb "dietary_flags_json", default: [], null: false
+    t.text "religious_notes"
+    t.jsonb "inventory_usage_json", default: [], null: false
     t.index ["daily_menu_id"], name: "index_daily_menu_items_on_daily_menu_id"
   end
 
@@ -52,6 +58,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_24_090506) do
     t.bigint "created_by_user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "nutrition_summary_json", default: {}, null: false
+    t.jsonb "dietary_guidance_json", default: {}, null: false
+    t.jsonb "planning_notes_json", default: {}, null: false
     t.index ["tenant_id", "menu_date"], name: "index_daily_menus_on_tenant_id_and_menu_date", unique: true
     t.index ["tenant_id", "status"], name: "index_daily_menus_on_tenant_id_and_status"
     t.index ["tenant_id"], name: "index_daily_menus_on_tenant_id"
