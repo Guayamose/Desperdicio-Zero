@@ -35,5 +35,7 @@ class TenantMenuGeneratorPageTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Menu diario guiado"
     assert_includes response.body, "Arroz integral"
     assert_includes response.body, "Paso 2 y 3: Preview y generacion"
+    assert_includes response.body, "Generando menu con IA"
+    assert_includes response.body, "Cancelar y volver atras"
   end
 end

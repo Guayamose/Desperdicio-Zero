@@ -152,7 +152,15 @@
       <div class="empty-state">Selecciona lotes para ver el preview de ingredientes.</div>
     <% end %>
 
-    <%= form_with url: generate_tenant_menus_path, method: :post, local: true, class: "menu-generate-form" do %>
+    <%= form_with url: generate_tenant_menus_path,
+      method: :post,
+      local: true,
+      class: "menu-generate-form",
+      data: {
+        controller: "menu-generation-loading",
+        action: "submit->menu-generation-loading#start turbo:submit-start->menu-generation-loading#captureSubmission turbo:submit-end->menu-generation-loading#finish",
+        menu_generation_loading_cancel_path_value: tenant_menus_path
+      } do %>
       <%= hidden_field_tag :date, @menu_date %>
       <% @selected_lot_ids.each do |lot_id| %>
         <%= hidden_field_tag "lot_ids[]", lot_id %>
@@ -169,6 +177,21 @@
       <% else %>
         <p class="help-text">Despues de generar: revisa el resumen y pulsa "Confirmar y Publicar".</p>
       <% end %>
+
+      <div class="menu-generation-overlay" data-menu-generation-loading-target="overlay" aria-live="polite" aria-hidden="true">
+        <section class="menu-generation-dialog" role="dialog" aria-modal="true" aria-label="Generando menu del dia">
+          <div class="menu-generation-logo-shell">
+            <span class="menu-generation-ring" aria-hidden="true"></span>
+            <%= image_tag "brand/logo-zero.png", alt: "Logo Desperdicio Cero", class: "menu-generation-logo" %>
+          </div>
+          <h3 class="menu-generation-title">Generando menu con IA</h3>
+          <p class="menu-generation-copy">Estamos preparando el borrador. No cierres esta pantalla hasta completar el proceso.</p>
+          <p class="menu-generation-status">Cargando menu<span class="menu-generation-dots" aria-hidden="true"></span></p>
+          <button type="button" class="btn btn-secondary" data-menu-generation-loading-target="cancelButton" data-action="menu-generation-loading#cancel">
+            Cancelar y volver atras
+          </button>
+        </section>
+      </div>
     <% end %>
   </aside>
 </section>
