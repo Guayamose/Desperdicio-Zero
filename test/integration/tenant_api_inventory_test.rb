@@ -3,8 +3,8 @@ require "test_helper"
 class TenantApiInventoryTest < ActionDispatch::IntegrationTest
   setup do
     @user = User.create!(full_name: "Empleado A", email: "empleado-a@example.com", password: "Password123!", password_confirmation: "Password123!", locale: "es")
-    @tenant_a = Tenant.create!(name: "A", slug: "a", status: :active)
-    @tenant_b = Tenant.create!(name: "B", slug: "b", status: :active)
+    @tenant_a = Tenant.create!(name: "A", slug: "a", status: :active, operating_hours_json: { "lunes" => "08:00-16:00" })
+    @tenant_b = Tenant.create!(name: "B", slug: "b", status: :active, operating_hours_json: { "lunes" => "08:00-16:00" })
 
     Membership.create!(user: @user, tenant: @tenant_a, role: :tenant_staff, active: true)
 

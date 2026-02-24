@@ -2,7 +2,12 @@ require "test_helper"
 
 class TenantMenuGeneratorPageTest < ActionDispatch::IntegrationTest
   test "tenant user can open generator page and see prioritized inventory" do
-    tenant = Tenant.create!(name: "Comedor Centro", slug: "comedor-centro", status: :active)
+    tenant = Tenant.create!(
+      name: "Comedor Centro",
+      slug: "comedor-centro",
+      status: :active,
+      operating_hours_json: { "lunes" => "08:00-16:00" }
+    )
     user = User.create!(
       full_name: "Manager Centro",
       email: "manager-centro@example.com",
@@ -27,8 +32,8 @@ class TenantMenuGeneratorPageTest < ActionDispatch::IntegrationTest
     get generate_tenant_menus_path(date: Date.current)
 
     assert_response :success
-    assert_includes response.body, "Generar menu del dia"
+    assert_includes response.body, "Menu diario guiado"
     assert_includes response.body, "Arroz integral"
-    assert_includes response.body, "Ingredientes que recibira la IA"
+    assert_includes response.body, "Paso 2 y 3: Preview y generacion"
   end
 end

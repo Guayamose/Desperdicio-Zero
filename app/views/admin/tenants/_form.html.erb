@@ -1,4 +1,5 @@
 <%= form_with model: [ :admin, @tenant ] do |f| %>
+  <% operating_hours = @tenant.operating_hours_json.is_a?(Hash) ? @tenant.operating_hours_json.stringify_keys : {} %>
   <% if @tenant.errors.any? %>
     <div class="flash alert"><%= @tenant.errors.full_messages.join(", ") %></div>
   <% end %>
@@ -56,6 +57,22 @@
         <%= f.label :longitude, "Longitud" %>
         <%= f.number_field :longitude, step: 0.000001 %>
       </div>
+    </div>
+  </section>
+
+  <section class="panel panel-soft">
+    <h2>Horario del comedor</h2>
+    <p class="help-text">Campo obligatorio. Indica al menos una franja por dia (ejemplo: 08:00-16:00). Si no abre, usa "cerrado".</p>
+    <div class="form-grid">
+      <% operating_days_labels.each do |day_key, day_label| %>
+        <div class="field">
+          <%= label_tag "tenant_operating_hours_json_#{day_key}", day_label %>
+          <%= text_field_tag "tenant[operating_hours_json][#{day_key}]",
+            operating_hours[day_key],
+            id: "tenant_operating_hours_json_#{day_key}",
+            placeholder: "08:00-16:00" %>
+        </div>
+      <% end %>
     </div>
   </section>
 

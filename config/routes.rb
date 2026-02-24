@@ -92,6 +92,10 @@ Rails.application.routes.draw do
 
     # Perfil del usuario autenticado.
     resource :profile, only: [ :show, :edit, :update ], controller: :profile
+    # Cambio de contraseña obligatorio en primer login.
+    # GET /tenant/password/edit -> edit_tenant_password_path
+    # PATCH /tenant/password    -> tenant_password_path
+    resource :password, only: [ :edit, :update ], controller: :passwords
   end
 
   # --------------------------------------------------------------------------
@@ -154,6 +158,7 @@ Rails.application.routes.draw do
 
           # Endpoint de escaneo de codigo de barras.
           post :scan, to: "scans#create"
+          post :barcode_check, to: "scans#barcode_check"
         end
 
         # Alertas de caducidad.

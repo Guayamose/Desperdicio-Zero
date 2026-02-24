@@ -80,11 +80,6 @@ module TenantPortal
     def destroy
       authorize @menu
 
-      if @menu.published?
-        redirect_to tenant_menu_path(@menu), alert: "No se puede eliminar un menu ya publicado."
-        return
-      end
-
       @menu.destroy!
       AuditLogger.log!(action: "menu.deleted", actor: current_user, tenant: current_tenant, entity: @menu, metadata: {}, ip_address: request.remote_ip)
       redirect_to tenant_menus_path, notice: "Menu eliminado"
@@ -102,15 +97,36 @@ module TenantPortal
         :title,
         :description,
         allergens_json: [],
-        daily_menu_items_attributes: [ :id, :name, :description, :position, :_destroy, { ingredients_json: [], allergens_json: [] } ]
+        nutrition_summary_json: {},
+        planning_notes_json: {},
+        dietary_guidance_json: [ :halalStatus, :religiousNotes, { haramRisks: [], vegetarianOptions: [], veganOptions: [] } ],
+        daily_menu_items_attributes: [
+          :id,
+          :name,
+          :description,
+          :position,
+          :servings,
+          :repetitions,
+          :religious_notes,
+          :_destroy,
+          { ingredients_json: [], allergens_json: [], dietary_flags_json: [], nutrition_json: {}, inventory_usage_json: [ :lotId, :product, :quantity, :unit ] }
+        ]
       ).to_h
 
-      raw["allergens_json"] = normalize_csv_array(raw["allergens_json"])
+      raw["allergens_json"] = normalize_csv_array(raw["allergens_json"]) if raw.key?("allergens_json")
+      raw["nutrition_summary_json"] = normalize_hash(raw["nutrition_summary_json"]) if raw.key?("nutrition_summary_json")
+      raw["planning_notes_json"] = normalize_hash(raw["planning_notes_json"]) if raw.key?("planning_notes_json")
+      raw["dietary_guidance_json"] = normalize_dietary_guidance(raw["dietary_guidance_json"]) if raw.key?("dietary_guidance_json")
 
       items = raw["daily_menu_items_attributes"] || {}
       items.each_value do |item|
-        item["ingredients_json"] = normalize_csv_array(item["ingredients_json"])
-        item["allergens_json"] = normalize_csv_array(item["allergens_json"])
+        item["ingredients_json"] = normalize_csv_array(item["ingredients_json"]) if item.key?("ingredients_json")
+        item["allergens_json"] = normalize_csv_array(item["allergens_json"]) if item.key?("allergens_json")
+        item["dietary_flags_json"] = normalize_csv_array(item["dietary_flags_json"]) if item.key?("dietary_flags_json")
+        item["nutrition_json"] = normalize_hash(item["nutrition_json"]) if item.key?("nutrition_json")
+        item["inventory_usage_json"] = normalize_inventory_usage(item["inventory_usage_json"]) if item.key?("inventory_usage_json")
+        item["servings"] = normalize_positive_integer(item["servings"], default: 1) if item.key?("servings")
+        item["repetitions"] = normalize_positive_integer(item["repetitions"], default: 1) if item.key?("repetitions")
       end
 
       raw
@@ -118,6 +134,45 @@ module TenantPortal
 
     def normalize_csv_array(value)
       Array(value).flat_map { |v| v.to_s.split(",") }.map(&:strip).reject(&:blank?)
+    end
+
+    def normalize_hash(value)
+      value.is_a?(Hash) ? value : {}
+    end
+
+    def normalize_dietary_guidance(value)
+      return {} unless value.is_a?(Hash)
+
+      {
+        "halalStatus" => value["halalStatus"].to_s.strip,
+        "religiousNotes" => value["religiousNotes"].to_s.strip,
+        "haramRisks" => normalize_csv_array(value["haramRisks"]),
+        "vegetarianOptions" => normalize_csv_array(value["vegetarianOptions"]),
+        "veganOptions" => normalize_csv_array(value["veganOptions"])
+      }.compact
+    end
+
+    def normalize_inventory_usage(value)
+      entries = value.is_a?(Hash) ? value.values : Array(value)
+
+      entries.map do |usage|
+        normalized = usage.is_a?(Hash) ? usage.to_h : {}
+        next if normalized.blank?
+
+        {
+          "lotId" => normalized["lotId"].presence || normalized[:lotId],
+          "product" => normalized["product"].presence || normalized[:product],
+          "quantity" => normalized["quantity"].presence || normalized[:quantity],
+          "unit" => normalized["unit"].presence || normalized[:unit]
+        }.compact
+      end.compact
+    end
+
+    def normalize_positive_integer(value, default:)
+      parsed = Integer(value)
+      parsed.positive? ? parsed : default
+    rescue ArgumentError, TypeError
+      default
     end
 
     def parse_menu_date(raw_date)
@@ -137,6 +192,7 @@ module TenantPortal
       @selected_lots = @candidate_lots if @selected_lots.empty?
 
       @ingredients_preview = Menus::GenerateDailyMenuService.ingredients_for(@selected_lots)
+      @planning_preview = Menus::GenerateDailyMenuService.planning_context_for(@selected_lots)
       @latest_generation = current_tenant.menu_generations.order(created_at: :desc).first
       @menu_for_date = current_tenant.daily_menus.find_by(menu_date: @menu_date)
     end

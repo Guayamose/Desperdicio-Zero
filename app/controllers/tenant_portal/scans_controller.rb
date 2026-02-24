@@ -42,7 +42,11 @@ module TenantPortal
           received_on: Date.current,
           expires_on: Date.current + 7.days
         }
-        redirect_to new_tenant_inventory_lot_path(inventory_lot: prefill), notice: "Producto listo: #{result.product.name}. Completa y guarda el lote."
+        if result.source == "manual_fallback"
+          redirect_to new_tenant_inventory_lot_path(inventory_lot: prefill), alert: "El alimento no existe en nuestra base de datos. Completa y guarda el lote manualmente."
+        else
+          redirect_to new_tenant_inventory_lot_path(inventory_lot: prefill), notice: "Producto listo: #{result.product.name}. Completa y guarda el lote."
+        end
       end
     rescue ActionController::ParameterMissing
       redirect_to new_tenant_scan_path, alert: "Debe indicar el codigo de barras"

@@ -9,8 +9,29 @@ class Tenant < ApplicationRecord
 
   enum :status, { active: "active", inactive: "inactive", suspended: "suspended" }, default: :active, validate: true
 
+  before_validation :normalize_operating_hours_json
+
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
+  validate :operating_hours_presence
 
   scope :operational, -> { where(status: statuses[:active]) }
+
+  private
+
+  def normalize_operating_hours_json
+    hours = operating_hours_json.is_a?(Hash) ? operating_hours_json : {}
+
+    self.operating_hours_json = hours
+      .to_h
+      .transform_keys(&:to_s)
+      .transform_values { |value| value.to_s.strip }
+      .reject { |_day, value| value.blank? }
+  end
+
+  def operating_hours_presence
+    return if operating_hours_json.is_a?(Hash) && operating_hours_json.any?
+
+    errors.add(:operating_hours_json, "debe incluir al menos un horario")
+  end
 end
