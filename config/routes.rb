@@ -148,6 +148,7 @@ Rails.application.routes.draw do
 
           # Endpoint de escaneo de codigo de barras.
           post :scan, to: "scans#create"
+          post :barcode_check, to: "scans#barcode_check"
         end
 
         # Alertas de caducidad.

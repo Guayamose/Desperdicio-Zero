@@ -43,12 +43,12 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
         Horario
       </h3>
-      <% hours = @tenant.operating_hours_json.is_a?(Hash) ? @tenant.operating_hours_json : {} %>
-      <% if hours.present? %>
+      <% rows = operating_hours_rows(@tenant.operating_hours_json) %>
+      <% if rows.any? %>
         <div style="font-size: 0.9375rem; color: var(--text-muted);">
-          <% hours.each do |day, period| %>
+          <% rows.each do |day, period| %>
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-              <span style="font-weight: 700; color: var(--text);"><%= day.to_s.capitalize %>:</span>
+              <span style="font-weight: 700; color: var(--text);"><%= day %>:</span>
               <span><%= period %></span>
             </div>
           <% end %>
