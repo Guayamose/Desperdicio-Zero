@@ -12,7 +12,12 @@ class Menus::GenerateDailyMenuServiceTest < ActiveSupport::TestCase
   end
 
   test "falls back to manual draft when AI fails" do
-    tenant = Tenant.create!(name: "Comedor Sur", slug: "comedor-sur", status: :active)
+    tenant = Tenant.create!(
+      name: "Comedor Sur",
+      slug: "comedor-sur",
+      status: :active,
+      operating_hours_json: { "lunes" => "08:00-16:00" }
+    )
     user = User.create!(full_name: "Manager", email: "manager@example.com", password: "Password123!", password_confirmation: "Password123!", locale: "es")
     Membership.create!(user: user, tenant: tenant, role: :tenant_manager, active: true)
 
@@ -28,7 +33,12 @@ class Menus::GenerateDailyMenuServiceTest < ActiveSupport::TestCase
   end
 
   test "fallback still works when async retry is disabled" do
-    tenant = Tenant.create!(name: "Comedor Este", slug: "comedor-este", status: :active)
+    tenant = Tenant.create!(
+      name: "Comedor Este",
+      slug: "comedor-este",
+      status: :active,
+      operating_hours_json: { "lunes" => "08:00-16:00" }
+    )
     user = User.create!(full_name: "Manager", email: "manager2@example.com", password: "Password123!", password_confirmation: "Password123!", locale: "es")
     Membership.create!(user: user, tenant: tenant, role: :tenant_manager, active: true)
 

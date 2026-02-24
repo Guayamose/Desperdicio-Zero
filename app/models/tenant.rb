@@ -13,6 +13,7 @@ class Tenant < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
+  validate :operating_hours_presence
 
   scope :operational, -> { where(status: statuses[:active]) }
 
@@ -26,5 +27,11 @@ class Tenant < ApplicationRecord
       .transform_keys(&:to_s)
       .transform_values { |value| value.to_s.strip }
       .reject { |_day, value| value.blank? }
+  end
+
+  def operating_hours_presence
+    return if operating_hours_json.is_a?(Hash) && operating_hours_json.any?
+
+    errors.add(:operating_hours_json, "debe incluir al menos un horario")
   end
 end

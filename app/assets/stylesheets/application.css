@@ -1329,6 +1329,283 @@ textarea:focus {
   font-size: 0.75rem;
   letter-spacing: 0.2rem;
 }
+
+/* Public Menu Today Readability */
+.menu-today-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.menu-today-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.menu-today-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--line-light) 100%);
+}
+
+.menu-today-header-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.menu-today-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.menu-today-main {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.menu-today-main-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.menu-today-kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.menu-today-title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  line-height: 1.2;
+}
+
+.menu-today-description {
+  margin: 0.8rem 0 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.menu-today-allergens {
+  margin-top: 0.9rem;
+  color: var(--text-muted);
+}
+
+.menu-today-allergens-inline {
+  margin-top: 0.7rem;
+}
+
+.menu-today-section-title {
+  margin: 1.1rem 0 0.7rem;
+  font-size: 1.1rem;
+}
+
+.menu-today-dishes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.menu-today-dish {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 0.85rem;
+}
+
+.menu-today-dish-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.menu-today-dish-number {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  border: 1px solid var(--primary-border);
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 800;
+  padding: 0.12rem 0.55rem;
+}
+
+.menu-today-dish-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.menu-today-dish-description {
+  margin: 0.45rem 0 0;
+  color: var(--text-muted);
+}
+
+.menu-today-ingredients {
+  margin-top: 0.7rem;
+}
+
+.menu-today-meta-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+  font-weight: 700;
+}
+
+.menu-today-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.menu-today-chip {
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--line-light);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.18rem 0.58rem;
+  line-height: 1.2;
+}
+
+.menu-today-side {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.menu-today-kitchen,
+.menu-today-history {
+  background: var(--bg);
+}
+
+.menu-today-facts {
+  margin-top: 0.4rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-today-fact {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.8rem;
+  align-items: start;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.menu-today-fact:last-child {
+  border-bottom: 0;
+  padding-bottom: 0.1rem;
+}
+
+.menu-today-fact-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.menu-today-fact-value {
+  font-weight: 600;
+}
+
+.menu-today-hours-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.menu-today-hours-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--line-light);
+}
+
+.menu-today-hours-item:last-child {
+  border-bottom: 0;
+}
+
+.menu-today-hours-day {
+  font-weight: 700;
+}
+
+.menu-today-hours-slot {
+  color: var(--text-muted);
+}
+
+.menu-today-map {
+  margin-top: 0.95rem;
+}
+
+.menu-today-map .map-frame {
+  border: 0;
+  border-radius: var(--radius-md);
+  min-height: 220px;
+}
+
+.menu-today-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.menu-today-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.menu-today-history-item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 0.7rem 0.8rem;
+}
+
+.menu-today-history-item strong {
+  display: block;
+}
+
+.menu-today-history-date {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
 /* Tenant Menus UX Refresh */
 .menu-flow-hero,
 .menu-summary-hero {
@@ -1624,6 +1901,10 @@ textarea:focus {
 }
 
 @media (max-width: 1024px) {
+  .menu-today-layout {
+    grid-template-columns: 1fr;
+  }
+
   .menu-flow-grid,
   .menu-summary-grid,
   .menu-dishes-grid,
@@ -1642,6 +1923,35 @@ textarea:focus {
 }
 
 @media (max-width: 760px) {
+  .menu-today-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-today-header-toolbar {
+    justify-content: flex-start;
+  }
+
+  .menu-today-main-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-today-fact {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .menu-today-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .menu-today-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .menu-flow-hero,
   .menu-summary-hero,
   .menu-lock-banner {
