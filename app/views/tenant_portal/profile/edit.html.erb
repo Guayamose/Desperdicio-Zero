@@ -1,0 +1,47 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Cuenta</span>
+    <h1 class="page-title">Editar Perfil</h1>
+  </div>
+  <div class="toolbar">
+    <%= link_to "Cancelar", tenant_profile_path, class: "btn btn-secondary btn-sm" %>
+  </div>
+</section>
+
+<%= form_with model: current_user, url: tenant_profile_path, method: :patch do |f| %>
+  <section class="panel">
+    <h2>Datos personales</h2>
+    <div class="form-grid">
+      <div class="field">
+        <%= f.label :full_name, "Nombre completo" %>
+        <%= f.text_field :full_name %>
+      </div>
+      <div class="field">
+        <%= f.label :email, "Email" %>
+        <%= f.email_field :email, disabled: true %>
+        <p class="help-text">El email no se puede cambiar desde aquí.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Cambiar contraseña</h2>
+    <p class="muted">Deja los campos en blanco si no quieres cambiar la contraseña.</p>
+    <div class="form-grid">
+      <div class="field">
+        <%= f.label :password, "Nueva contraseña" %>
+        <%= f.password_field :password, autocomplete: "new-password" %>
+        <p class="help-text">Mínimo 6 caracteres.</p>
+      </div>
+      <div class="field">
+        <%= f.label :password_confirmation, "Confirmar contraseña" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <%= f.submit "Guardar cambios", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", tenant_profile_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
