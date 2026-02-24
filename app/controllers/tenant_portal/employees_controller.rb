@@ -18,6 +18,7 @@ module TenantPortal
       @user.password_confirmation = generated_password
 
       ActiveRecord::Base.transaction do
+        @user.must_change_password = true
         @user.save!
         Membership.create!(
           user: @user,
@@ -27,7 +28,14 @@ module TenantPortal
         )
       end
 
-      redirect_to tenant_employees_path, notice: "Empleado creado. Contraseña temporal: #{generated_password}"
+      begin
+        UserMailer.welcome_employee(@user, current_tenant, generated_password).deliver_now
+        redirect_to tenant_employees_path, notice: "Empleado creado. Se ha enviado un email con las credenciales a #{@user.email}."
+      rescue StandardError => e
+        Rails.logger.error "Error enviando email de bienvenida: #{e.message}"
+        error_detail = Rails.env.development? ? " [#{e.class}: #{e.message}]" : ""
+        redirect_to tenant_employees_path, alert: "Empleado creado pero el email falló.#{error_detail} Contraseña temporal: #{generated_password}"
+      end
     rescue ActiveRecord::RecordInvalid
       render :new, status: :unprocessable_entity
     end
@@ -44,7 +52,9 @@ module TenantPortal
         return redirect_to tenant_employees_path, alert: "No puedes eliminarte a ti mismo"
       end
 
+      user = @membership.user
       @membership.destroy!
+      user.destroy! if user.memberships.reload.empty?
       redirect_to tenant_employees_path, notice: "Empleado eliminado del comedor"
     end
 
