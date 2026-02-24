@@ -120,7 +120,7 @@ a:hover {
 }
 
 .app-header {
-  height: 80px;
+  height: 90px;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   position: sticky;
@@ -143,25 +143,21 @@ a:hover {
   gap: 1rem;
   text-decoration: none;
   color: var(--text);
+  height: 90px;
 }
 
 .brand-icon {
-  width: 34px;
-  height: 34px;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
+  height: 60%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
+  flex-shrink: 0;
 }
 
 .brand-logo {
-  width: 34px;
-  height: 34px;
+  height: 100%;
+  width: auto;
   object-fit: contain;
-  background: transparent;
   display: block;
 }
 
@@ -389,7 +385,7 @@ input[type="submit"]:hover {
   border-bottom: 1px solid var(--line);
   padding: 0.25rem 0;
   position: sticky;
-  top: 80px;
+  top: 90px;
   z-index: 90;
 }
 
@@ -996,8 +992,8 @@ input[type="checkbox"] {
 }
 
 .footer-brand-logo {
-  width: 28px;
-  height: 28px;
+  width: auto;
+  height: 30px;
   object-fit: contain;
   color: var(--text);
   background: transparent;
@@ -1027,8 +1023,8 @@ input[type="checkbox"] {
 }
 
 .footer-mini-logo {
-  width: 15px;
-  height: 15px;
+  width: auto;
+  height: 18px;
   object-fit: contain;
   color: var(--text);
   background: transparent;
@@ -1094,7 +1090,7 @@ input[type="checkbox"] {
   .nav-main.is-open {
     display: flex;
     position: fixed;
-    top: 80px;
+    top: 90px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -1873,8 +1869,8 @@ input[type="checkbox"] {
 
 .menu-generation-logo-shell {
   position: relative;
-  width: 84px;
-  height: 84px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto 0.2rem;
   display: grid;
   place-items: center;
@@ -1890,8 +1886,8 @@ input[type="checkbox"] {
 }
 
 .menu-generation-logo {
-  width: 58px;
-  height: 58px;
+  width: 80%;
+  height: 80%;
   object-fit: contain;
   display: block;
 }
