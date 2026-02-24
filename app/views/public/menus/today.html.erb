@@ -14,6 +14,10 @@
 <section class="split-panel">
   <article class="panel">
     <% if @menu.present? %>
+      <% planning = @menu.planning_notes_json.is_a?(Hash) ? @menu.planning_notes_json : {} %>
+      <% nutrition_summary = @menu.nutrition_summary_json.is_a?(Hash) ? @menu.nutrition_summary_json : {} %>
+      <% dietary = @menu.dietary_guidance_json.is_a?(Hash) ? @menu.dietary_guidance_json : {} %>
+
       <div class="title-row mb-sm">
         <h2><%= @menu.title %></h2>
         <%= status_pill(@menu.status) %>
@@ -21,29 +25,108 @@
 
       <p><%= present_or_dash(@menu.description) %></p>
 
+      <div class="menu-smart-summary menu-smart-summary-public">
+        <div class="menu-smart-summary-card">
+          <h3>Plan de servicio</h3>
+          <p><%= present_or_dash(planning["strategy"]) %></p>
+          <div class="menu-inline-metrics">
+            <% if planning["estimatedTotalServings"].present? %>
+              <span class="menu-inline-metric"><strong><%= planning["estimatedTotalServings"] %></strong> raciones</span>
+            <% end %>
+            <% if planning["productionMode"].present? %>
+              <span class="menu-inline-metric"><strong>Modo:</strong> <%= planning["productionMode"] %></span>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="menu-smart-summary-card">
+          <h3>Nutricion</h3>
+          <div class="menu-nutrition-grid menu-nutrition-grid-compact">
+            <% if nutrition_summary["estimatedAverageKcalPerServing"].present? %>
+              <div class="menu-nutrition-item"><span>Kcal / racion</span><strong><%= nutrition_summary["estimatedAverageKcalPerServing"] %></strong></div>
+            <% end %>
+            <% if nutrition_summary["proteinFocus"].present? %>
+              <div class="menu-nutrition-item"><span>Proteina</span><strong><%= nutrition_summary["proteinFocus"] %></strong></div>
+            <% end %>
+            <% if nutrition_summary["carbFocus"].present? %>
+              <div class="menu-nutrition-item"><span>Carbs</span><strong><%= nutrition_summary["carbFocus"] %></strong></div>
+            <% end %>
+            <% if nutrition_summary["fatFocus"].present? %>
+              <div class="menu-nutrition-item"><span>Grasa</span><strong><%= nutrition_summary["fatFocus"] %></strong></div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="menu-smart-summary-card">
+          <h3>Compatibilidad</h3>
+          <div class="menu-inline-metrics">
+            <% if dietary["halalStatus"].present? %>
+              <span class="menu-inline-metric"><strong>Halal:</strong> <%= dietary["halalStatus"] %></span>
+            <% end %>
+            <% if Array(dietary["haramRisks"]).any? %>
+              <span class="menu-inline-metric is-warning"><strong>Riesgo haram:</strong> <%= Array(dietary["haramRisks"]).join(", ") %></span>
+            <% end %>
+          </div>
+          <% if dietary["religiousNotes"].present? %>
+            <p class="help-text"><strong>Nota:</strong> <%= dietary["religiousNotes"] %></p>
+          <% end %>
+        </div>
+      </div>
+
       <% if @menu.allergens_json.present? %>
-        <p class="help-text"><strong>Alergenos:</strong> <%= Array(@menu.allergens_json).join(", ") %></p>
+        <h3 class="section-title mt-md">Alergenos generales</h3>
+        <div class="menu-chip-group">
+          <% Array(@menu.allergens_json).each do |allergen| %>
+            <span class="menu-chip menu-chip-danger"><%= allergen %></span>
+          <% end %>
+        </div>
       <% end %>
 
       <h3 class="section-title mt-md">Platos del menu</h3>
       <% if @menu.daily_menu_items.any? %>
-        <ol class="list-clean menu-list-numbered">
+        <div class="menu-dishes-grid menu-dishes-grid-rich">
           <% @menu.daily_menu_items.each_with_index do |item, index| %>
-            <li class="menu-item">
-              <div class="menu-item-head">
-                <strong><%= item.name %></strong>
-                <span class="help-text">Plato <%= index + 1 %></span>
+            <% nutrition = item.nutrition_json.is_a?(Hash) ? item.nutrition_json : {} %>
+            <article class="menu-dish-card">
+              <div class="menu-dish-head">
+                <h3><%= item.name %></h3>
+                <span class="status-pill status-neutral">Plato <%= index + 1 %></span>
               </div>
               <p><%= present_or_dash(item.description) %></p>
+
+              <div class="menu-inline-metrics">
+                <span class="menu-inline-metric"><strong>Raciones:</strong> <%= item.total_servings %></span>
+                <% if nutrition["kcal"].present? %>
+                  <span class="menu-inline-metric"><strong><%= nutrition["kcal"] %></strong> kcal/racion</span>
+                <% end %>
+              </div>
+
               <% if item.ingredients_json.present? %>
-                <p class="help-text">Ingredientes: <%= Array(item.ingredients_json).join(", ") %></p>
+                <p class="help-text"><strong>Ingredientes:</strong> <%= Array(item.ingredients_json).join(", ") %></p>
               <% end %>
+
               <% if item.allergens_json.present? %>
-                <p class="help-text">Alergenos: <%= Array(item.allergens_json).join(", ") %></p>
+                <div class="menu-chip-group">
+                  <% Array(item.allergens_json).each do |allergen| %>
+                    <span class="menu-chip menu-chip-danger"><%= allergen %></span>
+                  <% end %>
+                </div>
               <% end %>
-            </li>
+
+              <% if item.dietary_flags_json.present? %>
+                <div class="menu-chip-group">
+                  <% Array(item.dietary_flags_json).each do |flag| %>
+                    <span class="menu-chip menu-chip-info"><%= flag %></span>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <% if item.religious_notes.present? %>
+                <p class="menu-note menu-note-warning"><strong>Nota religiosa:</strong> <%= item.religious_notes %></p>
+              <% end %>
+            </article>
           <% end %>
-        </ol>
+        </div>
       <% else %>
         <div class="empty-state">El menu esta publicado pero todavia no tiene platos detallados.</div>
       <% end %>

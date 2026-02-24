@@ -15,21 +15,27 @@ module ApplicationHelper
     "succeeded" => "status-positive",
     "tenant_manager" => "status-positive",
     "system_admin" => "status-positive",
+    "compatible" => "status-positive",
+    "variety" => "status-positive",
 
     "draft" => "status-neutral",
     "queued" => "status-neutral",
     "running" => "status-neutral",
     "reserved" => "status-neutral",
+    "balanced" => "status-neutral",
+    "batch" => "status-neutral",
 
     "inactive" => "status-warning",
     "fallback_manual" => "status-warning",
+    "needs_review" => "status-warning",
 
     "suspended" => "status-danger",
     "discarded" => "status-danger",
     "expired" => "status-danger",
     "failed" => "status-danger",
     "blocked" => "status-danger",
-    "archived" => "status-danger"
+    "archived" => "status-danger",
+    "not_compatible" => "status-danger"
   }.freeze
 
   def status_pill(value)

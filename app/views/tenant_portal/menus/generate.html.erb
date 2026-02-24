@@ -117,6 +117,20 @@
 
     <p class="help-text">Este bloque no publica nada automaticamente. Solo crea un borrador en resumen.</p>
 
+    <% planning = @planning_preview.is_a?(Hash) ? @planning_preview : {} %>
+    <% if planning.present? %>
+      <div class="menu-smart-summary">
+        <div class="menu-smart-summary-card">
+          <h3>Modo sugerido IA</h3>
+          <p><%= planning[:menuGuideline] %></p>
+          <div class="menu-inline-metrics">
+            <span class="menu-inline-metric"><strong><%= planning[:suggestedMode] %></strong></span>
+            <span class="menu-inline-metric"><strong><%= planning[:urgentLots] %></strong> lotes criticos</span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <% if @ingredients_preview.any? %>
       <ul class="list-clean menu-preview-list">
         <% @ingredients_preview.each_with_index do |ingredient, index| %>
