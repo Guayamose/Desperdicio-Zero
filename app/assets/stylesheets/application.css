@@ -1091,18 +1091,19 @@ input[type="checkbox"] {
   color: var(--text);
 }
 
-  .nav-main.is-open {
-    display: flex;
-    position: fixed;
-    top: 90px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--surface);
-    flex-direction: column;
-    padding: 2rem;
-    z-index: 1000;
-  }
+.nav-main.is-open {
+  display: flex;
+  position: fixed;
+  top: 90px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface);
+  flex-direction: column;
+  padding: 2rem;
+  z-index: 1000;
+}
+
 /* Dashboard — hero grid & illustration */
 .dashboard-hero-grid {
   display: grid;
@@ -3425,6 +3426,8 @@ body.nav-open {
   height: 80%;
   object-fit: contain;
   display: block;
+}
+
 .profile-stat-icon {
   width: 48px;
   height: 48px;
