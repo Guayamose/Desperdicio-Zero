@@ -120,7 +120,7 @@ a:hover {
 }
 
 .app-header {
-  height: 80px;
+  height: 90px;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   position: sticky;
@@ -143,25 +143,21 @@ a:hover {
   gap: 1rem;
   text-decoration: none;
   color: var(--text);
+  height: 90px;
 }
 
 .brand-icon {
-  width: 34px;
-  height: 34px;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
+  height: 60%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
+  flex-shrink: 0;
 }
 
 .brand-logo {
-  width: 34px;
-  height: 34px;
+  height: 100%;
+  width: auto;
   object-fit: contain;
-  background: transparent;
   display: block;
 }
 
@@ -390,7 +386,7 @@ input[type="submit"]:hover {
   border-bottom: 1px solid var(--line);
   padding: 0.25rem 0;
   position: sticky;
-  top: 80px;
+  top: 90px;
   z-index: 90;
 }
 
@@ -997,8 +993,8 @@ input[type="checkbox"] {
 }
 
 .footer-brand-logo {
-  width: 28px;
-  height: 28px;
+  width: auto;
+  height: 30px;
   object-fit: contain;
   color: var(--text);
   background: transparent;
@@ -1028,8 +1024,8 @@ input[type="checkbox"] {
 }
 
 .footer-mini-logo {
-  width: 15px;
-  height: 15px;
+  width: auto;
+  height: 18px;
   object-fit: contain;
   color: var(--text);
   background: transparent;
@@ -1095,6 +1091,18 @@ input[type="checkbox"] {
   color: var(--text);
 }
 
+  .nav-main.is-open {
+    display: flex;
+    position: fixed;
+    top: 90px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--surface);
+    flex-direction: column;
+    padding: 2rem;
+    z-index: 1000;
+  }
 /* Dashboard — hero grid & illustration */
 .dashboard-hero-grid {
   display: grid;
@@ -3392,6 +3400,19 @@ body.nav-open {
 .profile-stat-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
+  padding: 1.35rem;
+  text-align: center;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.menu-generation-logo-shell {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 0.2rem;
+  display: grid;
+  place-items: center;
   border-color: var(--primary-border);
 }
 
@@ -3399,6 +3420,11 @@ body.nav-open {
   opacity: 1;
 }
 
+.menu-generation-logo {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  display: block;
 .profile-stat-icon {
   width: 48px;
   height: 48px;
