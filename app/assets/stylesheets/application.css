@@ -116,7 +116,8 @@ a:hover {
 }
 
 .main-shell {
-  padding: 2rem 0 4rem;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
 }
 
 .app-header {
@@ -398,13 +399,14 @@ input[type="submit"]:hover {
 }
 
 .section-link {
-  font-size: 0.8125rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  padding: 0.4rem 0.85rem;
+  padding: 0.65rem 1.15rem;
   border-radius: 99px;
   color: var(--text-muted);
   transition: var(--transition);
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .section-link:hover {
@@ -1072,6 +1074,13 @@ input[type="checkbox"] {
   padding: 1.5rem;
 }
 
+/* Form Grid — used in forms */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
 .detail-item {
   display: flex;
   flex-direction: column;
@@ -1346,6 +1355,14 @@ body.nav-open {
     padding: 0.25rem 0 !important;
     border-bottom: none !important;
     font-size: 0.9rem;
+    word-break: break-word;
+    /* Prevents long text from clipping flex container */
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  .table-shell td>* {
+    min-width: 0;
   }
 
   .table-shell td::before {
@@ -1719,7 +1736,8 @@ body.nav-open {
   }
 
   .main-shell {
-    padding: 1rem 0 2rem;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
   }
 
   /* Header — smaller */
