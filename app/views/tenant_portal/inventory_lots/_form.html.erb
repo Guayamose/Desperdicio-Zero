@@ -3,6 +3,8 @@
 <% product_name_value = @prefill_product_name.presence || params.dig(:inventory_lot, :product_name).presence || selected_product&.name %>
 
 <%= form_with model: [ :tenant, @inventory_lot ],
+  class: "premium-form-container",
+  style: "max-width: 800px; margin: 0 auto; padding-bottom: 2rem;",
   data: {
     controller: "inventory-form",
     action: "submit->inventory-form#confirmUnknownBarcode",
@@ -10,116 +12,162 @@
     inventory_form_barcode_check_url_value: api_v1_tenant_barcode_check_path,
     inventory_form_allergen_icon_map_value: allergen_icon_asset_map.to_json
   } do |f| %>
+  
   <% if @inventory_lot.errors.any? %>
-    <div class="flash alert"><%= @inventory_lot.errors.full_messages.join(", ") %></div>
+    <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; color: #b91c1c; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 2rem;">
+      <h3 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; color: #991b1b;">Se encontraron errores:</h3>
+      <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.85rem;">
+        <% @inventory_lot.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
   <% end %>
 
-  <div class="panel panel-soft">
-    <h2>Producto</h2>
-    <div class="form-grid">
-      <div class="field">
-        <%= f.label :product_id, "Producto existente" %>
-        <%= f.collection_select :product_id,
-          Product.order(:name),
-          :id,
-          :name,
-          { include_blank: "Seleccionar", selected: selected_product&.id },
-          { data: { inventory_form_target: "product" } } %>
-        <span class="help-text">Selecciona un producto ya registrado o usa barcode/manual.</span>
-      </div>
-
-      <div class="field">
-        <%= f.label :barcode, "Codigo de barras" %>
-        <%= f.hidden_field :unknown_barcode_confirmed, value: "0", data: { inventory_form_target: "unknownBarcodeConfirmed" } %>
-        <div class="input-inline">
-          <%= f.text_field :barcode,
-            value: barcode_value,
-            placeholder: "Ejemplo: 8412345678901",
-            inputmode: "numeric",
-            autocomplete: "off",
-            data: {
-              inventory_form_target: "barcode",
-              action: "input->inventory-form#scheduleBarcodeCheck blur->inventory-form#lookup"
-            } %>
-          <button type="button" class="btn btn-secondary btn-sm" data-action="inventory-form#lookup">
-            Autorrellenar
-          </button>
-        </div>
-        <p class="help-text" data-inventory-form-target="status">Escanea o escribe un codigo para completar datos automaticamente.</p>
-      </div>
-
-      <div class="field field-full">
-        <%= f.label :product_name, "Nombre manual (opcional)" %>
-        <%= f.text_field :product_name,
-          value: product_name_value,
-          placeholder: "Usado si el producto no existe en catalogo",
-          data: { inventory_form_target: "productName" } %>
-      </div>
+  <div class="form-section-card" style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 2rem; overflow: hidden;">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--line); background: var(--line-light);">
+      <h2 style="margin: 0; font-size: 1.1rem; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        Identificación del Producto
+      </h2>
     </div>
+    
+    <div style="padding: 2rem 1.5rem;">
+      <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+        
+        <!-- Product Select -->
+        <div class="field-group">
+          <%= f.label :product_id, "Producto en catálogo", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+          <%= f.collection_select :product_id,
+            Product.order(:name), :id, :name,
+            { include_blank: "Seleccionar de la lista desplegable..." },
+            { class: "input", style: "width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); padding: 0.75rem; background-color: var(--surface); color: var(--text);", 
+              data: { inventory_form_target: "product" } } %>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem;">Selecciona un producto registrado o introduce el código abajo para autorrellenar.</p>
+        </div>
 
-    <div class="product-preview <%= selected_product.present? ? "" : "is-hidden" %>" data-inventory-form-target="preview">
-      <div class="detail-grid">
-        <div class="detail-item">
-          <div class="detail-label">Producto</div>
-          <div class="detail-value" data-inventory-form-target="previewName"><%= selected_product&.name || "-" %></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">Marca</div>
-          <div class="detail-value" data-inventory-form-target="previewBrand"><%= selected_product&.brand.presence || "-" %></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">Categoria</div>
-          <div class="detail-value" data-inventory-form-target="previewCategory"><%= selected_product&.category.presence || "-" %></div>
-        </div>
-        <div class="detail-item">
-          <div class="detail-label">Alergenos</div>
-          <div class="detail-value" data-inventory-form-target="previewAllergens">
-            <%= selected_product.present? ? allergen_badges(Array(selected_product.allergens_json), empty: "Ninguno") : "-" %>
+        <!-- Barcode & Manual Name in a 2-column layout on desktop -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+          <div class="field-group">
+            <%= f.label :barcode, "Código de Barras", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+            <%= f.hidden_field :unknown_barcode_confirmed, value: "0", data: { inventory_form_target: "unknownBarcodeConfirmed" } %>
+            <div style="display: flex; gap: 0.5rem;">
+              <div style="position: relative; flex: 1;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <%= f.text_field :barcode,
+                  value: barcode_value,
+                  class: "input",
+                  placeholder: "Ej. 841...",
+                  inputmode: "numeric",
+                  autocomplete: "off",
+                  style: "width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.2rem; border-radius: var(--radius-md); border: 1px solid var(--line); font-family: 'Fira Code', monospace; background: var(--bg); color: var(--text); font-size: 0.95rem;",
+                  data: {
+                    inventory_form_target: "barcode",
+                    action: "input->inventory-form#scheduleBarcodeCheck blur->inventory-form#lookup"
+                  } %>
+              </div>
+              <button type="button" class="btn btn-secondary" style="border-radius: var(--radius-md); padding: 0 1rem; font-weight: 500;" data-action="inventory-form#lookup">
+                Verificar
+              </button>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem;" data-inventory-form-target="status">Listo para autocompletar.</p>
+          </div>
+
+          <div class="field-group">
+            <%= f.label :product_name, "Nombre manual (si no existe)", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+            <%= f.text_field :product_name,
+              value: product_name_value,
+              class: "input",
+              placeholder: "Descriptivo...",
+              style: "width: 100%; padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--bg); color: var(--text); font-size: 0.95rem;",
+              data: { inventory_form_target: "productName" } %>
           </div>
         </div>
+
+        <!-- Dynamic Product Preview Card -->
+        <div class="product-preview-card <%= selected_product.present? ? "" : "is-hidden" %>" data-inventory-form-target="preview" style="background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 0.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+          <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 0 0 1rem 0;">Información Recuperada</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+            <div>
+              <span style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem;">Nombre Interno</span>
+              <strong style="font-size: 0.95rem; font-weight: 600; color: var(--text);" data-inventory-form-target="previewName"><%= selected_product&.name.presence || "-" %></strong>
+            </div>
+            <div>
+              <span style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem;">Marca Comercial</span>
+              <strong style="font-size: 0.95rem; font-weight: 600; color: var(--text);" data-inventory-form-target="previewBrand"><%= selected_product&.brand.presence || "-" %></strong>
+            </div>
+            <div>
+              <span style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem;">Categoría</span>
+              <strong style="font-size: 0.95rem; font-weight: 600; color: var(--text);" data-inventory-form-target="previewCategory"><%= selected_product&.category.presence || "-" %></strong>
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <span style="display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">Ficha de Alérgenos Detectada</span>
+              <div data-inventory-form-target="previewAllergens" style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                <%= selected_product.present? ? allergen_badges(Array(selected_product.allergens_json), empty: "Ninguno") : "-" %>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <div class="panel panel-soft">
-    <h2>Stock</h2>
-    <div class="form-grid">
-      <div class="field">
-        <%= f.label :quantity, "Cantidad" %>
-        <%= f.number_field :quantity, step: 0.01 %>
+  <div class="form-section-card" style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 2rem; overflow: hidden;">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--line); background: var(--line-light);">
+      <h2 style="margin: 0; font-size: 1.1rem; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        Asignación de Stock (Lote)
+      </h2>
+    </div>
+
+    <div style="padding: 2rem 1.5rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
+        
+        <div class="field-group">
+          <%= f.label :quantity, "Cantidad Ingresada", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+          <%= f.number_field :quantity, step: 0.01, class: "input", style: "width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); padding: 0.75rem; background: var(--bg); color: var(--text); font-size: 0.95rem; font-family: monospace;" %>
+        </div>
+
+        <div class="field-group">
+          <%= f.label :unit, "Unidad de Medida", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+          <%= f.select :unit, InventoryLot.units.keys.map { |k| [k.capitalize, k] }, {}, class: "input", style: "width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); padding: 0.75rem; background-color: var(--surface); color: var(--text); font-size: 0.95rem;" %>
+        </div>
+
+        <div class="field-group">
+          <%= f.label :expires_on, "Fecha de Caducidad", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+          <%= f.date_field :expires_on, class: "input", style: "width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); padding: 0.75rem; background: var(--bg); color: var(--text); font-size: 0.95rem; color-scheme: dark light;" %>
+        </div>
+
+        <div class="field-group">
+          <%= f.label :received_on, "Fecha de Recepción", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+          <%= f.date_field :received_on, class: "input", style: "width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); padding: 0.75rem; background: var(--bg); color: var(--text); font-size: 0.95rem; color-scheme: dark light;" %>
+        </div>
+
+        <div class="field-group">
+          <%= f.label :status, "Estado Inicial", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+          <%= f.select :status, InventoryLot.statuses.keys.map { |k| [k.capitalize, k] }, {}, class: "input", style: "width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); padding: 0.75rem; background-color: var(--surface); color: var(--text); font-size: 0.95rem;" %>
+        </div>
+
+        <div class="field-group">
+          <%= f.label :source, "Canal de Origen", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+          <%= f.select :source, InventoryLot.sources.keys.map { |k| [k.capitalize, k] }, {}, class: "input", style: "width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); padding: 0.75rem; background-color: var(--surface); color: var(--text); font-size: 0.95rem;" %>
+        </div>
+
       </div>
-      <div class="field">
-        <%= f.label :unit, "Unidad" %>
-        <%= f.select :unit, InventoryLot.units.keys %>
-      </div>
-      <div class="field">
-        <%= f.label :expires_on, "Caducidad" %>
-        <%= f.date_field :expires_on %>
-      </div>
-      <div class="field">
-        <%= f.label :received_on, "Recepcion" %>
-        <%= f.date_field :received_on %>
-      </div>
-      <div class="field">
-        <%= f.label :status %>
-        <%= f.select :status, InventoryLot.statuses.keys %>
-      </div>
-      <div class="field">
-        <%= f.label :source, "Origen" %>
-        <%= f.select :source, InventoryLot.sources.keys %>
+
+      <div class="field-group" style="margin-top: 1.5rem;">
+        <%= f.label :notes, "Notas y Observaciones", style: "display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem;" %>
+        <%= f.text_area :notes, rows: 2, class: "input", placeholder: "Observaciones de estado o rotura de cadena de frío...", style: "width: 100%; border-radius: var(--radius-md); border: 1px solid var(--line); padding: 0.75rem; font-family: inherit; resize: vertical; background: var(--bg); color: var(--text); font-size: 0.95rem;" %>
       </div>
     </div>
   </div>
 
-  <div class="field">
-    <%= f.label :notes, "Notas" %>
-    <%= f.text_area :notes, rows: 3, placeholder: "Observaciones sobre estado, almacenamiento o trazabilidad" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit @inventory_lot.persisted? ? "Guardar cambios" : "Crear lote",
+  <div style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center; padding-top: 1rem;">
+    <%= link_to "Cancelar", tenant_inventory_lots_path, class: "btn btn-secondary", style: "padding: 0.75rem 1.5rem; font-weight: 500; border-radius: var(--radius-md);" %>
+    <%= f.submit @inventory_lot.persisted? ? "Guardar cambios" : "Registrar Lote",
       class: "btn btn-primary",
+      style: "padding: 0.75rem 2rem; font-weight: 600; border-radius: var(--radius-md);",
       data: { action: "click->inventory-form#confirmUnknownBarcode" } %>
-    <%= link_to "Cancelar", tenant_inventory_lots_path, class: "btn btn-secondary" %>
   </div>
 <% end %>
