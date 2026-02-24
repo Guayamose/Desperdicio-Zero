@@ -26,7 +26,7 @@
       <tbody>
         <% @memberships.each do |membership| %>
           <tr>
-            <td style="padding: 1.25rem 1rem;">
+            <td data-label="Nombre" style="padding: 1.25rem 1rem;">
               <div style="font-weight: 700; color: var(--text);">
                 <%= membership.user.full_name %>
                 <% if membership.user == current_user %>
@@ -34,24 +34,25 @@
                 <% end %>
               </div>
             </td>
-            <td>
-              <span style="color: var(--text-muted);"><%= membership.user.email %></span>
+            <td data-label="Email">
+              <span style="color: var(--text-muted); word-break: break-all;"><%= membership.user.email %></span>
             </td>
-            <td>
-              <%= form_with url: tenant_employee_path(membership), method: :patch, style: "display: flex; gap: 0.5rem; align-items: center;" do |f| %>
+            <td data-label="Rol">
+              <%= form_with url: tenant_employee_path(membership), method: :patch, class: "employee-role-form" do |f| %>
                 <%= select_tag "membership[role]",
                       options_for_select([["Personal", "tenant_staff"], ["Administrador", "tenant_manager"]], membership.role),
-                      style: "padding: 0.25rem 0.5rem; font-size: 0.8rem;" %>
+                      style: "padding: 0.35rem 0.5rem; font-size: 0.85rem;" %>
                 <%= f.submit "Cambiar", class: "btn btn-secondary btn-sm" %>
               <% end %>
             </td>
-            <td style="text-align: right;">
+            <td data-label="">
               <% unless membership.user == current_user %>
                 <%= button_to tenant_employee_path(membership), method: :delete,
                       data: { turbo_confirm: "¿Eliminar a #{membership.user.full_name} del comedor?" },
                       class: "btn btn-sm",
-                      style: "background: transparent; border: none; color: var(--danger);" do %>
+                      style: "background: transparent; border: 1px solid var(--danger); color: var(--danger);" do %>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  Eliminar
                 <% end %>
               <% end %>
             </td>

@@ -1,0 +1,263 @@
+<% planning = @menu.planning_notes_json.is_a?(Hash) ? @menu.planning_notes_json : {} %>
+
+<section class="cookbook-hero">
+  <div class="cookbook-hero-inner">
+    <div class="cookbook-hero-badge">
+      <span class="cookbook-icon">📖</span>
+    </div>
+    <div class="cookbook-hero-text">
+      <p class="cookbook-eyebrow">Recetario del día <%= ui_date(@menu.menu_date) %></p>
+      <h1 class="cookbook-title"><%= @menu.title %></h1>
+      <p class="cookbook-subtitle"><%= @menu.description.presence || "Instrucciones de cocina para el equipo del comedor." %></p>
+      <div class="cookbook-hero-meta">
+        <span class="cookbook-meta-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l4 2"/></svg>
+          <%= @menu.daily_menu_items.size %> platos
+        </span>
+        <span class="cookbook-meta-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <%= @menu.daily_menu_items.sum(&:total_servings) %> raciones totales
+        </span>
+        <% if planning["productionMode"].present? %>
+          <span class="cookbook-meta-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            Modo: <%= planning["productionMode"]&.capitalize %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+    <div class="cookbook-hero-actions">
+      <%= link_to tenant_menu_path(@menu), class: "btn btn-secondary" do %>
+        ← Volver al resumen
+      <% end %>
+      <button class="btn btn-secondary" onclick="window.print()">
+        🖨️ Imprimir
+      </button>
+    </div>
+  </div>
+</section>
+
+<% if @menu.allergens_json.present? %>
+  <section class="cookbook-allergens-bar">
+    <div class="cookbook-allergens-inner">
+      <span class="cookbook-allergens-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Alérgenos presentes en este menú:
+      </span>
+      <%= allergen_badges(Array(@menu.allergens_json)) %>
+    </div>
+  </section>
+<% end %>
+
+<% if planning["strategy"].present? %>
+  <section class="cookbook-strategy-strip">
+    <div class="cookbook-strategy-inner">
+      <div class="cookbook-strategy-icon">💡</div>
+      <div>
+        <strong>Estrategia del día:</strong>
+        <span><%= planning["strategy"] %></span>
+      </div>
+    </div>
+  </section>
+<% end %>
+
+<section class="cookbook-recipes">
+  <% @menu.daily_menu_items.each_with_index do |item, index| %>
+    <% cooking = item.cooking_instructions_json.is_a?(Hash) ? item.cooking_instructions_json : {} %>
+    <% nutrition = item.nutrition_json.is_a?(Hash) ? item.nutrition_json : {} %>
+
+    <article class="recipe-card" id="recipe-<%= index + 1 %>">
+      <div class="recipe-header">
+        <div class="recipe-number"><%= index + 1 %></div>
+        <div class="recipe-header-text">
+          <h2 class="recipe-name"><%= item.name %></h2>
+          <p class="recipe-description"><%= item.description.presence || "Plato del menú del día" %></p>
+        </div>
+        <div class="recipe-header-badges">
+          <span class="recipe-badge recipe-badge-servings">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <%= item.total_servings %> raciones
+          </span>
+          <% if cooking["difficulty"].present? %>
+            <% diff_class = case cooking["difficulty"].to_s.downcase
+                            when "facil", "fácil", "easy" then "recipe-badge-easy"
+                            when "medio", "medium" then "recipe-badge-medium"
+                            when "dificil", "difícil", "hard" then "recipe-badge-hard"
+                            else "recipe-badge-easy"
+                            end %>
+            <span class="recipe-badge <%= diff_class %>">
+              <%= cooking["difficulty"] %>
+            </span>
+          <% end %>
+          <% if cooking["prep_time"].present? %>
+            <span class="recipe-badge recipe-badge-time">
+              ⏱️ <%= cooking["prep_time"] %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="recipe-body">
+        <%# ---- INGREDIENTES ---- %>
+        <div class="recipe-ingredients">
+          <div class="recipe-section-header">
+            <div class="recipe-section-icon">🥕</div>
+            <h3>Ingredientes</h3>
+          </div>
+          <% if item.ingredients_json.present? %>
+            <ul class="ingredient-list">
+              <% Array(item.ingredients_json).each do |ingredient| %>
+                <li class="ingredient-item">
+                  <span class="ingredient-check">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
+                  </span>
+                  <span class="ingredient-text"><%= ingredient %></span>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="recipe-empty">No hay ingredientes registrados.</p>
+          <% end %>
+
+          <%# ---- ALÉRGENOS DEL PLATO ---- %>
+          <% if item.allergens_json.present? %>
+            <div class="recipe-allergens-mini">
+              <strong>⚠️ Alérgenos:</strong>
+              <%= allergen_badges(Array(item.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-compact") %>
+            </div>
+          <% end %>
+
+          <%# ---- INFO NUTRICIONAL MINI ---- %>
+          <% if nutrition.values.any?(&:present?) %>
+            <div class="recipe-nutrition-mini">
+              <h4>Valores por ración</h4>
+              <div class="nutrition-mini-grid">
+                <% if nutrition["kcal"].present? %>
+                  <div class="nutrition-mini-item">
+                    <span class="nutrition-mini-value"><%= nutrition["kcal"].to_i %></span>
+                    <span class="nutrition-mini-label">kcal</span>
+                  </div>
+                <% end %>
+                <% if nutrition["protein_g"].present? %>
+                  <div class="nutrition-mini-item">
+                    <span class="nutrition-mini-value"><%= nutrition["protein_g"] %>g</span>
+                    <span class="nutrition-mini-label">Proteína</span>
+                  </div>
+                <% end %>
+                <% if nutrition["carbs_g"].present? %>
+                  <div class="nutrition-mini-item">
+                    <span class="nutrition-mini-value"><%= nutrition["carbs_g"] %>g</span>
+                    <span class="nutrition-mini-label">Carbos</span>
+                  </div>
+                <% end %>
+                <% if nutrition["fat_g"].present? %>
+                  <div class="nutrition-mini-item">
+                    <span class="nutrition-mini-value"><%= nutrition["fat_g"] %>g</span>
+                    <span class="nutrition-mini-label">Grasa</span>
+                  </div>
+                <% end %>
+                <% if nutrition["fiber_g"].present? %>
+                  <div class="nutrition-mini-item">
+                    <span class="nutrition-mini-value"><%= nutrition["fiber_g"] %>g</span>
+                    <span class="nutrition-mini-label">Fibra</span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <%# ---- PASOS DE PREPARACIÓN ---- %>
+        <div class="recipe-steps">
+          <div class="recipe-section-header">
+            <div class="recipe-section-icon">👨‍🍳</div>
+            <h3>Preparación paso a paso</h3>
+          </div>
+
+          <% steps = Array(cooking["steps"]) %>
+          <% if steps.any? %>
+            <ol class="steps-list">
+              <% steps.each_with_index do |step, step_index| %>
+                <li class="step-item">
+                  <div class="step-number-badge"><%= step_index + 1 %></div>
+                  <div class="step-content">
+                    <p class="step-text"><%= step %></p>
+                  </div>
+                </li>
+              <% end %>
+            </ol>
+          <% else %>
+            <div class="recipe-no-instructions">
+              <div class="recipe-no-instructions-icon">📝</div>
+              <p>Las instrucciones de cocina se generarán automáticamente con IA la próxima vez que se cree este menú.</p>
+              <p class="help-text">Mientras tanto, consulta los ingredientes y cantidades para preparar el plato.</p>
+            </div>
+          <% end %>
+
+          <%# ---- TIPS DEL CHEF ---- %>
+          <% tips = Array(cooking["tips"]) %>
+          <% if tips.any? %>
+            <div class="chef-tips">
+              <div class="chef-tips-header">
+                <span class="chef-tips-icon">💡</span>
+                <strong>Consejos del Chef</strong>
+              </div>
+              <ul class="chef-tips-list">
+                <% tips.each do |tip| %>
+                  <li><%= tip %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <%# ---- NOTA DE APROVECHAMIENTO ---- %>
+          <% if cooking["waste_note"].present? %>
+            <div class="waste-note">
+              <span class="waste-note-icon">♻️</span>
+              <div>
+                <strong>Desperdicio cero</strong>
+                <p><%= cooking["waste_note"] %></p>
+              </div>
+            </div>
+          <% end %>
+
+          <%# ---- NOTAS RELIGIOSAS ---- %>
+          <% if item.religious_notes.present? %>
+            <div class="religious-note">
+              <span class="religious-note-icon">🕌</span>
+              <div>
+                <strong>Nota religiosa</strong>
+                <p><%= item.religious_notes %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </article>
+  <% end %>
+</section>
+
+<% waste_plan = planning.is_a?(Hash) ? Array(planning["wasteReductionPlan"]) : [] %>
+<% if waste_plan.any? %>
+  <section class="cookbook-waste-plan">
+    <div class="cookbook-waste-plan-inner">
+      <div class="cookbook-waste-plan-header">
+        <span class="cookbook-waste-plan-icon">♻️</span>
+        <h2>Plan desperdicio cero del día</h2>
+      </div>
+      <ul class="cookbook-waste-plan-list">
+        <% waste_plan.each do |line| %>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span><%= line %></span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </section>
+<% end %>
+
+<section class="cookbook-footer">
+  <p>Recetario generado para <strong><%= current_tenant.name %></strong> · <%= ui_date(@menu.menu_date) %></p>
+  <p class="help-text">Imprime esta página para tenerla en la cocina durante el servicio.</p>
+</section>

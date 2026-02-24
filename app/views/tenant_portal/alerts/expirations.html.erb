@@ -4,11 +4,11 @@
     <p class="page-subtitle">Priorización y gestión de inventario en riesgo.</p>
   </div>
   <div class="toolbar">
-    <%= link_to "Ver Inventario Completo", tenant_inventory_lots_path, class: "btn btn-secondary", style: "border-color: var(--line);" %>
+    <%= link_to "Ver Inventario Completo", tenant_inventory_lots_path, class: "btn btn-secondary" %>
   </div>
 </section>
 
-<div class="metric-grid" style="margin-bottom: 3rem;">
+<div class="metric-grid" style="margin-bottom: 2rem;">
   <div class="metric-card" style="border-left: 4px solid var(--accent); background: linear-gradient(to right, var(--accent-soft) 0%, var(--surface) 20%);">
     <div class="metric-label" style="color: var(--accent); text-transform: uppercase; font-weight: 800; font-size: 0.75rem;">Atención Requerida</div>
     <div class="metric-value"><%= @expiring_lots.count %></div>
@@ -22,75 +22,59 @@
   </div>
 </div>
 
-<section class="grid-2">
-  <article>
-    <div class="title-row" style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="font-size: 1.25rem; font-family: 'Outfit'; margin: 0;">Caducan en 48h</h2>
+<section class="alerts-panels">
+  <article class="alert-panel">
+    <div class="alert-panel-header">
+      <h2 class="alert-panel-title">Caducan en 48h</h2>
       <span class="status-pill status-warning">Alta Prioridad</span>
     </div>
 
     <% if @expiring_lots.any? %>
-      <div class="table-shell">
-        <table>
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Vence</th>
-              <th>Cant.</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @expiring_lots.each do |lot| %>
-              <tr style="border-bottom: 1px solid var(--line-light); background: var(--surface); transition: var(--transition);" onmouseover="this.style.background='var(--line-light)'" onmouseout="this.style.background='transparent'">
-                <td style="padding: 1rem; font-weight: 600; font-size: 0.9rem;"><%= lot.product.name %></td>
-                <td style="padding: 1rem; font-size: 0.9rem; color: var(--text-muted);"><%= ui_date(lot.expires_on) %></td>
-                <td style="padding: 1rem; font-size: 0.9rem;"><%= lot.quantity %> <span style="font-size: 0.75rem; color: var(--text-muted);"><%= lot.unit %></span></td>
-                <td style="padding: 1rem;"><%= status_pill(lot.status) %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+      <div class="alert-items-list">
+        <% @expiring_lots.each do |lot| %>
+          <div class="alert-item alert-item-warning">
+            <div class="alert-item-main">
+              <span class="alert-item-name"><%= lot.product.name %></span>
+              <span class="alert-item-qty"><%= lot.quantity %> <small><%= lot.unit %></small></span>
+            </div>
+            <div class="alert-item-meta">
+              <span class="alert-item-date">Vence: <%= ui_date(lot.expires_on) %></span>
+              <%= status_pill(lot.status) %>
+            </div>
+          </div>
+        <% end %>
       </div>
     <% else %>
-      <div class="empty-state" style="background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius-lg); padding: 4rem 2rem;">
+      <div class="empty-state" style="background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius-lg); padding: 3rem 2rem;">
         <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Inventario saludable</p>
         <span style="font-size: 0.9rem; color: var(--text-muted);">No hay lotes próximos a caducar.</span>
       </div>
     <% end %>
   </article>
 
-  <article>
-    <div class="title-row" style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-      <h2 style="font-size: 1.25rem; font-family: 'Outfit'; margin: 0;">Lotes Vencidos</h2>
+  <article class="alert-panel">
+    <div class="alert-panel-header">
+      <h2 class="alert-panel-title">Lotes Vencidos</h2>
       <span class="status-pill status-danger">Crítico</span>
     </div>
 
     <% if @expired_lots.any? %>
-      <div class="table-shell" style="border-color: rgba(239, 68, 68, 0.2);">
-        <table style="background: var(--danger-soft);">
-          <thead style="background: rgba(239, 68, 68, 0.05); border-bottom: 1px solid rgba(239, 68, 68, 0.1);">
-            <tr>
-              <th style="color: var(--danger);">Producto</th>
-              <th style="color: var(--danger);">Caducidad</th>
-              <th style="color: var(--danger);">Cant.</th>
-              <th style="text-align: right; color: var(--danger);">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @expired_lots.each do |lot| %>
-              <tr style="border-bottom: 1px solid rgba(239, 68, 68, 0.1);">
-                <td style="padding: 1rem; font-weight: 600; font-size: 0.9rem; color: var(--danger);"><%= lot.product.name %></td>
-                <td style="padding: 1rem; font-size: 0.9rem; color: var(--danger); opacity: 0.8;"><%= ui_date(lot.expires_on) %></td>
-                <td style="padding: 1rem; font-size: 0.9rem; color: var(--danger);"><%= lot.quantity %> <span style="font-size: 0.75rem; opacity: 0.8;"><%= lot.unit %></span></td>
-                <td style="padding: 1rem; text-align: right;"><%= status_pill("expired") %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+      <div class="alert-items-list">
+        <% @expired_lots.each do |lot| %>
+          <div class="alert-item alert-item-danger">
+            <div class="alert-item-main">
+              <span class="alert-item-name" style="color: var(--danger);"><%= lot.product.name %></span>
+              <span class="alert-item-qty" style="color: var(--danger);"><%= lot.quantity %> <small><%= lot.unit %></small></span>
+            </div>
+            <div class="alert-item-meta">
+              <span class="alert-item-date" style="color: var(--danger); opacity: 0.8;">Venció: <%= ui_date(lot.expires_on) %></span>
+              <%= status_pill("expired") %>
+            </div>
+          </div>
+        <% end %>
       </div>
     <% else %>
-      <div class="empty-state" style="background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius-lg); padding: 4rem 2rem;">
+      <div class="empty-state" style="background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius-lg); padding: 3rem 2rem;">
         <p style="margin: 0; font-weight: 700; font-size: 1.1rem;">Todo optimizado</p>
         <span style="font-size: 0.9rem; color: var(--text-muted);">No hay lotes vencidos en el sistema.</span>
       </div>

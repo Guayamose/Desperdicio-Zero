@@ -3,8 +3,8 @@
   <div class="container">
     <div style="max-width: 800px;">
       <span class="eyebrow" style="color: var(--primary); font-weight: 800; letter-spacing: 0.2em;">BIENVENIDO AL PORTAL DE SOLIDARIDAD</span>
-      <h1 style="font-size: 4.5rem; line-height: 1; margin: 1rem 0; color: white;">Alimentos con propósito.</h1>
-      <p style="font-size: 1.5rem; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">
+      <h1 class="portal-hero-heading">Alimentos con propósito.</h1>
+      <p class="portal-hero-subtitle">
         Gestionamos el excedente alimentario para garantizar que cada plato llegue a quien más lo necesita.
       </p>
     </div>
@@ -33,10 +33,10 @@
 <% end %>
 
 <section class="container" style="margin-top: 4rem;">
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+  <div class="section-header-row">
     <div>
       <span class="eyebrow" style="color: var(--primary);">LO QUE SE COCINA HOY</span>
-      <h2 style="font-size: 2.5rem; margin-top: 0.5rem;">Menús Destacados</h2>
+      <h2 class="section-heading">Menús Destacados</h2>
     </div>
     <%= link_to public_tenants_path, class: "btn btn-secondary" do %>
       Ver todos los comedores
