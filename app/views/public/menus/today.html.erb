@@ -22,7 +22,10 @@
       <p><%= present_or_dash(@menu.description) %></p>
 
       <% if @menu.allergens_json.present? %>
-        <p class="help-text"><strong>Alergenos:</strong> <%= Array(@menu.allergens_json).join(", ") %></p>
+        <div class="help-text">
+          <strong>Alergenos:</strong>
+          <%= allergen_badges(Array(@menu.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
+        </div>
       <% end %>
 
       <h3 class="section-title mt-md">Platos del menu</h3>
@@ -39,7 +42,10 @@
                 <p class="help-text">Ingredientes: <%= Array(item.ingredients_json).join(", ") %></p>
               <% end %>
               <% if item.allergens_json.present? %>
-                <p class="help-text">Alergenos: <%= Array(item.allergens_json).join(", ") %></p>
+                <div class="help-text">
+                  <strong>Alergenos:</strong>
+                  <%= allergen_badges(Array(item.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
+                </div>
               <% end %>
             </li>
           <% end %>

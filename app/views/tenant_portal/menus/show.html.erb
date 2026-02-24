@@ -57,11 +57,7 @@
             <% end %>
 
             <% if item.allergens_json.present? %>
-              <div class="menu-chip-group">
-                <% Array(item.allergens_json).each do |allergen| %>
-                  <span class="menu-chip menu-chip-danger"><%= allergen %></span>
-                <% end %>
-              </div>
+              <%= allergen_badges(Array(item.allergens_json)) %>
             <% end %>
           </article>
         <% end %>
@@ -92,11 +88,7 @@
 
     <% if @menu.allergens_json.present? %>
       <h4 class="menu-mini-title">Alergenos generales</h4>
-      <div class="menu-chip-group">
-        <% Array(@menu.allergens_json).each do |allergen| %>
-          <span class="menu-chip menu-chip-danger"><%= allergen %></span>
-        <% end %>
-      </div>
+      <%= allergen_badges(Array(@menu.allergens_json)) %>
     <% end %>
 
     <% if @menu.draft? %>

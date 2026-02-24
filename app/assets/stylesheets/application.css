@@ -1534,6 +1534,49 @@ textarea:focus {
   background: var(--danger-soft);
 }
 
+.allergen-badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+}
+
+.allergen-badge-group-inline {
+  display: inline-flex;
+  margin-top: 0;
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
+.allergen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid #fecaca;
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.allergen-badge-text-only {
+  padding-left: 0.6rem;
+}
+
+.allergen-icon {
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.allergen-label {
+  white-space: nowrap;
+}
+
 .menu-summary-checklist {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);

@@ -32,6 +32,33 @@ module ApplicationHelper
     "archived" => "status-danger"
   }.freeze
 
+  ALLERGEN_ICON_FILES = {
+    gluten: "Icons/CerealesConGluten.webp",
+    crustaceos: "Icons/Crustaceos.webp",
+    huevos: "Icons/Huevos.webp",
+    pescado: "Icons/Pescado.webp",
+    cacahuetes: "Icons/Cacahuetes.webp",
+    soja: "Icons/Soja.webp",
+    lacteos: "Icons/Lacteos.webp",
+    frutos_de_cascara: "Icons/FrutosDeCascara.webp",
+    apio: "Icons/Apio.webp",
+    mostaza: "Icons/Mostaza.webp",
+    sesamo: "Icons/GranosSesamo.webp",
+    sulfitos: "Icons/DioxidoDeAzufreYSulfatos.webp",
+    altramuces: "Icons/Altramuces.webp",
+    moluscos: "Icons/Moluscos.webp"
+  }.freeze
+
+  OPERATING_DAYS_LABELS = {
+    "lunes" => "Lunes",
+    "martes" => "Martes",
+    "miercoles" => "Miercoles",
+    "jueves" => "Jueves",
+    "viernes" => "Viernes",
+    "sabado" => "Sabado",
+    "domingo" => "Domingo"
+  }.freeze
+
   def status_pill(value)
     label = value.to_s.tr("_", " ").capitalize
     klass = STATUS_CLASS_MAP.fetch(value.to_s, "status-neutral")
@@ -41,6 +68,48 @@ module ApplicationHelper
 
   def yes_no(value)
     value ? "Si" : "No"
+  end
+
+  def allergen_badges(allergens, empty: nil, wrapper_class: "allergen-badge-group")
+    values = Array(allergens).map { |item| item.to_s.strip }.reject(&:blank?)
+    return content_tag(:span, empty, class: "muted") if values.empty? && empty.present?
+    return content_tag(:span, "Ninguno", class: "muted") if values.empty?
+
+    content_tag(:div, class: wrapper_class) do
+      safe_join(values.map { |allergen| allergen_badge(allergen) })
+    end
+  end
+
+  def allergen_icon_asset_map
+    ALLERGEN_ICON_FILES.transform_values { |asset_name| asset_path(asset_name) }
+  end
+
+  def operating_days_labels
+    OPERATING_DAYS_LABELS
+  end
+
+  def operating_hours_rows(raw_hours)
+    hours = raw_hours.is_a?(Hash) ? raw_hours : {}
+    normalized = hours
+      .to_h
+      .transform_keys(&:to_s)
+      .transform_values { |value| value.to_s.strip }
+      .reject { |_day, value| value.blank? }
+
+    ordered_days = OPERATING_DAYS_LABELS.keys.select { |day| normalized.key?(day) }
+    extra_days = (normalized.keys - OPERATING_DAYS_LABELS.keys).sort
+
+    (ordered_days + extra_days).map do |day|
+      [ OPERATING_DAYS_LABELS.fetch(day, day.humanize), normalized.fetch(day) ]
+    end
+  end
+
+  def operating_hours_summary(raw_hours)
+    rows = operating_hours_rows(raw_hours)
+    return "Horario no disponible" if rows.empty?
+
+    day, period = rows.first
+    "#{day}: #{period}"
   end
 
   def present_or_dash(value)
@@ -149,6 +218,52 @@ module ApplicationHelper
   end
 
   private
+
+  def allergen_badge(allergen)
+    icon_path = allergen_icon_path(allergen)
+    classes = [ "allergen-badge" ]
+    classes << "allergen-badge-text-only" if icon_path.blank?
+
+    content_tag(:span, class: classes.join(" "), title: allergen) do
+      parts = []
+      if icon_path.present?
+        parts << image_tag(icon_path, alt: "Icono alergeno #{allergen}", class: "allergen-icon", loading: "lazy")
+      end
+      parts << content_tag(:span, allergen, class: "allergen-label")
+      safe_join(parts)
+    end
+  end
+
+  def allergen_icon_path(allergen)
+    key = allergen_icon_key(allergen)
+    return nil if key.blank?
+
+    asset_path(ALLERGEN_ICON_FILES.fetch(key))
+  end
+
+  def allergen_icon_key(allergen)
+    normalized = normalize_allergen_name(allergen)
+    return :gluten if normalized.match?(/\b(gluten|trigo|cebada|centeno|avena|espelta|kamut)\b/)
+    return :crustaceos if normalized.match?(/crustace|crustacean|shrimp|prawn/)
+    return :huevos if normalized.match?(/huevo|egg/)
+    return :pescado if normalized.match?(/pescado|fish/)
+    return :cacahuetes if normalized.match?(/\b(cacahuete|cacahuetes|mani|peanut|peanuts)\b/)
+    return :soja if normalized.match?(/soja|soy/)
+    return :lacteos if normalized.match?(/\b(lacteo|lacteos|lactosa|leche|milk)\b/)
+    return :frutos_de_cascara if normalized.match?(/frutos?\s+(de\s+)?cascara|frutos?\s+secos|nueces?|tree\s+nuts?/)
+    return :apio if normalized.match?(/apio|celery/)
+    return :mostaza if normalized.match?(/mostaza|mustard/)
+    return :sesamo if normalized.match?(/sesamo|sesame/)
+    return :sulfitos if normalized.match?(/sulfit|sulfat|dioxido\s+de\s+azufre|sulfur\s+dioxide/)
+    return :altramuces if normalized.match?(/altramuz|altramuces|lupin/)
+    return :moluscos if normalized.match?(/molusco|mollusc|mollusk/)
+
+    nil
+  end
+
+  def normalize_allergen_name(value)
+    I18n.transliterate(value.to_s).downcase.gsub(/[^a-z0-9]+/, " ").strip
+  end
 
   def placeholder_image_for(tenant)
     seed = tenant.id || tenant.slug.to_s.each_byte.sum
