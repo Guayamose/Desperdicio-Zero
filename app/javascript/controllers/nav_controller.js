@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["menu", "trigger"]
+  static targets = ["menu"]
 
   connect() {
     this.boundResize = this.handleResize.bind(this)
@@ -17,19 +17,17 @@ export default class extends Controller {
     if (!this.hasMenuTarget) return
 
     const isOpen = this.menuTarget.classList.toggle("is-open")
-    if (this.hasTriggerTarget) {
-      this.triggerTarget.setAttribute("aria-expanded", isOpen ? "true" : "false")
-    }
+
+    // Lock body scroll when menu is open
+    document.body.classList.toggle("nav-open", isOpen)
   }
 
   handleResize() {
     if (!this.hasMenuTarget) return
 
-    if (window.innerWidth > 760) {
+    if (window.innerWidth > 940) {
       this.menuTarget.classList.remove("is-open")
-      if (this.hasTriggerTarget) {
-        this.triggerTarget.setAttribute("aria-expanded", "false")
-      }
+      document.body.classList.remove("nav-open")
     }
   }
 }

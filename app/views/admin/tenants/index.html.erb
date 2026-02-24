@@ -24,12 +24,12 @@
       <tbody>
         <% @tenants.each do |tenant| %>
           <tr>
-            <td><strong><%= tenant.name %></strong></td>
-            <td><%= tenant.slug %></td>
-            <td><%= status_pill(tenant.status) %></td>
-            <td><%= present_or_dash(tenant.city) %></td>
-            <td><%= present_or_dash(tenant.contact_email) %></td>
-            <td>
+            <td data-label="Nombre"><strong><%= tenant.name %></strong></td>
+            <td data-label="Slug"><%= tenant.slug %></td>
+            <td data-label="Estado"><%= status_pill(tenant.status) %></td>
+            <td data-label="Ciudad"><%= present_or_dash(tenant.city) %></td>
+            <td data-label="Contacto"><span style="word-break: break-all;"><%= present_or_dash(tenant.contact_email) %></span></td>
+            <td data-label="">
               <div class="actions">
                 <%= link_to "Ver", admin_tenant_path(tenant), class: "btn btn-secondary btn-sm" %>
                 <%= link_to "Editar", edit_admin_tenant_path(tenant), class: "btn btn-secondary btn-sm" %>

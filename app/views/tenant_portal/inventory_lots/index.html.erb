@@ -15,7 +15,7 @@
 
 <turbo-frame id="inventory_lots_panel" data-turbo-action="replace">
   <section class="panel" data-controller="card-filter" style="padding: 1.5rem;">
-    <div class="field" style="margin-bottom: 2rem; max-width: 400px;">
+    <div class="field" style="margin-bottom: 2rem;">
       <label for="inventory-filter" style="font-size: 0.75rem; color: var(--text-muted);">Filtrar por producto, lote o estado</label>
       <div style="position: relative;">
         <input id="inventory-filter" type="search" placeholder="Buscar en inventario..." data-card-filter-target="query" data-action="input->card-filter#filter" style="padding-left: 2.5rem;">
@@ -37,21 +37,23 @@
         <tbody>
           <% @inventory_lots.each do |lot| %>
             <tr data-card-filter-target="card" data-search="<%= [lot.product.name, lot.status, lot.unit, lot.source].join(' ') %>">
-              <td style="padding: 1.25rem 1rem;">
-                <div style="font-weight: 700; color: var(--text);"><%= lot.product.name %></div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">LOTE #<%= lot.id %> • <%= lot.source.upcase %></div>
+              <td data-label="Producto">
+                <div>
+                  <div style="font-weight: 700; color: var(--text);"><%= lot.product.name %></div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">LOTE #<%= lot.id %> • <%= lot.source.upcase %></div>
+                </div>
               </td>
-              <td>
+              <td data-label="Cantidad">
                 <span style="font-weight: 600; font-size: 1rem;"><%= lot.quantity %></span>
                 <span style="font-size: 0.8rem; color: var(--text-muted);"><%= lot.unit %></span>
               </td>
-              <td>
+              <td data-label="Vence el">
                 <div style="font-weight: 500; <%= 'color: var(--danger);' if lot.expires_on <= Date.today + 2.days %>">
                   <%= ui_date(lot.expires_on) %>
                 </div>
               </td>
-              <td><%= status_pill(lot.status) %></td>
-              <td style="text-align: right;">
+              <td data-label="Estado"><%= status_pill(lot.status) %></td>
+              <td data-label="">
                 <div class="actions" style="justify-content: flex-end; margin-top: 0;">
                   <%= link_to "Ver", tenant_inventory_lot_path(lot), class: "btn btn-secondary btn-sm", data: { turbo_frame: "_top" } %>
                   <%= link_to "Editar", edit_tenant_inventory_lot_path(lot), class: "btn btn-secondary btn-sm", data: { turbo_frame: "_top" } %>

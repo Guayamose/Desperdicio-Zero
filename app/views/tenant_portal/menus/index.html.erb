@@ -56,16 +56,19 @@
       <tbody>
         <% @menus.each do |menu| %>
           <tr data-card-filter-target="card" data-search="<%= [menu.title, menu.status, menu.generated_by].join(' ') %>">
-            <td style="white-space: nowrap;"><strong><%= ui_date(menu.menu_date) %></strong></td>
-            <td>
-              <strong><%= menu.title %></strong>
-              <div class="help-text"><%= truncate(menu.description, length: 90) %></div>
+            <td data-label="Fecha" style="white-space: nowrap;"><strong><%= ui_date(menu.menu_date) %></strong></td>
+            <td data-label="Menú">
+              <div>
+                <strong><%= menu.title %></strong>
+                <div class="help-text"><%= truncate(menu.description, length: 90) %></div>
+              </div>
             </td>
-            <td><%= status_pill(menu.status) %></td>
-            <td><%= status_pill(menu.generated_by) %></td>
-            <td style="text-align: right;">
+            <td data-label="Estado"><%= status_pill(menu.status) %></td>
+            <td data-label="Origen"><%= status_pill(menu.generated_by) %></td>
+            <td data-label="">
               <div class="actions" style="justify-content: flex-end; margin-top: 0;">
                 <%= link_to "Resumen", tenant_menu_path(menu), class: "btn btn-secondary btn-sm" %>
+                <%= link_to "Recetario", cookbook_tenant_menu_path(menu), class: "btn btn-secondary btn-sm" %>
                 <%= link_to "Editar", edit_tenant_menu_path(menu), class: "btn btn-secondary btn-sm" %>
               </div>
             </td>

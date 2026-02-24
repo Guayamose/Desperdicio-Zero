@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_02_24_090506) do
+ActiveRecord::Schema[7.1].define(version: 2026_02_24_173204) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -44,6 +44,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_02_24_090506) do
     t.jsonb "dietary_flags_json", default: [], null: false
     t.text "religious_notes"
     t.jsonb "inventory_usage_json", default: [], null: false
+    t.jsonb "cooking_instructions_json", default: {}, null: false
     t.index ["daily_menu_id"], name: "index_daily_menu_items_on_daily_menu_id"
   end
 
