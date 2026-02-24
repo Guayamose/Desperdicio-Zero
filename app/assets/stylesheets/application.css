@@ -185,6 +185,7 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex: 1;
 }
 
 .nav-link {
@@ -1091,18 +1092,6 @@ input[type="checkbox"] {
   color: var(--text);
 }
 
-.nav-main.is-open {
-  display: flex;
-  position: fixed;
-  top: 90px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--surface);
-  flex-direction: column;
-  padding: 2rem;
-  z-index: 1000;
-}
 
 /* Dashboard — hero grid & illustration */
 .dashboard-hero-grid {
@@ -1522,7 +1511,7 @@ body.nav-open {
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 80px;
+    top: 90px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -1588,7 +1577,7 @@ body.nav-open {
 
   /* Section nav — horizontal scrollable */
   .section-nav {
-    top: 80px;
+    top: 90px;
   }
 
   .section-nav-inner {
