@@ -2,10 +2,14 @@
   <div>
     <p class="eyebrow">Resumen del dia <%= ui_date(@menu.menu_date) %></p>
     <h1 class="page-title"><%= @menu.title %></h1>
-    <p class="page-subtitle">Valida platos y alergenos antes de confirmar publicacion.</p>
+    <p class="page-subtitle">Revision completa: produccion, nutricion, alergenos y compatibilidad alimentaria antes de publicar.</p>
     <div class="menu-summary-badges">
       <%= status_pill(@menu.status) %>
       <%= status_pill(@menu.generated_by) %>
+      <% production_mode = @menu.planning_notes_json.is_a?(Hash) ? @menu.planning_notes_json["productionMode"].presence : nil %>
+      <% if production_mode.present? %>
+        <%= status_pill(production_mode) %>
+      <% end %>
     </div>
   </div>
   <div class="toolbar">
@@ -27,7 +31,7 @@
       <%= button_to tenant_menu_path(@menu),
         method: :delete,
         class: "btn btn-danger",
-        form: { data: { turbo_confirm: "Eliminar este menu borrador? Esta accion no se puede deshacer." } } do %>
+        form: { data: { turbo_confirm: "Eliminar este menu? Esta accion no se puede deshacer." } } do %>
         Eliminar menu
       <% end %>
     </div>
@@ -41,14 +45,92 @@
       <span class="status-pill status-neutral"><%= @menu.daily_menu_items.size %> platos</span>
     </div>
 
+    <% planning = @menu.planning_notes_json.is_a?(Hash) ? @menu.planning_notes_json : {} %>
+    <% nutrition_summary = @menu.nutrition_summary_json.is_a?(Hash) ? @menu.nutrition_summary_json : {} %>
+    <% dietary = @menu.dietary_guidance_json.is_a?(Hash) ? @menu.dietary_guidance_json : {} %>
+
+    <div class="menu-smart-summary">
+      <div class="menu-smart-summary-card">
+        <h3>Estrategia de produccion</h3>
+        <p><%= present_or_dash(planning["strategy"].presence || @menu.description) %></p>
+        <div class="menu-inline-metrics">
+          <% if planning["estimatedTotalServings"].present? %>
+            <span class="menu-inline-metric"><strong><%= planning["estimatedTotalServings"] %></strong> raciones estimadas</span>
+          <% end %>
+          <% if planning["productionMode"].present? %>
+            <span class="menu-inline-metric"><strong>Modo:</strong> <%= planning["productionMode"] %></span>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="menu-smart-summary-card">
+        <h3>Nutricion estimada</h3>
+        <div class="menu-nutrition-grid">
+          <% if nutrition_summary["estimatedTotalKcal"].present? %>
+            <div class="menu-nutrition-item"><span>Kcal totales</span><strong><%= nutrition_summary["estimatedTotalKcal"] %></strong></div>
+          <% end %>
+          <% if nutrition_summary["estimatedAverageKcalPerServing"].present? %>
+            <div class="menu-nutrition-item"><span>Kcal / racion</span><strong><%= nutrition_summary["estimatedAverageKcalPerServing"] %></strong></div>
+          <% end %>
+          <% if nutrition_summary["proteinFocus"].present? %>
+            <div class="menu-nutrition-item"><span>Proteina</span><strong><%= nutrition_summary["proteinFocus"] %></strong></div>
+          <% end %>
+          <% if nutrition_summary["carbFocus"].present? %>
+            <div class="menu-nutrition-item"><span>Carbohidratos</span><strong><%= nutrition_summary["carbFocus"] %></strong></div>
+          <% end %>
+          <% if nutrition_summary["fatFocus"].present? %>
+            <div class="menu-nutrition-item"><span>Grasas</span><strong><%= nutrition_summary["fatFocus"] %></strong></div>
+          <% end %>
+        </div>
+        <% if nutrition_summary["notes"].present? %>
+          <p class="help-text"><strong>Nota:</strong> <%= nutrition_summary["notes"] %></p>
+        <% end %>
+      </div>
+
+      <div class="menu-smart-summary-card">
+        <h3>Compatibilidad alimentaria</h3>
+        <div class="menu-inline-metrics">
+          <% if dietary["halalStatus"].present? %>
+            <span class="menu-inline-metric"><strong>Halal:</strong> <%= dietary["halalStatus"] %></span>
+          <% end %>
+          <% if Array(dietary["haramRisks"]).any? %>
+            <span class="menu-inline-metric is-warning"><strong>Riesgos haram:</strong> <%= Array(dietary["haramRisks"]).join(", ") %></span>
+          <% end %>
+        </div>
+        <% if Array(dietary["vegetarianOptions"]).any? %>
+          <p class="help-text"><strong>Opciones vegetarianas:</strong> <%= Array(dietary["vegetarianOptions"]).join(", ") %></p>
+        <% end %>
+        <% if Array(dietary["veganOptions"]).any? %>
+          <p class="help-text"><strong>Opciones veganas:</strong> <%= Array(dietary["veganOptions"]).join(", ") %></p>
+        <% end %>
+        <% if dietary["religiousNotes"].present? %>
+          <p class="help-text"><strong>Nota:</strong> <%= dietary["religiousNotes"] %></p>
+        <% end %>
+      </div>
+    </div>
+
     <% if @menu.daily_menu_items.any? %>
-      <div class="menu-dishes-grid">
+      <div class="menu-dishes-grid menu-dishes-grid-rich">
         <% @menu.daily_menu_items.each do |item| %>
+          <% nutrition = item.nutrition_json.is_a?(Hash) ? item.nutrition_json : {} %>
           <article class="menu-dish-card">
-            <h3><%= item.name %></h3>
+            <div class="menu-dish-head">
+              <h3><%= item.name %></h3>
+              <span class="status-pill status-neutral"><%= item.total_servings %> raciones</span>
+            </div>
+
             <p><%= present_or_dash(item.description) %></p>
 
+            <div class="menu-inline-metrics">
+              <span class="menu-inline-metric"><strong>Por lote:</strong> <%= item.servings %></span>
+              <span class="menu-inline-metric"><strong>Repeticiones:</strong> <%= item.repetitions %></span>
+              <% if nutrition["kcal"].present? %>
+                <span class="menu-inline-metric"><strong><%= nutrition["kcal"] %></strong> kcal/racion</span>
+              <% end %>
+            </div>
+
             <% if item.ingredients_json.present? %>
+              <h4 class="menu-mini-title">Ingredientes</h4>
               <div class="menu-chip-group">
                 <% Array(item.ingredients_json).each do |ingredient| %>
                   <span class="menu-chip"><%= ingredient %></span>
@@ -57,7 +139,61 @@
             <% end %>
 
             <% if item.allergens_json.present? %>
-              <%= allergen_badges(Array(item.allergens_json)) %>
+              <h4 class="menu-mini-title">Alergenos</h4>
+              <div class="menu-chip-group">
+                <% Array(item.allergens_json).each do |allergen| %>
+                  <span class="menu-chip menu-chip-danger"><%= allergen %></span>
+                <% end %>
+              </div>
+            <% end %>
+
+            <% if item.dietary_flags_json.present? %>
+              <h4 class="menu-mini-title">Etiquetas dietarias</h4>
+              <div class="menu-chip-group">
+                <% Array(item.dietary_flags_json).each do |flag| %>
+                  <span class="menu-chip menu-chip-info"><%= flag %></span>
+                <% end %>
+              </div>
+            <% end %>
+
+            <div class="menu-nutrition-grid menu-nutrition-grid-compact">
+              <% if nutrition["protein_g"].present? %>
+                <div class="menu-nutrition-item"><span>Proteina</span><strong><%= nutrition["protein_g"] %> g</strong></div>
+              <% end %>
+              <% if nutrition["carbs_g"].present? %>
+                <div class="menu-nutrition-item"><span>Carbs</span><strong><%= nutrition["carbs_g"] %> g</strong></div>
+              <% end %>
+              <% if nutrition["fat_g"].present? %>
+                <div class="menu-nutrition-item"><span>Grasa</span><strong><%= nutrition["fat_g"] %> g</strong></div>
+              <% end %>
+              <% if nutrition["fiber_g"].present? %>
+                <div class="menu-nutrition-item"><span>Fibra</span><strong><%= nutrition["fiber_g"] %> g</strong></div>
+              <% end %>
+            </div>
+
+            <% if item.religious_notes.present? %>
+              <p class="menu-note menu-note-warning"><strong>Nota religiosa:</strong> <%= item.religious_notes %></p>
+            <% end %>
+
+            <% if item.inventory_usage_json.present? %>
+              <h4 class="menu-mini-title">Trazabilidad de inventario</h4>
+              <ul class="list-clean menu-usage-list">
+                <% Array(item.inventory_usage_json).each do |usage| %>
+                  <% usage_hash = usage.is_a?(Hash) ? usage : {} %>
+                  <li>
+                    <strong><%= usage_hash["product"].presence || usage_hash[:product].presence || "Ingrediente" %></strong>
+                    <span>
+                      <% lot_label = usage_hash["lotId"].presence || usage_hash[:lotId].presence %>
+                      <% if lot_label.present? %>
+                        lote #<%= lot_label %>
+                      <% end %>
+                      <% if usage_hash["quantity"].present? || usage_hash[:quantity].present? %>
+                        - <%= usage_hash["quantity"].presence || usage_hash[:quantity] %> <%= usage_hash["unit"].presence || usage_hash[:unit] %>
+                      <% end %>
+                    </span>
+                  </li>
+                <% end %>
+              </ul>
             <% end %>
           </article>
         <% end %>
@@ -84,6 +220,14 @@
         <span>Alergenos globales</span>
         <strong><%= @menu.allergens_json.present? ? "Informados" : "Sin datos" %></strong>
       </div>
+      <div class="menu-check-row">
+        <span>Nutricion resumida</span>
+        <strong><%= @menu.nutrition_summary_json.present? ? "Informada" : "Sin datos" %></strong>
+      </div>
+      <div class="menu-check-row">
+        <span>Revision halal/haram</span>
+        <strong><%= @menu.dietary_guidance_json.present? ? "Informada" : "Sin datos" %></strong>
+      </div>
     </div>
 
     <% if @menu.allergens_json.present? %>
@@ -91,18 +235,28 @@
       <%= allergen_badges(Array(@menu.allergens_json)) %>
     <% end %>
 
-    <% if @menu.draft? %>
-      <div class="actions mt-sm">
+    <% waste_plan = @menu.planning_notes_json.is_a?(Hash) ? Array(@menu.planning_notes_json["wasteReductionPlan"]) : [] %>
+    <% if waste_plan.any? %>
+      <h4 class="menu-mini-title">Plan desperdicio cero</h4>
+      <ul class="list-clean menu-usage-list">
+        <% waste_plan.each do |line| %>
+          <li><span><%= line %></span></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <div class="actions mt-sm">
+      <% if @menu.draft? %>
         <%= button_to publish_tenant_menu_path(@menu), method: :post, class: "btn btn-primary menu-cta" do %>
           Confirmar y Publicar
         <% end %>
-        <%= button_to tenant_menu_path(@menu),
-          method: :delete,
-          class: "btn btn-danger menu-cta",
-          form: { data: { turbo_confirm: "Eliminar este menu borrador? Esta accion no se puede deshacer." } } do %>
-          Eliminar menu
-        <% end %>
-      </div>
-    <% end %>
+      <% end %>
+      <%= button_to tenant_menu_path(@menu),
+        method: :delete,
+        class: "btn btn-danger menu-cta",
+        form: { data: { turbo_confirm: "Eliminar este menu? Esta accion no se puede deshacer." } } do %>
+        Eliminar menu
+      <% end %>
+    </div>
   </aside>
 </section>

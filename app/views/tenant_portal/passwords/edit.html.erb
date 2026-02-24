@@ -1,0 +1,31 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Seguridad</span>
+    <h1 class="page-title">Establece tu contraseña</h1>
+    <p class="page-subtitle">Es tu primer acceso. Crea una contraseña personal para continuar.</p>
+  </div>
+</section>
+
+<section class="panel">
+  <%= form_with url: tenant_password_path, method: :patch do |f| %>
+    <section class="panel panel-soft">
+      <h2>Nueva contraseña</h2>
+      <div class="form-grid">
+        <div class="field">
+          <%= label_tag "user_password", "Nueva contraseña" %>
+          <%= password_field_tag "user[password]", nil, autocomplete: "new-password", autofocus: true %>
+          <p class="help-text">Mínimo 6 caracteres.</p>
+        </div>
+
+        <div class="field">
+          <%= label_tag "user_password_confirmation", "Confirmar contraseña" %>
+          <%= password_field_tag "user[password_confirmation]", nil, autocomplete: "new-password" %>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <%= f.submit "Guardar contraseña", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</section>

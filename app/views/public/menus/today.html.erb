@@ -1,5 +1,27 @@
-<% hours_rows = operating_hours_rows(@tenant.operating_hours_json) %>
-<% location_text = [@tenant.address, @tenant.city, @tenant.region, @tenant.country].map(&:presence).compact.join(", ") %>
+<section class="page-header page-header-loose">
+  <div>
+    <p class="eyebrow">Menu diario</p>
+    <h1 class="page-title"><%= @tenant.name %></h1>
+    <p class="page-subtitle">Consulta de menu para <%= ui_date(Date.current) %></p>
+  </div>
+  <div class="toolbar">
+    <%= status_pill(@menu.present? ? @menu.status : "inactive") %>
+    <%= link_to "Volver al comedor", public_tenant_path(@tenant.slug), class: "btn btn-secondary btn-sm" %>
+    <%= link_to "Todos los comedores", public_tenants_path, class: "btn btn-secondary btn-sm" %>
+  </div>
+</section>
+
+<section class="split-panel">
+  <article class="panel">
+    <% if @menu.present? %>
+      <% planning = @menu.planning_notes_json.is_a?(Hash) ? @menu.planning_notes_json : {} %>
+      <% nutrition_summary = @menu.nutrition_summary_json.is_a?(Hash) ? @menu.nutrition_summary_json : {} %>
+      <% dietary = @menu.dietary_guidance_json.is_a?(Hash) ? @menu.dietary_guidance_json : {} %>
+
+      <div class="title-row mb-sm">
+        <h2><%= @menu.title %></h2>
+        <%= status_pill(@menu.status) %>
+      </div>
 
 <section class="menu-today-page">
   <header class="menu-today-card menu-today-header">
@@ -15,35 +37,116 @@
     </div>
   </header>
 
-  <div class="menu-today-layout">
-    <article class="menu-today-card menu-today-main">
-      <% if @menu.present? %>
-        <div class="menu-today-main-head">
-          <div>
-            <p class="menu-today-kicker">Menu del dia</p>
-            <h2 class="menu-today-title"><%= @menu.title %></h2>
+      <div class="menu-smart-summary menu-smart-summary-public">
+        <div class="menu-smart-summary-card">
+          <h3>Plan de servicio</h3>
+          <p><%= present_or_dash(planning["strategy"]) %></p>
+          <div class="menu-inline-metrics">
+            <% if planning["estimatedTotalServings"].present? %>
+              <span class="menu-inline-metric"><strong><%= planning["estimatedTotalServings"] %></strong> raciones</span>
+            <% end %>
+            <% if planning["productionMode"].present? %>
+              <span class="menu-inline-metric"><strong>Modo:</strong> <%= planning["productionMode"] %></span>
+            <% end %>
           </div>
-          <%= status_pill(@menu.status) %>
         </div>
 
-        <p class="menu-today-description"><%= present_or_dash(@menu.description) %></p>
-
-        <% if @menu.allergens_json.present? %>
-          <div class="menu-today-allergens">
-            <strong>Alergenos generales:</strong>
-            <%= allergen_badges(Array(@menu.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
+        <div class="menu-smart-summary-card">
+          <h3>Nutricion</h3>
+          <div class="menu-nutrition-grid menu-nutrition-grid-compact">
+            <% if nutrition_summary["estimatedAverageKcalPerServing"].present? %>
+              <div class="menu-nutrition-item"><span>Kcal / racion</span><strong><%= nutrition_summary["estimatedAverageKcalPerServing"] %></strong></div>
+            <% end %>
+            <% if nutrition_summary["proteinFocus"].present? %>
+              <div class="menu-nutrition-item"><span>Proteina</span><strong><%= nutrition_summary["proteinFocus"] %></strong></div>
+            <% end %>
+            <% if nutrition_summary["carbFocus"].present? %>
+              <div class="menu-nutrition-item"><span>Carbs</span><strong><%= nutrition_summary["carbFocus"] %></strong></div>
+            <% end %>
+            <% if nutrition_summary["fatFocus"].present? %>
+              <div class="menu-nutrition-item"><span>Grasa</span><strong><%= nutrition_summary["fatFocus"] %></strong></div>
+            <% end %>
           </div>
-        <% end %>
+        </div>
 
-        <h3 class="menu-today-section-title">Platos del menu</h3>
-        <% if @menu.daily_menu_items.any? %>
-          <ol class="menu-today-dishes">
-            <% @menu.daily_menu_items.each_with_index do |item, index| %>
-              <li class="menu-today-dish">
-                <div class="menu-today-dish-head">
-                  <span class="menu-today-dish-number">Plato <%= index + 1 %></span>
-                  <h4 class="menu-today-dish-title"><%= item.name %></h4>
+        <div class="menu-smart-summary-card">
+          <h3>Compatibilidad</h3>
+          <div class="menu-inline-metrics">
+            <% if dietary["halalStatus"].present? %>
+              <span class="menu-inline-metric"><strong>Halal:</strong> <%= dietary["halalStatus"] %></span>
+            <% end %>
+            <% if Array(dietary["haramRisks"]).any? %>
+              <span class="menu-inline-metric is-warning"><strong>Riesgo haram:</strong> <%= Array(dietary["haramRisks"]).join(", ") %></span>
+            <% end %>
+          </div>
+          <% if dietary["religiousNotes"].present? %>
+            <p class="help-text"><strong>Nota:</strong> <%= dietary["religiousNotes"] %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @menu.allergens_json.present? %>
+        <div class="help-text">
+          <strong>Alergenos:</strong>
+          <%= allergen_badges(Array(@menu.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
+        </div>
+
+      <h3 class="section-title mt-md">Platos del menu</h3>
+      <% if @menu.daily_menu_items.any? %>
+        <div class="menu-dishes-grid menu-dishes-grid-rich">
+          <% @menu.daily_menu_items.each_with_index do |item, index| %>
+            <% nutrition = item.nutrition_json.is_a?(Hash) ? item.nutrition_json : {} %>
+            <article class="menu-dish-card">
+              <div class="menu-dish-head">
+                <h3><%= item.name %></h3>
+                <span class="status-pill status-neutral">Plato <%= index + 1 %></span>
+              </div>
+              <p><%= present_or_dash(item.description) %></p>
+
+              <div class="menu-inline-metrics">
+                <span class="menu-inline-metric"><strong>Raciones:</strong> <%= item.total_servings %></span>
+                <% if nutrition["kcal"].present? %>
+                  <span class="menu-inline-metric"><strong><%= nutrition["kcal"] %></strong> kcal/racion</span>
+                <% end %>
+              </div>
+
+              <% if item.ingredients_json.present? %>
+                <p class="help-text"><strong>Ingredientes:</strong> <%= Array(item.ingredients_json).join(", ") %></p>
+              <% end %>
+
+              <% if item.allergens_json.present? %>
+                <div class="menu-chip-group">
+                  <% Array(item.allergens_json).each do |allergen| %>
+                    <span class="menu-chip menu-chip-danger"><%= allergen %></span>
+                  <% end %>
                 </div>
+              <% end %>
+
+              <% if item.dietary_flags_json.present? %>
+                <div class="menu-chip-group">
+                  <% Array(item.dietary_flags_json).each do |flag| %>
+                    <span class="menu-chip menu-chip-info"><%= flag %></span>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <% if item.religious_notes.present? %>
+                <p class="menu-note menu-note-warning"><strong>Nota religiosa:</strong> <%= item.religious_notes %></p>
+                <div class="help-text">
+                  <strong>Alergenos:</strong>
+                  <%= allergen_badges(Array(item.allergens_json), wrapper_class: "allergen-badge-group allergen-badge-group-inline") %>
+                </div>
+              <% end %>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state">El menu esta publicado pero todavia no tiene platos detallados.</div>
+      <% end %>
+    <% else %>
+      <div class="empty-state">No hay menu publicado para hoy en este comedor.</div>
+    <% end %>
+  </article>
 
                 <p class="menu-today-dish-description"><%= present_or_dash(item.description) %></p>
 

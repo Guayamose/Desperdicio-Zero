@@ -1,0 +1,29 @@
+<h2>Bienvenido/a, <%= @user.full_name %></h2>
+
+<p>Has sido añadido/a como empleado/a en <strong><%= @tenant.name %></strong>.</p>
+
+<p>Tus credenciales de acceso son:</p>
+
+<table style="border-collapse:collapse;margin:16px 0;">
+  <tr>
+    <td style="padding:6px 12px 6px 0;font-weight:bold;">Email</td>
+    <td style="padding:6px 0;"><%= @user.email %></td>
+  </tr>
+  <tr>
+    <td style="padding:6px 12px 6px 0;font-weight:bold;">Contraseña temporal</td>
+    <td style="padding:6px 0;font-family:monospace;font-size:1.1em;"><%= @temporary_password %></td>
+  </tr>
+</table>
+
+<p>
+  Esta contraseña es de <strong>un solo uso</strong>. Al iniciar sesión por primera vez
+  se te pedirá que la cambies por una contraseña personal.
+</p>
+
+<p style="margin-top:24px;">
+  <%= link_to "Iniciar sesión", @login_url, style: "background:#2563eb;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:bold;" %>
+</p>
+
+<p style="margin-top:32px;color:#6b7280;font-size:0.9em;">
+  Si no esperabas este mensaje, puedes ignorarlo.
+</p>

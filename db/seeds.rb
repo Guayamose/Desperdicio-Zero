@@ -134,13 +134,13 @@ MENU_BASES = [
   }
 ].freeze
 
-def upsert_user!(email:, full_name:, locale: "es", blocked: false)
+def upsert_user!(email:, full_name:, locale: "es", blocked: false, password: DEFAULT_PASSWORD)
   user = User.find_or_initialize_by(email: email)
   user.full_name = full_name
   user.locale = locale
   user.gdpr_consent_at ||= Time.current
-  user.password = DEFAULT_PASSWORD
-  user.password_confirmation = DEFAULT_PASSWORD
+  user.password = password
+  user.password_confirmation = password
   user.blocked_at = blocked ? (user.blocked_at || Time.current) : nil
   user.save!
   user
@@ -208,11 +208,34 @@ ActiveRecord::Base.transaction do
       full_name: "Staff B #{tenant.name}"
     )
 
+    demo_central_users = if tenant.slug == "comedor-central"
+                           [
+                             [
+                               upsert_user!(
+                                 email: "manager@test.com",
+                                 full_name: "Manager Demo Comedor Central",
+                                 password: "manager123"
+                               ),
+                               :tenant_manager
+                             ],
+                             [
+                               upsert_user!(
+                                 email: "staff@test.com",
+                                 full_name: "Staff Demo Comedor Central",
+                                 password: "staff1234"
+                               ),
+                               :tenant_staff
+                             ]
+                           ]
+                         else
+                           []
+                         end
+
     [
       [manager, :tenant_manager],
       [staff_a, :tenant_staff],
       [staff_b, :tenant_staff]
-    ].each do |user, role|
+    ].concat(demo_central_users).each do |user, role|
       membership = Membership.find_or_initialize_by(user: user, tenant: tenant)
       membership.role = role
       membership.active = true
@@ -366,8 +389,8 @@ puts "== Social Kitchen seed: done =="
 puts "\nCredenciales demo:"
 puts "- Admin global: admin@socialkitchen.local / #{DEFAULT_PASSWORD}"
 puts "- Ops admin: ops-admin@socialkitchen.local / #{DEFAULT_PASSWORD}"
-puts "- Manager base: manager+comedor-central@socialkitchen.local / #{DEFAULT_PASSWORD}"
-puts "- Staff base: staff-a+comedor-central@socialkitchen.local / #{DEFAULT_PASSWORD}"
+puts "- Manager demo (Comedor Central): manager@test.com / manager123"
+puts "- Staff demo (Comedor Central): staff@test.com / staff1234"
 puts "\nResumen:"
 puts "- Tenants: #{Tenant.count}"
 puts "- Users: #{User.count}"
