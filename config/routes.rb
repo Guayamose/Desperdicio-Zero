@@ -128,6 +128,9 @@ Rails.application.routes.draw do
 
     # Auditoria solo lectura desde panel admin.
     resources :audit_logs, only: [ :index ]
+
+    # Inventario global: vista cross-tenant agrupada por comedor.
+    resource :inventory, only: [ :show ]
   end
 
   # --------------------------------------------------------------------------

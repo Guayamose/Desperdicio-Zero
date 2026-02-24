@@ -172,6 +172,7 @@ module ApplicationHelper
       [
         [ "Metricas", admin_metrics_path ],
         [ "Comedores", admin_tenants_path ],
+        [ "Inventario", admin_inventory_path ],
         [ "Usuarios", admin_users_path ],
         [ "Auditoria", admin_audit_logs_path ]
       ]

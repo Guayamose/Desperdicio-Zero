@@ -1,0 +1,109 @@
+<%# Header y métricas globales %>
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Panel de administración</span>
+    <h1 class="page-title">Inventario global</h1>
+    <p class="page-subtitle">Stock disponible en todos los comedores, agrupado por comedor.</p>
+  </div>
+</section>
+
+<div class="metric-grid" style="margin-bottom: 2rem;">
+  <article class="metric-card">
+    <div class="metric-label">Total lotes</div>
+    <div class="metric-value"><%= @global_total %></div>
+    <p class="metric-caption">En todos los comedores</p>
+  </article>
+  <article class="metric-card">
+    <div class="metric-label">Disponibles</div>
+    <div class="metric-value"><%= @global_available %></div>
+    <p class="metric-caption">Estado available</p>
+  </article>
+  <article class="metric-card" style="<%= 'border-color: var(--danger); background: var(--danger-soft);' if @global_expiring > 0 %>">
+    <div class="metric-label">Caducan en 3 días</div>
+    <div class="metric-value" style="<%= 'color: var(--danger);' if @global_expiring > 0 %>"><%= @global_expiring %></div>
+    <p class="metric-caption">Requieren atención urgente</p>
+  </article>
+</div>
+
+<%# Una sección por comedor %>
+<% @tenants_inventory.each do |data| %>
+  <section class="panel" style="margin-bottom: 1.5rem;">
+
+    <%# Cabecera del comedor %>
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+        <div style="width: 36px; height: 36px; background: var(--primary-soft); color: var(--primary); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        </div>
+        <div>
+          <h2 style="margin: 0; font-size: 1.1rem;"><%= data[:tenant].name %></h2>
+          <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);"><%= data[:tenant].slug %></p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 0.75rem; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 0.2rem 0.75rem; font-weight: 600;">
+          <%= data[:total] %> lotes
+        </span>
+        <span style="font-size: 0.75rem; background: var(--primary-soft); color: var(--primary); border: 1px solid var(--primary-border); border-radius: 999px; padding: 0.2rem 0.75rem; font-weight: 600;">
+          <%= data[:available] %> disponibles
+        </span>
+        <% if data[:expiring_soon] > 0 %>
+          <span style="font-size: 0.75rem; background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger-border); border-radius: 999px; padding: 0.2rem 0.75rem; font-weight: 700;">
+            ⚠ <%= data[:expiring_soon] %> caducan pronto
+          </span>
+        <% end %>
+        <%= link_to "Ver comedor", admin_tenant_path(data[:tenant]), class: "btn btn-secondary btn-sm", style: "margin-left: 0.5rem;" %>
+      </div>
+    </div>
+
+    <% if data[:lots].any? %>
+      <div class="table-shell">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Cantidad</th>
+              <th>Caduca el</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% data[:lots].each do |lot| %>
+              <% expiring = lot.available? && lot.expires_on <= Date.current + 3.days %>
+              <tr style="<%= 'background: var(--danger-soft);' if expiring %>">
+                <td>
+                  <strong><%= lot.product.name %></strong>
+                  <% if lot.product.category.present? %>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">LOTE #<%= lot.id %></div>
+                  <% end %>
+                </td>
+                <td style="color: var(--text-muted); font-size: 0.85rem;">
+                  <%= lot.product.category.presence || "—" %>
+                </td>
+                <td>
+                  <span style="font-weight: 600;"><%= lot.quantity.to_i %></span>
+                  <span style="font-size: 0.8rem; color: var(--text-muted);"><%= lot.unit %></span>
+                </td>
+                <td style="<%= 'color: var(--danger); font-weight: 700;' if expiring %>">
+                  <%= ui_date(lot.expires_on) %>
+                  <% if expiring %>
+                    <div style="font-size: 0.7rem;">Urgente</div>
+                  <% end %>
+                </td>
+                <td><%= status_pill(lot.status) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="empty-state" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.75rem; opacity: 0.4;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+        <p style="margin: 0;">Sin lotes de inventario</p>
+      </div>
+    <% end %>
+
+  </section>
+<% end %>

@@ -16,6 +16,26 @@
   </div>
 </section>
 
+<% if draft_count > 0 %>
+  <div class="menu-lock-banner">
+    <div>
+      <h2>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:0.4rem;color:var(--warning)"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <%= draft_count == 1 ? "1 menú pendiente de confirmación" : "#{draft_count} menús pendientes de confirmación" %>
+      </h2>
+      <p>Estos menús no son visibles en el portal público hasta que los confirmes.</p>
+    </div>
+    <div class="actions">
+      <% @menus.select(&:draft?).each do |draft| %>
+        <%= link_to tenant_menu_path(draft), class: "btn btn-secondary btn-sm" do %>
+          <%= ui_date(draft.menu_date) %>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
 <section class="metric-grid menu-index-metrics">
   <article class="metric-card">
     <div class="metric-label">Menu de hoy</div>
@@ -65,6 +85,12 @@
             <td><%= status_pill(menu.generated_by) %></td>
             <td style="text-align: right;">
               <div class="actions" style="justify-content: flex-end; margin-top: 0;">
+                <% if menu.draft? %>
+                  <%= button_to publish_tenant_menu_path(menu), method: :post, class: "btn btn-primary btn-sm" do %>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Confirmar
+                  <% end %>
+                <% end %>
                 <%= link_to "Resumen", tenant_menu_path(menu), class: "btn btn-secondary btn-sm" %>
                 <%= link_to "Editar", edit_tenant_menu_path(menu), class: "btn btn-secondary btn-sm" %>
               </div>
