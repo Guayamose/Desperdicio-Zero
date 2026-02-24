@@ -39,20 +39,20 @@ module ApplicationHelper
   }.freeze
 
   ALLERGEN_ICON_FILES = {
-    gluten: "Icons/CerealesConGluten.webp",
-    crustaceos: "Icons/Crustaceos.webp",
-    huevos: "Icons/Huevos.webp",
-    pescado: "Icons/Pescado.webp",
-    cacahuetes: "Icons/Cacahuetes.webp",
-    soja: "Icons/Soja.webp",
-    lacteos: "Icons/Lacteos.webp",
-    frutos_de_cascara: "Icons/FrutosDeCascara.webp",
-    apio: "Icons/Apio.webp",
-    mostaza: "Icons/Mostaza.webp",
-    sesamo: "Icons/GranosSesamo.webp",
-    sulfitos: "Icons/DioxidoDeAzufreYSulfatos.webp",
-    altramuces: "Icons/Altramuces.webp",
-    moluscos: "Icons/Moluscos.webp"
+    gluten: "Alergenos/ContieneGluten.webp",
+    crustaceos: "Alergenos/Crustaceos.webp",
+    huevos: "Alergenos/Huevos.webp",
+    pescado: "Alergenos/Pescado.webp",
+    cacahuetes: "Alergenos/Cacahuetes.webp",
+    soja: "Alergenos/Soja.webp",
+    lacteos: "Alergenos/Lacteos.webp",
+    frutos_de_cascara: "Alergenos/FrutosConCascara.webp",
+    apio: "Alergenos/Apio.webp",
+    mostaza: "Alergenos/Mostaza.webp",
+    sesamo: "Alergenos/Sesamo.webp",
+    sulfitos: "Alergenos/Sulfitos.webp",
+    altramuces: "Alergenos/Altramuces.webp",
+    moluscos: "Alergenos/Moluscos.webp"
   }.freeze
 
   OPERATING_DAYS_LABELS = {

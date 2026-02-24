@@ -93,6 +93,7 @@ module Integrations
       - Proporciona estimaciones nutricionales realistas y redondeadas.
       - En inventoryUsage usa lotId cuando sea posible para trazabilidad.
       - Lenguaje claro para personal no tecnico.
+      - Consumir menos del 10 % de calorías/día de azúcares añadidos.
     PROMPT
 
     attr_reader :model
