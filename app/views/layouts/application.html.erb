@@ -55,15 +55,14 @@
 
         <div class="user-context">
           <% if user_signed_in? %>
-            <div class="context-item">
-              <span class="context-label">Sesión Activa</span>
-              <span class="context-value"><%= current_user.full_name %></span>
-            </div>
-            
             <% if current_tenant.present? %>
               <div class="tenant-badge">
                 <%= current_tenant.name %>
               </div>
+            <% end %>
+
+            <%= link_to tenant_profile_path, class: "avatar-btn", title: current_user.full_name do %>
+              <%= current_user.full_name.split.map(&:first).first(2).join.upcase %>
             <% end %>
 
             <%= button_to "Salir", destroy_user_session_path, method: :delete, class: "btn btn-secondary btn-sm", style: "border-radius: 99px; padding: 0.4rem 1rem;" %>
