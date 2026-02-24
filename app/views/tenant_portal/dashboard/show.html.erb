@@ -68,12 +68,12 @@
 <section class="split-panel">
   <div class="panel-stack">
     <article class="hero-surface panel" style="padding: 3rem; background: var(--surface); border-width: 2px; border-color: var(--primary-soft);">
-      <div style="display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;">
+      <div class="dashboard-hero-grid">
         <div>
           <span class="status-pill status-positive" style="margin-bottom: 1rem;">MENÚ RECOMENDADO</span>
           <% if @today_menu.present? %>
-            <h2 style="font-size: 3rem; margin: 0.5rem 0; line-height: 1;"><%= @today_menu.title %></h2>
-            <p style="font-size: 1.25rem; color: var(--text-muted); margin: 1.5rem 0 2rem;"><%= truncate(@today_menu.description, length: 140) %></p>
+            <h2 class="dashboard-hero-heading"><%= @today_menu.title %></h2>
+            <p class="dashboard-hero-desc"><%= truncate(@today_menu.description, length: 140) %></p>
             <div class="actions">
               <%= link_to tenant_menu_path(@today_menu), class: "btn btn-primary" do %>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -81,15 +81,15 @@
               <% end %>
             </div>
           <% else %>
-            <h2 style="font-size: 3rem; margin: 0.5rem 0; line-height: 1;">Diseña el día</h2>
-            <p style="font-size: 1.25rem; color: var(--text-muted); margin: 1.5rem 0 2rem;">No hay menú para hoy. Deja que la IA analice el stock crítico.</p>
+            <h2 class="dashboard-hero-heading">Diseña el día</h2>
+            <p class="dashboard-hero-desc">No hay menú para hoy. Deja que la IA analice el stock crítico.</p>
             <%= link_to generate_tenant_menus_path(date: Date.current), class: "btn btn-primary btn-lg" do %>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4m0 14v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m14 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83M12 7a5 5 0 015 5 5 5 0 01-5 5 5 5 0 01-5-5 5 5 0 015-5z"></path></svg>
               Generar con IA
             <% end %>
           <% end %>
         </div>
-        <div style="width: 200px; height: 200px; background: var(--primary-soft); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+        <div class="dashboard-illustration">
            <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path><path d="M7 2v20"></path><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"></path></svg>
         </div>
       </div>

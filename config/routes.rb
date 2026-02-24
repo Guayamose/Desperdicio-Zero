@@ -77,6 +77,8 @@ Rails.application.routes.draw do
       # member = opera sobre un menu concreto (requiere :id en URL)
       # POST /tenant/menus/:id/publish
       post :publish, on: :member
+      # GET /tenant/menus/:id/cookbook -> recetario para cocineras
+      get :cookbook, on: :member
 
       # collection = opera sobre el conjunto de menus (sin :id)
       # GET /tenant/menus/generate  -> pantalla previa

@@ -163,7 +163,7 @@
     </div>
   </div>
 
-  <div style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center; padding-top: 1rem;">
+  <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center; padding-top: 1rem;">
     <%= link_to "Cancelar", tenant_inventory_lots_path, class: "btn btn-secondary", style: "padding: 0.75rem 1.5rem; font-weight: 500; border-radius: var(--radius-md);" %>
     <%= f.submit @inventory_lot.persisted? ? "Guardar cambios" : "Registrar Lote",
       class: "btn btn-primary",

@@ -21,12 +21,12 @@
       <tbody>
         <% @audit_logs.each do |log| %>
           <tr>
-            <td><%= ui_datetime(log.created_at) %></td>
-            <td><strong><%= log.action %></strong></td>
-            <td><%= log.actor&.email || "sistema" %></td>
-            <td><%= log.tenant&.name || "global" %></td>
-            <td><%= [log.entity_type, log.entity_id].compact.join("#") %></td>
-            <td><%= present_or_dash(log.ip_address) %></td>
+            <td data-label="Fecha"><%= ui_datetime(log.created_at) %></td>
+            <td data-label="Acción"><strong><%= log.action %></strong></td>
+            <td data-label="Actor"><span style="word-break: break-all;"><%= log.actor&.email || "sistema" %></span></td>
+            <td data-label="Tenant"><%= log.tenant&.name || "global" %></td>
+            <td data-label="Entidad"><%= [log.entity_type, log.entity_id].compact.join("#") %></td>
+            <td data-label="IP"><%= present_or_dash(log.ip_address) %></td>
           </tr>
         <% end %>
       </tbody>

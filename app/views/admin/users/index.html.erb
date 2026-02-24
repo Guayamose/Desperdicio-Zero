@@ -23,11 +23,11 @@
       <tbody>
         <% @users.each do |user| %>
           <tr>
-            <td><strong><%= user.full_name %></strong></td>
-            <td><%= user.email %></td>
-            <td><%= status_pill(user.blocked_at.present? ? "blocked" : "active") %></td>
-            <td><%= status_pill(user.system_admin? ? "system_admin" : "inactive") %></td>
-            <td>
+            <td data-label="Nombre"><strong><%= user.full_name %></strong></td>
+            <td data-label="Email"><span style="word-break: break-all;"><%= user.email %></span></td>
+            <td data-label="Bloqueado"><%= status_pill(user.blocked_at.present? ? "blocked" : "active") %></td>
+            <td data-label="Admin"><%= status_pill(user.system_admin? ? "system_admin" : "inactive") %></td>
+            <td data-label="">
               <%= link_to "Ver", admin_user_path(user), class: "btn btn-secondary btn-sm" %>
             </td>
           </tr>

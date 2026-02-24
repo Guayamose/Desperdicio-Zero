@@ -80,16 +80,16 @@
               <% @candidate_lots.each do |lot| %>
                 <% days_to_expiry = (lot.expires_on - Date.current).to_i %>
                 <tr>
-                  <td>
+                  <td data-label="">
                     <%= check_box_tag "lot_ids[]", lot.id, @selected_lot_ids.include?(lot.id), id: "lot_#{lot.id}" %>
                   </td>
-                  <td>
+                  <td data-label="Producto">
                     <label for="lot_<%= lot.id %>"><strong><%= lot.product.name %></strong></label>
                     <div class="help-text">Lote #<%= lot.id %></div>
                   </td>
-                  <td><%= lot.quantity %> <%= lot.unit %></td>
-                  <td><%= ui_date(lot.expires_on) %></td>
-                  <td>
+                  <td data-label="Cantidad"><%= lot.quantity %> <%= lot.unit %></td>
+                  <td data-label="Caducidad"><%= ui_date(lot.expires_on) %></td>
+                  <td data-label="Prioridad">
                     <% if days_to_expiry <= 1 %>
                       <span class="status-pill status-danger">Critica (<%= days_to_expiry %>d)</span>
                     <% elsif days_to_expiry <= 2 %>

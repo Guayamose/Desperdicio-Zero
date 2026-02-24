@@ -1,6 +1,6 @@
 module TenantPortal
   class MenusController < TenantPortal::BaseController
-    before_action :set_menu, only: [ :show, :edit, :update, :publish, :destroy ]
+    before_action :set_menu, only: [ :show, :cookbook, :edit, :update, :publish, :destroy ]
 
     def index
       @menus = tenant_scope(DailyMenu).includes(:daily_menu_items).order(menu_date: :desc)
@@ -9,6 +9,10 @@ module TenantPortal
 
     def show
       authorize @menu
+    end
+
+    def cookbook
+      authorize @menu, :show?
     end
 
     def new
