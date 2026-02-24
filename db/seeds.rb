@@ -82,6 +82,71 @@ TENANTS_DATA = [
     longitude: -1.130654,
     contact_email: "huerta@socialkitchen.local",
     contact_phone: "+34 900 100 205"
+  },
+  {
+    slug: "comedor-sol",
+    name: "Comedor del Sol",
+    status: :active,
+    address: "Plaza del Sol 1",
+    city: "Málaga",
+    region: "Andalucía",
+    country: "ES",
+    latitude: 36.721273,
+    longitude: -4.421398,
+    contact_email: "sol@socialkitchen.local",
+    contact_phone: "+34 900 100 206"
+  },
+  {
+    slug: "comedor-pinares",
+    name: "Comedor Pinares",
+    status: :active,
+    address: "Avenida de los Pinares 12",
+    city: "Valladolid",
+    region: "Castilla y León",
+    country: "ES",
+    latitude: 41.652251,
+    longitude: -4.724532,
+    contact_email: "pinares@socialkitchen.local",
+    contact_phone: "+34 900 100 207"
+  },
+  {
+    slug: "comedor-esperanza",
+    name: "Comedor La Esperanza",
+    status: :active,
+    address: "Calle de la Esperanza 44",
+    city: "Zaragoza",
+    region: "Aragón",
+    country: "ES",
+    latitude: 41.649693,
+    longitude: -0.887712,
+    contact_email: "esperanza@socialkitchen.local",
+    contact_phone: "+34 900 100 208"
+  },
+  {
+    slug: "comedor-puerto",
+    name: "Comedor del Puerto",
+    status: :active,
+    address: "Paseo Marítimo 3",
+    city: "A Coruña",
+    region: "Galicia",
+    country: "ES",
+    latitude: 43.371350,
+    longitude: -8.396000,
+    contact_email: "puerto@socialkitchen.local",
+    contact_phone: "+34 900 100 209"
+  },
+  {
+    slug: "comedor-sierra",
+    name: "Comedor La Sierra",
+    status: :active,
+    address: "Calle Alta 100",
+    city: "Granada",
+    region: "Andalucía",
+    country: "ES",
+    latitude: 37.177336,
+    longitude: -3.598557,
+    contact_email: "sierra@socialkitchen.local",
+    contact_phone: "+34 900 100 210"
   }
 ].freeze
 
