@@ -197,6 +197,9 @@ MENU_BASES = [
   {
     title: "Menu mediterráneo solidario",
     description: "Propuesta equilibrada con prioridad en ingredientes cercanos a caducidad.",
+    planning_notes_json: { "strategy" => "Priorización rotación perecederos cortos", "estimatedTotalServings" => 150, "productionMode" => "Batch 2 turnos" },
+    nutrition_summary_json: { "estimatedAverageKcalPerServing" => 750, "proteinFocus" => "Media (legumbre)", "carbFocus" => "Complejos (integral)", "fatFocus" => "Saludable (AOVE)" },
+    dietary_guidance_json: { "halalStatus" => "Apto", "haramRisks" => [], "religiousNotes" => "Menú apto sin carne" },
     items: [
       {
         name: "Lentejas estofadas",
@@ -255,6 +258,9 @@ MENU_BASES = [
   {
     title: "Menú proteico de aprovechamiento",
     description: "Menú orientado a aprovechar lotes donados de proteína y verdura fresca.",
+    planning_notes_json: { "strategy" => "Procesamiento inmediato de cárnicos", "estimatedTotalServings" => 120, "productionMode" => "Batch único" },
+    nutrition_summary_json: { "estimatedAverageKcalPerServing" => 850, "proteinFocus" => "Alta (pollo, garbanzo)", "carbFocus" => "Media", "fatFocus" => "Moderada" },
+    dietary_guidance_json: { "halalStatus" => "Verificar certificación del pollo", "haramRisks" => ["Contaminación cruzada"], "religiousNotes" => "Confirmar trazabilidad de carne donada" },
     items: [
       {
         name: "Pollo guisado",
@@ -308,6 +314,9 @@ MENU_BASES = [
   {
     title: "Menú rápido comunitario",
     description: "Formato sencillo para servicios con alta demanda en horario punta.",
+    planning_notes_json: { "strategy" => "Operativa de alta velocidad de emplatado", "estimatedTotalServings" => 300, "productionMode" => "Línea continua" },
+    nutrition_summary_json: { "estimatedAverageKcalPerServing" => 900, "proteinFocus" => "Media (atún, huevo)", "carbFocus" => "Media-Alta", "fatFocus" => "Media (fritura controlada)" },
+    dietary_guidance_json: { "halalStatus" => "Apto", "haramRisks" => [], "religiousNotes" => "Pescado y huevo son generalmente aceptados" },
     items: [
       {
         name: "Pasta con atún",
@@ -360,6 +369,9 @@ MENU_BASES = [
   {
     title: "Menú Caliente de Invierno",
     description: "Menú denso en calorías para refugios de invierno, ideal para combatir el frío.",
+    planning_notes_json: { "strategy" => "Cocción lenta de alto rendimiento", "estimatedTotalServings" => 200, "productionMode" => "Ollas gran formato" },
+    nutrition_summary_json: { "estimatedAverageKcalPerServing" => 1100, "proteinFocus" => "Alta (carne, legumbre)", "carbFocus" => "Alta", "fatFocus" => "Moderada" },
+    dietary_guidance_json: { "halalStatus" => "No Apto por defecto", "haramRisks" => ["Carne picada mixta (cerdo)"], "religiousNotes" => "Ofrecer alternativa vegetal si se solicita" },
     items: [
       {
         name: "Cocido completo",
@@ -407,6 +419,9 @@ MENU_BASES = [
   {
     title: "Menú Vegetariano Equilibrado",
     description: "Opción libre de carne con fuerte aporte proteico a través de legumbres y lácteos.",
+    planning_notes_json: { "strategy" => "Sostenibilidad y bajo coste", "estimatedTotalServings" => 100, "productionMode" => "Batch único" },
+    nutrition_summary_json: { "estimatedAverageKcalPerServing" => 650, "proteinFocus" => "Media (alubia, leche)", "carbFocus" => "Media", "fatFocus" => "Baja" },
+    dietary_guidance_json: { "halalStatus" => "Apto", "haramRisks" => [], "religiousNotes" => "Apto universal (salvo alergias)" },
     items: [
       {
         name: "Alubias blancas con verduras",
@@ -457,6 +472,9 @@ MENU_BASES = [
   {
     title: "Menú Ligero y Dietético",
     description: "Especial para usuarios con estómagos más delicados o dietas blandas.",
+    planning_notes_json: { "strategy" => "Elaboración centralizada bajo en especias", "estimatedTotalServings" => 50, "productionMode" => "Bandejas individuales" },
+    nutrition_summary_json: { "estimatedAverageKcalPerServing" => 500, "proteinFocus" => "Media (pescado)", "carbFocus" => "Media", "fatFocus" => "Baja" },
+    dietary_guidance_json: { "halalStatus" => "Apto", "haramRisks" => [], "religiousNotes" => "Pescado aceptado" },
     items: [
       {
         name: "Merluza al horno con verduritas",
@@ -507,6 +525,9 @@ MENU_BASES = [
   {
     title: "Menú Internacional Asiático",
     description: "Variedad cultural con ingredientes muy atractivos que eleva la moral de los asistentes.",
+    planning_notes_json: { "strategy" => "Servicio de wok directo", "estimatedTotalServings" => 150, "productionMode" => "Salteado en tanda" },
+    nutrition_summary_json: { "estimatedAverageKcalPerServing" => 800, "proteinFocus" => "Alta (lomo de cerdo)", "carbFocus" => "Alta (arroz)", "fatFocus" => "Moderada" },
+    dietary_guidance_json: { "halalStatus" => "Prohibido", "haramRisks" => ["Cerdo"], "religiousNotes" => "El lomo de cerdo es haram. Reemplazo requerido." },
     items: [
       {
         name: "Arroz frito con vegetales",
@@ -558,6 +579,9 @@ MENU_BASES = [
   {
     title: "Menú Estival Refrescante",
     description: "Platos frescos para la temporada de calor, sin necesidad de horno u ollas largas.",
+    planning_notes_json: { "strategy" => "Línea fría total", "estimatedTotalServings" => 250, "productionMode" => "Montaje en mesa fría" },
+    nutrition_summary_json: { "estimatedAverageKcalPerServing" => 750, "proteinFocus" => "Media (atún, huevo)", "carbFocus" => "Media", "fatFocus" => "Media (mayonesa)" },
+    dietary_guidance_json: { "halalStatus" => "Apto", "haramRisks" => [], "religiousNotes" => "" },
     items: [
       {
         name: "Ensalada de pasta tricolor",
@@ -750,7 +774,23 @@ ActiveRecord::Base.transaction do
       expires_on = Date.current + expiry_offsets[lot_index % expiry_offsets.length].days
       received_on = [Date.current - 3.days, expires_on - 10.days].max
       source = lot_index.even? ? :donation : :purchase
-      quantity = rand(4.0..25.0).round(2)
+      category = product.category
+      if ["granos", "legumbres", "verdura", "fruta", "otros", "proteina"].include?(category)
+        unit = :kg
+        quantity = rand(50.0..500.0).round(2)
+      elsif ["lacteos", "aceites", "salsas"].include?(category)
+        unit = :l
+        quantity = rand(20.0..100.0).round(2)
+      else
+        unit = :unit
+        quantity = rand(100.0..1000.0).round(2)
+      end
+
+      # Excepción para huevos (vienen en unidades, no kg aunque sean proteina)
+      if product.name.downcase.include?("huevo")
+        unit = :unit
+        quantity = rand(300..1500).to_f
+      end
 
       lot = InventoryLot.find_or_initialize_by(
         tenant: tenant,
@@ -761,7 +801,7 @@ ActiveRecord::Base.transaction do
 
       lot.assign_attributes(
         quantity: quantity,
-        unit: %i[kg g l ml unit].sample,
+        unit: unit,
         status: expires_on < Date.current ? :expired : (lot_index % 5 == 0 ? :reserved : :available),
         received_on: received_on,
         notes: "Seed lote #{lot_index + 1} para #{tenant.slug}"
@@ -816,6 +856,9 @@ ActiveRecord::Base.transaction do
       menu.assign_attributes(
         title: "#{menu_template[:title]} (#{tenant.city})",
         description: menu_template[:description],
+        planning_notes_json: menu_template[:planning_notes_json] || {},
+        nutrition_summary_json: menu_template[:nutrition_summary_json] || {},
+        dietary_guidance_json: menu_template[:dietary_guidance_json] || {},
         allergens_json: menu_template[:items].flat_map { |i| i[:allergens] }.uniq,
         status: status,
         generated_by: (menu_index.even? ? :ai : :manual),
