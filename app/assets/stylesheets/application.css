@@ -2021,9 +2021,7 @@ body.nav-open {
 .kitchen-visual img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  /* Better for the SVGs we have */
-  padding: 1rem;
+  object-fit: cover;
   transition: transform 0.5s ease;
 }
 

@@ -5,7 +5,12 @@ module ApplicationHelper
     "placeholders/kitchen-01.png",
     "placeholders/kitchen-02.png",
     "placeholders/kitchen-03.png",
-    "placeholders/kitchen-04.png"
+    "placeholders/kitchen-04.png",
+    "placeholders/kitchen-05.png",
+    "placeholders/kitchen-06.png",
+    "placeholders/kitchen-07.png",
+    "placeholders/kitchen-08.png",
+    "placeholders/kitchen-09.png"
   ].freeze
 
   STATUS_CLASS_MAP = {
