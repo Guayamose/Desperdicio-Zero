@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell x:Class="DesperdicioZero.Maui.AppShell"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:pages="clr-namespace:DesperdicioZero.Maui.Pages"
+       Title="Desperdicio Zero"
+       FlyoutBehavior="Flyout">
+
+  <FlyoutItem Title="Operación" Route="tenant" x:Name="TenantFlyout">
+    <ShellContent Title="Dashboard" ContentTemplate="{DataTemplate pages:TenantDashboardPage}" />
+    <ShellContent Title="Inventario" ContentTemplate="{DataTemplate pages:InventoryPage}" />
+    <ShellContent Title="Alertas" ContentTemplate="{DataTemplate pages:AlertsPage}" />
+    <ShellContent Title="Menús" ContentTemplate="{DataTemplate pages:MenusPage}" />
+    <ShellContent Title="Equipo" ContentTemplate="{DataTemplate pages:EmployeesPage}" />
+  </FlyoutItem>
+
+  <FlyoutItem Title="Público" Route="public">
+    <ShellContent Title="Comedores" ContentTemplate="{DataTemplate pages:PublicTenantsPage}" />
+  </FlyoutItem>
+
+  <FlyoutItem Title="Admin" Route="admin" x:Name="AdminFlyout">
+    <ShellContent Title="Consola" ContentTemplate="{DataTemplate pages:AdminConsolePage}" />
+  </FlyoutItem>
+
+  <FlyoutItem Title="Perfil" Route="profile">
+    <ShellContent Title="Mi Perfil" ContentTemplate="{DataTemplate pages:ProfilePage}" />
+  </FlyoutItem>
+</Shell>

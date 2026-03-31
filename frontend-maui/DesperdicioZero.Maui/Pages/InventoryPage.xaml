@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.Maui.Pages.InventoryPage"
+             Title="Inventario">
+  <RefreshView x:Name="RefreshControl" Refreshing="OnRefreshing">
+    <ScrollView>
+      <VerticalStackLayout Padding="16" Spacing="12">
+        <Label Text="Gestión de Inventario" FontSize="24" FontAttributes="Bold" />
+
+        <Frame>
+          <VerticalStackLayout Spacing="8">
+            <Label x:Name="EditorTitle" Text="Nuevo lote" FontAttributes="Bold" FontSize="18" />
+
+            <Entry x:Name="BarcodeEntry" Placeholder="Código de barras" Keyboard="Numeric" />
+            <Entry x:Name="ProductNameEntry" Placeholder="Nombre de producto (manual)" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+              <Entry x:Name="QuantityEntry" Placeholder="Cantidad" Keyboard="Numeric" />
+              <Picker x:Name="UnitPicker" Title="Unidad" Grid.Column="1" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+              <DatePicker x:Name="ExpiresPicker" />
+              <DatePicker x:Name="ReceivedPicker" Grid.Column="1" />
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+              <Picker x:Name="StatusPicker" Title="Estado" />
+              <Picker x:Name="SourcePicker" Title="Origen" Grid.Column="1" />
+            </Grid>
+
+            <Editor x:Name="NotesEditor" Placeholder="Notas" />
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+              <Button Text="Guardar" Clicked="OnSaveClicked" />
+              <Button Text="Nuevo" Grid.Column="1" BackgroundColor="{StaticResource ColorSecondary}" Clicked="OnResetClicked" />
+              <Button Text="Escanear" Grid.Column="2" BackgroundColor="{StaticResource ColorAccent}" Clicked="OnScanClicked" />
+            </Grid>
+          </VerticalStackLayout>
+        </Frame>
+
+        <Entry x:Name="SearchEntry" Placeholder="Buscar por producto, estado o lote..." TextChanged="OnSearchChanged" />
+
+        <CollectionView x:Name="LotsList" SelectionMode="None">
+          <CollectionView.ItemTemplate>
+            <DataTemplate>
+              <Frame Margin="0,0,0,8">
+                <VerticalStackLayout Spacing="6">
+                  <Label Text="{Binding Product.Name}" FontAttributes="Bold" FontSize="17" />
+                  <Label Text="{Binding ExpiresOn, StringFormat='Caduca: {0:dd/MM/yyyy}'}" TextColor="{StaticResource ColorMuted}" />
+                  <Label Text="{Binding Quantity, StringFormat='Cantidad: {0}'}" TextColor="{StaticResource ColorMuted}" />
+                  <Label Text="{Binding Unit}" TextColor="{StaticResource ColorMuted}" />
+                  <Label Text="{Binding Status}" TextColor="{StaticResource ColorSecondary}" />
+
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <Button Text="Editar" Clicked="OnEditClicked" CommandParameter="{Binding .}" BackgroundColor="{StaticResource ColorSecondary}" />
+                    <Button Text="Eliminar" Grid.Column="1" Clicked="OnDeleteClicked" CommandParameter="{Binding .}" BackgroundColor="{StaticResource ColorDanger}" />
+                  </Grid>
+                </VerticalStackLayout>
+              </Frame>
+            </DataTemplate>
+          </CollectionView.ItemTemplate>
+        </CollectionView>
+      </VerticalStackLayout>
+    </ScrollView>
+  </RefreshView>
+</ContentPage>

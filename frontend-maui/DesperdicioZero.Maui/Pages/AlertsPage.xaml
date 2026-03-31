@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.Maui.Pages.AlertsPage"
+             Title="Alertas">
+  <RefreshView x:Name="RefreshControl" Refreshing="OnRefreshing">
+    <ScrollView>
+      <VerticalStackLayout Padding="16" Spacing="12">
+        <Label Text="Centro de Alertas" FontSize="24" FontAttributes="Bold" />
+        <Label x:Name="SummaryLabel" TextColor="{StaticResource ColorMuted}" />
+
+        <Label Text="Caducan en 48h" FontAttributes="Bold" FontSize="18" />
+        <CollectionView x:Name="ExpiringList" SelectionMode="None">
+          <CollectionView.ItemTemplate>
+            <DataTemplate>
+              <Frame Margin="0,0,0,6">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                  <Label Text="{Binding Product.Name}" FontAttributes="Bold" />
+                  <Label Grid.Column="1" Text="{Binding ExpiresOn, StringFormat='{0:dd/MM/yyyy}'}" TextColor="{StaticResource ColorDanger}" />
+                  <Label Grid.Row="1" Text="{Binding Quantity}" TextColor="{StaticResource ColorMuted}" />
+                  <Label Grid.Row="1" Grid.Column="1" Text="{Binding Unit}" TextColor="{StaticResource ColorMuted}" />
+                </Grid>
+              </Frame>
+            </DataTemplate>
+          </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Label Text="Vencidos" FontAttributes="Bold" FontSize="18" />
+        <CollectionView x:Name="ExpiredList" SelectionMode="None">
+          <CollectionView.ItemTemplate>
+            <DataTemplate>
+              <Frame Margin="0,0,0,6" BorderColor="{StaticResource ColorDanger}">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                  <Label Text="{Binding Product.Name}" FontAttributes="Bold" />
+                  <Label Grid.Column="1" Text="{Binding ExpiresOn, StringFormat='{0:dd/MM/yyyy}'}" TextColor="{StaticResource ColorDanger}" />
+                  <Label Grid.Row="1" Text="{Binding Quantity}" TextColor="{StaticResource ColorMuted}" />
+                  <Label Grid.Row="1" Grid.Column="1" Text="{Binding Unit}" TextColor="{StaticResource ColorMuted}" />
+                </Grid>
+              </Frame>
+            </DataTemplate>
+          </CollectionView.ItemTemplate>
+        </CollectionView>
+      </VerticalStackLayout>
+    </ScrollView>
+  </RefreshView>
+</ContentPage>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.Maui.Pages.EmployeesPage"
+             Title="Equipo">
+  <RefreshView x:Name="RefreshControl" Refreshing="OnRefreshing">
+    <ScrollView>
+      <VerticalStackLayout Padding="16" Spacing="12">
+        <Label Text="Empleados del Comedor" FontSize="24" FontAttributes="Bold" />
+
+        <Frame>
+          <VerticalStackLayout Spacing="8">
+            <Label Text="Nuevo empleado" FontAttributes="Bold" FontSize="18" />
+            <Entry x:Name="EmployeeNameEntry" Placeholder="Nombre completo" />
+            <Entry x:Name="EmployeeEmailEntry" Placeholder="Email" Keyboard="Email" />
+            <Picker x:Name="EmployeeRolePicker" Title="Rol" />
+            <Button Text="Crear empleado" Clicked="OnCreateClicked" />
+            <Label x:Name="TempPasswordLabel" TextColor="{StaticResource ColorAccent}" IsVisible="False" />
+          </VerticalStackLayout>
+        </Frame>
+
+        <CollectionView x:Name="EmployeesList" SelectionMode="None">
+          <CollectionView.ItemTemplate>
+            <DataTemplate>
+              <Frame Margin="0,0,0,8">
+                <VerticalStackLayout Spacing="6">
+                  <Label Text="{Binding User.FullName}" FontAttributes="Bold" FontSize="17" />
+                  <Label Text="{Binding User.Email}" TextColor="{StaticResource ColorMuted}" />
+                  <Label Text="{Binding Role}" TextColor="{StaticResource ColorSecondary}" />
+
+                  <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <Button Text="Manager" BackgroundColor="{StaticResource ColorSecondary}" Clicked="OnSetManagerClicked" CommandParameter="{Binding .}" />
+                    <Button Grid.Column="1" Text="Staff" BackgroundColor="{StaticResource ColorPrimaryDark}" Clicked="OnSetStaffClicked" CommandParameter="{Binding .}" />
+                    <Button Grid.Column="2" Text="Eliminar" BackgroundColor="{StaticResource ColorDanger}" Clicked="OnDeleteClicked" CommandParameter="{Binding .}" />
+                  </Grid>
+                </VerticalStackLayout>
+              </Frame>
+            </DataTemplate>
+          </CollectionView.ItemTemplate>
+        </CollectionView>
+      </VerticalStackLayout>
+    </ScrollView>
+  </RefreshView>
+</ContentPage>

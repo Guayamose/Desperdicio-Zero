@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.Maui.Pages.MenusPage"
+             Title="Menús">
+  <RefreshView x:Name="RefreshControl" Refreshing="OnRefreshing">
+    <ScrollView>
+      <VerticalStackLayout Padding="16" Spacing="12">
+        <Label Text="Gestión de Menús" FontSize="24" FontAttributes="Bold" />
+
+        <Frame>
+          <VerticalStackLayout Spacing="8">
+            <Label x:Name="MenuEditorTitle" Text="Nuevo menú" FontSize="18" FontAttributes="Bold" />
+            <DatePicker x:Name="MenuDatePicker" />
+            <Entry x:Name="MenuTitleEntry" Placeholder="Título del menú" />
+            <Editor x:Name="MenuDescriptionEditor" Placeholder="Descripción" />
+            <Entry x:Name="MenuAllergensEntry" Placeholder="Alérgenos separados por coma" />
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+              <Entry x:Name="DishNameEntry" Placeholder="Nombre de plato" />
+              <Button Text="Añadir" Grid.Column="1" BackgroundColor="{StaticResource ColorSecondary}" Clicked="OnAddDishClicked" />
+            </Grid>
+
+            <CollectionView x:Name="DishDraftList" SelectionMode="None" HeightRequest="180">
+              <CollectionView.ItemTemplate>
+                <DataTemplate>
+                  <Frame Margin="0,0,0,6" Padding="8">
+                    <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                      <Label Text="{Binding Name}" VerticalOptions="Center" />
+                      <Button Grid.Column="1" Text="Quitar" FontSize="12" Padding="10,4" BackgroundColor="{StaticResource ColorDanger}" Clicked="OnRemoveDishClicked" CommandParameter="{Binding .}" />
+                    </Grid>
+                  </Frame>
+                </DataTemplate>
+              </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+              <Button Text="Guardar" Clicked="OnSaveMenuClicked" />
+              <Button Grid.Column="1" Text="Generar IA" BackgroundColor="{StaticResource ColorAccent}" Clicked="OnGenerateClicked" />
+              <Button Grid.Column="2" Text="Nuevo" BackgroundColor="{StaticResource ColorSecondary}" Clicked="OnResetMenuClicked" />
+            </Grid>
+          </VerticalStackLayout>
+        </Frame>
+
+        <Entry x:Name="MenuSearchEntry" Placeholder="Buscar menús..." TextChanged="OnMenuSearchChanged" />
+
+        <CollectionView x:Name="MenusList" SelectionMode="None">
+          <CollectionView.ItemTemplate>
+            <DataTemplate>
+              <Frame Margin="0,0,0,8">
+                <VerticalStackLayout Spacing="6">
+                  <Label Text="{Binding Title}" FontSize="17" FontAttributes="Bold" />
+                  <Label Text="{Binding MenuDate, StringFormat='Fecha: {0:dd/MM/yyyy}'}" TextColor="{StaticResource ColorMuted}" />
+                  <Label Text="{Binding Status}" TextColor="{StaticResource ColorSecondary}" />
+                  <Label Text="{Binding Description}" FontSize="12" TextColor="{StaticResource ColorMuted}" />
+
+                  <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <Button Text="Editar" BackgroundColor="{StaticResource ColorSecondary}" Clicked="OnEditMenuClicked" CommandParameter="{Binding .}" />
+                    <Button Grid.Column="1" Text="Publicar" BackgroundColor="{StaticResource ColorPrimaryDark}" Clicked="OnPublishMenuClicked" CommandParameter="{Binding .}" />
+                    <Button Grid.Column="2" Text="Eliminar" BackgroundColor="{StaticResource ColorDanger}" Clicked="OnDeleteMenuClicked" CommandParameter="{Binding .}" />
+                  </Grid>
+                </VerticalStackLayout>
+              </Frame>
+            </DataTemplate>
+          </CollectionView.ItemTemplate>
+        </CollectionView>
+      </VerticalStackLayout>
+    </ScrollView>
+  </RefreshView>
+</ContentPage>
