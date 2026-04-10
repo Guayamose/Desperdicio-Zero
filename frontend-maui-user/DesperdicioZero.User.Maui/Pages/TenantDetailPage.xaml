@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.User.Maui.Pages.TenantDetailPage">
+  <RefreshView x:Name="RefreshControl" Refreshing="OnRefreshing">
+    <ScrollView>
+      <VerticalStackLayout Padding="20,18,20,28" Spacing="18">
+        <Border Style="{StaticResource HeroBorderStyle}">
+          <VerticalStackLayout Spacing="10">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <VerticalStackLayout Spacing="4">
+                <Label Style="{StaticResource HeroTitleStyle}" Text="{Binding Name}" />
+                <Label IsVisible="{Binding HasLocation}" Text="{Binding LocationText}" TextColor="{StaticResource ColorSurface}" />
+              </VerticalStackLayout>
+
+              <Border Background="{StaticResource ColorSurface}"
+                      Padding="12,6"
+                      StrokeThickness="0"
+                      StrokeShape="RoundRectangle 999"
+                      VerticalOptions="Start">
+                <Label FontAttributes="Bold"
+                       FontSize="12"
+                       Text="{Binding StatusLabel}"
+                       TextColor="{StaticResource ColorPrimaryDark}" />
+              </Border>
+            </Grid>
+
+            <Label IsVisible="{Binding HasContact}" Text="{Binding ContactText}" TextColor="{StaticResource ColorSurface}" />
+            <Label IsVisible="{Binding HasAddress}" Text="{Binding Address}" TextColor="{StaticResource ColorSurface}" />
+          </VerticalStackLayout>
+        </Border>
+
+        <Border IsVisible="{Binding HasOperatingHours}" Style="{StaticResource CardBorderStyle}">
+          <VerticalStackLayout Spacing="12">
+            <Label Style="{StaticResource SectionTitleStyle}" Text="Horario" />
+            <VerticalStackLayout x:Name="OperatingHoursLayout" Spacing="8">
+              <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="18">
+                    <Label FontAttributes="Bold" Text="{Binding Day}" />
+                    <Label Grid.Column="1" HorizontalTextAlignment="End" Text="{Binding Hours}" TextColor="{StaticResource ColorMuted}" />
+                  </Grid>
+                </DataTemplate>
+              </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+          </VerticalStackLayout>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <VerticalStackLayout Spacing="12">
+            <Label Style="{StaticResource SectionTitleStyle}" Text="Menu de hoy" />
+
+            <ActivityIndicator x:Name="MenuLoadingIndicator"
+                               Color="{StaticResource ColorPrimary}"
+                               IsRunning="False"
+                               IsVisible="False" />
+
+            <VerticalStackLayout x:Name="MenuContent" Spacing="14" IsVisible="False">
+              <Label x:Name="MenuDateLabel" FontAttributes="Bold" FontSize="12" TextColor="{StaticResource ColorSecondary}" />
+              <Label x:Name="MenuTitleLabel" Style="{StaticResource CardTitleStyle}" />
+              <Label x:Name="MenuDescriptionLabel" TextColor="{StaticResource ColorMuted}" />
+
+              <VerticalStackLayout x:Name="MenuItemsLayout" Spacing="12">
+                <BindableLayout.ItemTemplate>
+                  <DataTemplate>
+                    <Border Background="{StaticResource ColorSurfaceAlt}"
+                            Padding="16"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 20">
+                      <VerticalStackLayout Spacing="8">
+                        <Label FontAttributes="Bold" FontSize="16" Text="{Binding Name}" />
+                        <Label IsVisible="{Binding HasDescription}" Text="{Binding Description}" TextColor="{StaticResource ColorMuted}" />
+                        <Label Text="{Binding IngredientsText}" />
+                        <Label FontSize="12" Text="{Binding AllergensText}" TextColor="{StaticResource ColorMuted}" />
+                        <Label FontSize="12" Text="{Binding DietaryFlagsText}" TextColor="{StaticResource ColorSecondary}" />
+                      </VerticalStackLayout>
+                    </Border>
+                  </DataTemplate>
+                </BindableLayout.ItemTemplate>
+              </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <Label x:Name="EmptyMenuLabel"
+                   HorizontalTextAlignment="Center"
+                   IsVisible="False"
+                   Text="Este comedor aun no ha publicado su menu para hoy."
+                   TextColor="{StaticResource ColorMuted}" />
+          </VerticalStackLayout>
+        </Border>
+      </VerticalStackLayout>
+    </ScrollView>
+  </RefreshView>
+</ContentPage>

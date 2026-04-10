@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.User.Maui.Pages.HomePage"
+             Title="Comedores">
+  <RefreshView x:Name="RefreshControl" Refreshing="OnRefreshing">
+    <CollectionView x:Name="TenantsList"
+                    Margin="0"
+                    SelectionMode="None">
+      <CollectionView.Header>
+        <VerticalStackLayout Padding="20,18,20,24" Spacing="18">
+          <Border Style="{StaticResource HeroBorderStyle}">
+            <Grid ColumnDefinitions="72,*" ColumnSpacing="16">
+              <Border Background="{StaticResource ColorSurface}"
+                      Padding="12"
+                      StrokeThickness="0"
+                      StrokeShape="RoundRectangle 22">
+                <Image HeightRequest="44"
+                       HorizontalOptions="Center"
+                       Source="logo_zero.png"
+                       VerticalOptions="Center"
+                       WidthRequest="44" />
+              </Border>
+
+              <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                <Label Style="{StaticResource HeroTitleStyle}" Text="Encuentra un comedor cerca" />
+                <Label Style="{StaticResource HeroSubtitleStyle}"
+                       Text="Consulta horario, contacto y el menu publicado para hoy desde una app separada del panel interno." />
+                <Label x:Name="BaseUrlLabel"
+                       FontAttributes="Bold"
+                       FontSize="12"
+                       TextColor="{StaticResource ColorPrimaryDark}" />
+              </VerticalStackLayout>
+            </Grid>
+          </Border>
+
+          <Border Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="10">
+              <Label Style="{StaticResource SectionTitleStyle}" Text="Buscar comedor" />
+              <Entry x:Name="SearchEntry"
+                     ClearButtonVisibility="WhileEditing"
+                     Placeholder="Nombre, ciudad, region o pais"
+                     TextChanged="OnSearchChanged" />
+              <Label x:Name="ResultsLabel" Style="{StaticResource MutedLabelStyle}" />
+            </VerticalStackLayout>
+          </Border>
+        </VerticalStackLayout>
+      </CollectionView.Header>
+
+      <CollectionView.EmptyView>
+        <VerticalStackLayout Padding="24,12,24,40" Spacing="10">
+          <Label FontAttributes="Bold" FontSize="20" HorizontalTextAlignment="Center" Text="No hay comedores para mostrar" />
+          <Label HorizontalTextAlignment="Center"
+                 Text="Prueba otra busqueda o revisa la URL del backend desde Ajustes."
+                 TextColor="{StaticResource ColorMuted}" />
+        </VerticalStackLayout>
+      </CollectionView.EmptyView>
+
+      <CollectionView.ItemTemplate>
+        <DataTemplate>
+          <Border Margin="20,0,20,16" Style="{StaticResource CardBorderStyle}">
+            <VerticalStackLayout Spacing="14">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <VerticalStackLayout Spacing="4">
+                  <Label Style="{StaticResource CardTitleStyle}" Text="{Binding Name}" />
+                  <Label IsVisible="{Binding HasLocation}" Text="{Binding LocationText}" TextColor="{StaticResource ColorMuted}" />
+                </VerticalStackLayout>
+
+                <Border Background="{StaticResource ColorSurfaceAlt}"
+                        Padding="12,6"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 999">
+                  <Label FontAttributes="Bold"
+                         FontSize="12"
+                         Text="{Binding StatusLabel}"
+                         TextColor="{StaticResource ColorPrimaryDark}" />
+                </Border>
+              </Grid>
+
+              <Label Text="{Binding ScheduleSummary}" TextColor="{StaticResource ColorText}" />
+              <Label IsVisible="{Binding HasContact}" Text="{Binding ContactText}" TextColor="{StaticResource ColorMuted}" />
+
+              <Button Clicked="OnOpenTenantClicked"
+                      CommandParameter="{Binding .}"
+                      HorizontalOptions="Start"
+                      Text="Ver menu de hoy" />
+            </VerticalStackLayout>
+          </Border>
+        </DataTemplate>
+      </CollectionView.ItemTemplate>
+    </CollectionView>
+  </RefreshView>
+</ContentPage>

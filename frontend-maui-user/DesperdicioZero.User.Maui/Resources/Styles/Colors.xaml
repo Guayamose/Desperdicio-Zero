@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+  <Color x:Key="ColorBackground">#F5EFE4</Color>
+  <Color x:Key="ColorSurface">#FFFDF8</Color>
+  <Color x:Key="ColorSurfaceAlt">#EFE4D1</Color>
+  <Color x:Key="ColorPrimary">#2F6B4F</Color>
+  <Color x:Key="ColorPrimaryDark">#214A37</Color>
+  <Color x:Key="ColorSecondary">#C46A2D</Color>
+  <Color x:Key="ColorAccent">#D7B77A</Color>
+  <Color x:Key="ColorDanger">#C74B4B</Color>
+  <Color x:Key="ColorText">#223127</Color>
+  <Color x:Key="ColorMuted">#6E746A</Color>
+  <Color x:Key="ColorLine">#DCCFB8</Color>
+
+  <LinearGradientBrush x:Key="HeroBrush" StartPoint="0,0" EndPoint="1,1">
+    <GradientStop Color="#2F6B4F" Offset="0.0" />
+    <GradientStop Color="#3E8764" Offset="1.0" />
+  </LinearGradientBrush>
+</ResourceDictionary>

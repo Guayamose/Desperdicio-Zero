@@ -1,0 +1,38 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend-maui", "frontend-maui", "{EE8B4A50-D3F4-FC5B-FD0A-C37C9C4474E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesperdicioZero.Maui", "frontend-maui\DesperdicioZero.Maui\DesperdicioZero.Maui.csproj", "{B97569A8-ACF0-0A68-8985-8C6C26E04A5E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend-maui-user", "frontend-maui-user", "{5CCCF782-EA1D-4DD9-B42A-79F0ABC93CAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesperdicioZero.User.Maui", "frontend-maui-user\DesperdicioZero.User.Maui\DesperdicioZero.User.Maui.csproj", "{74691D26-EB10-4130-8CBE-E19B40AD3068}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B97569A8-ACF0-0A68-8985-8C6C26E04A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97569A8-ACF0-0A68-8985-8C6C26E04A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B97569A8-ACF0-0A68-8985-8C6C26E04A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B97569A8-ACF0-0A68-8985-8C6C26E04A5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74691D26-EB10-4130-8CBE-E19B40AD3068}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74691D26-EB10-4130-8CBE-E19B40AD3068}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74691D26-EB10-4130-8CBE-E19B40AD3068}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74691D26-EB10-4130-8CBE-E19B40AD3068}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B97569A8-ACF0-0A68-8985-8C6C26E04A5E} = {EE8B4A50-D3F4-FC5B-FD0A-C37C9C4474E8}
+		{74691D26-EB10-4130-8CBE-E19B40AD3068} = {5CCCF782-EA1D-4DD9-B42A-79F0ABC93CAC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC9B74DD-879A-490B-8F95-70B055631E43}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+  <Style TargetType="ContentPage">
+    <Setter Property="BackgroundColor" Value="{StaticResource ColorBackground}" />
+  </Style>
+
+  <Style TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+
+  <Style TargetType="Button">
+    <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
+    <Setter Property="TextColor" Value="White" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="Padding" Value="18,12" />
+    <Setter Property="FontAttributes" Value="Bold" />
+  </Style>
+
+  <Style TargetType="Entry">
+    <Setter Property="BackgroundColor" Value="{StaticResource ColorSurfaceAlt}" />
+    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
+    <Setter Property="HeightRequest" Value="50" />
+  </Style>
+
+  <Style x:Key="CardBorderStyle" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource ColorSurface}" />
+    <Setter Property="Stroke" Value="{StaticResource ColorLine}" />
+    <Setter Property="StrokeThickness" Value="1" />
+    <Setter Property="Padding" Value="18" />
+    <Setter Property="StrokeShape">
+      <Setter.Value>
+        <RoundRectangle CornerRadius="24" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="HeroBorderStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+    <Setter Property="Background" Value="{StaticResource HeroBrush}" />
+    <Setter Property="StrokeThickness" Value="0" />
+    <Setter Property="Padding" Value="20" />
+    <Setter Property="StrokeShape">
+      <Setter.Value>
+        <RoundRectangle CornerRadius="30" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style x:Key="SectionTitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="20" />
+  </Style>
+
+  <Style x:Key="CardTitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="18" />
+  </Style>
+
+  <Style x:Key="MutedLabelStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+
+  <Style x:Key="HeroTitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="White" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="26" />
+  </Style>
+
+  <Style x:Key="HeroSubtitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="#F2F7F3" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+</ResourceDictionary>

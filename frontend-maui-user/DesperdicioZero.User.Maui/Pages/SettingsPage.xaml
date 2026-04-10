@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.User.Maui.Pages.SettingsPage"
+             Title="Ajustes">
+  <ScrollView>
+    <VerticalStackLayout Padding="20,18,20,28" Spacing="18">
+      <Border Style="{StaticResource HeroBorderStyle}">
+        <VerticalStackLayout Spacing="8">
+          <Label Style="{StaticResource HeroTitleStyle}" Text="Conexion con la API" />
+          <Label Style="{StaticResource HeroSubtitleStyle}"
+                 Text="Esta app publica consulta el backend Rails por la API publica. Puedes apuntarla a local, emulador o un entorno desplegado." />
+        </VerticalStackLayout>
+      </Border>
+
+      <Border Style="{StaticResource CardBorderStyle}">
+        <VerticalStackLayout Spacing="12">
+          <Label Style="{StaticResource SectionTitleStyle}" Text="URL base" />
+          <Entry x:Name="BaseUrlEntry"
+                 ClearButtonVisibility="WhileEditing"
+                 Keyboard="Url"
+                 Placeholder="http://localhost:3000" />
+          <Label x:Name="SavedUrlLabel" Style="{StaticResource MutedLabelStyle}" />
+          <Button Clicked="OnSaveClicked" Text="Guardar URL" />
+          <Button BackgroundColor="{StaticResource ColorSecondary}"
+                  Clicked="OnResetClicked"
+                  Text="Restaurar URL por defecto" />
+        </VerticalStackLayout>
+      </Border>
+
+      <Border Style="{StaticResource CardBorderStyle}">
+        <VerticalStackLayout Spacing="10">
+          <Label Style="{StaticResource SectionTitleStyle}" Text="Referencias rapidas" />
+          <Label Text="Android Emulator: http://10.0.2.2:3000" />
+          <Label Text="Desktop local o simulador iOS: http://localhost:3000" />
+          <Label Style="{StaticResource MutedLabelStyle}"
+                 Text="Si cambias la URL, vuelve a la pestaña de Comedores para refrescar los datos con el nuevo entorno." />
+        </VerticalStackLayout>
+      </Border>
+    </VerticalStackLayout>
+  </ScrollView>
+</ContentPage>

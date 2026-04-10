@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell x:Class="DesperdicioZero.User.Maui.AppShell"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:pages="clr-namespace:DesperdicioZero.User.Maui.Pages"
+       Title="Desperdicio Zero"
+       FlyoutBehavior="Disabled"
+       Shell.NavBarHasShadow="False"
+       Shell.TabBarForegroundColor="{StaticResource ColorPrimaryDark}"
+       Shell.TabBarTitleColor="{StaticResource ColorPrimaryDark}"
+       Shell.TabBarUnselectedColor="{StaticResource ColorMuted}">
+  <TabBar>
+    <ShellContent Title="Explorar" Route="explore" ContentTemplate="{DataTemplate pages:HomePage}" />
+    <ShellContent Title="Ajustes" Route="settings" ContentTemplate="{DataTemplate pages:SettingsPage}" />
+  </TabBar>
+</Shell>
