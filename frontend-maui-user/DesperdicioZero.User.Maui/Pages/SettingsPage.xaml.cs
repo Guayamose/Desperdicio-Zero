@@ -26,6 +26,13 @@ public partial class SettingsPage : ContentPage
     {
         BaseUrlEntry.Text = _state.BaseUrl;
         SavedUrlLabel.Text = $"Guardada: {_state.BaseUrl}";
+        FavoritesCountLabel.Text = _state.FavoriteCount switch
+        {
+            0 => "No tienes favoritos guardados todavia.",
+            1 => "Tienes 1 comedor guardado como favorito.",
+            _ => $"Tienes {_state.FavoriteCount} comedores guardados como favoritos."
+        };
+        ConnectionStatusLabel.Text = "Comprueba la conexion antes de cambiar de entorno si quieres validar la API publica.";
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
@@ -47,5 +54,25 @@ public partial class SettingsPage : ContentPage
         _state.RestoreDefaultBaseUrl();
         RefreshForm();
         await DisplayAlert("Ajustes", "Se ha restaurado la URL por defecto.", "OK");
+    }
+
+    private async void OnTestClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            ConnectionStatusLabel.Text = "Probando conexion con la API publica...";
+            var tenants = await _state.Api.GetPublicTenantsAsync();
+            var menusToday = tenants.Count(tenant => tenant.HasTodayMenu);
+
+            ConnectionStatusLabel.Text = tenants.Count switch
+            {
+                0 => "Conexion correcta, pero no hay comedores operativos visibles en este entorno.",
+                _ => $"Conexion correcta: {tenants.Count} comedores visibles y {menusToday} con menu hoy."
+            };
+        }
+        catch (Exception ex)
+        {
+            ConnectionStatusLabel.Text = $"Fallo de conexion: {ex.Message}";
+        }
     }
 }

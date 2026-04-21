@@ -76,6 +76,18 @@ public class TenantSummary
     [JsonPropertyName("operatingHoursJson")]
     public Dictionary<string, string>? OperatingHoursJson { get; set; }
 
+    [JsonPropertyName("todayMenuPublished")]
+    public bool TodayMenuPublished { get; set; }
+
+    [JsonPropertyName("todayMenuTitle")]
+    public string? TodayMenuTitle { get; set; }
+
+    [JsonPropertyName("todayMenuDate")]
+    public DateTime? TodayMenuDate { get; set; }
+
+    [JsonIgnore]
+    public bool IsFavorite { get; set; }
+
     [JsonIgnore]
     public string StatusLabel => string.IsNullOrWhiteSpace(Status)
         ? "Disponible"
@@ -91,6 +103,9 @@ public class TenantSummary
     public string LocationText => JoinParts(City, Region, Country);
 
     [JsonIgnore]
+    public string AddressText => JoinParts(Address, City, Region, Country);
+
+    [JsonIgnore]
     public bool HasLocation => !string.IsNullOrWhiteSpace(LocationText);
 
     [JsonIgnore]
@@ -101,6 +116,35 @@ public class TenantSummary
 
     [JsonIgnore]
     public bool HasAddress => !string.IsNullOrWhiteSpace(Address);
+
+    [JsonIgnore]
+    public bool HasTodayMenu => TodayMenuPublished;
+
+    [JsonIgnore]
+    public bool CanCall => !string.IsNullOrWhiteSpace(ContactPhone);
+
+    [JsonIgnore]
+    public bool CanEmail => !string.IsNullOrWhiteSpace(ContactEmail);
+
+    [JsonIgnore]
+    public bool CanOpenMap => !string.IsNullOrWhiteSpace(MapQuery);
+
+    [JsonIgnore]
+    public string MenuAvailabilityLabel => HasTodayMenu ? "Menu disponible hoy" : "Menu pendiente";
+
+    [JsonIgnore]
+    public string MenuPreviewText => HasTodayMenu
+        ? string.IsNullOrWhiteSpace(TodayMenuTitle) ? "Ya hay menu publicado para hoy." : TodayMenuTitle!
+        : "Todavia no hay un menu publicado para hoy.";
+
+    [JsonIgnore]
+    public string FavoriteButtonText => IsFavorite ? "Guardado" : "Guardar";
+
+    [JsonIgnore]
+    public string PrimaryActionLabel => HasTodayMenu ? "Ver comedor y menu" : "Ver detalles";
+
+    [JsonIgnore]
+    public string MapQuery => JoinParts(Name, Address, City, Region, Country);
 
     [JsonIgnore]
     public IReadOnlyList<OpeningHoursEntry> OpeningHours
@@ -138,6 +182,11 @@ public class TenantSummary
             return firstRow is null ? "Horario no disponible" : $"{firstRow.Day}: {firstRow.Hours}";
         }
     }
+
+    [JsonIgnore]
+    public string ScheduleDetail => HasOperatingHours
+        ? $"{OpeningHours.Count} franjas disponibles"
+        : "Sin horario confirmado";
 
     private static string JoinParts(params string?[] parts)
     {
@@ -177,14 +226,37 @@ public class DailyMenuItemDto
     [JsonIgnore]
     public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
 
+    [JsonIgnore]
+    public bool HasIngredients => CleanValues(IngredientsJson).Count > 0;
+
+    [JsonIgnore]
+    public bool HasAllergens => CleanValues(AllergensJson).Count > 0;
+
+    [JsonIgnore]
+    public bool HasDietaryFlags => CleanValues(DietaryFlagsJson).Count > 0;
+
+    [JsonIgnore]
+    public string IngredientsLabel => $"Ingredientes: {IngredientsText}";
+
+    [JsonIgnore]
+    public string AllergensLabel => $"Alergenos: {AllergensText}";
+
+    [JsonIgnore]
+    public string DietaryFlagsLabel => $"Etiquetas: {DietaryFlagsText}";
+
     private static string JoinValues(IEnumerable<string> values, string emptyText)
     {
-        var clean = values
+        var clean = CleanValues(values).ToArray();
+
+        return clean.Length == 0 ? emptyText : string.Join(", ", clean);
+    }
+
+    private static IReadOnlyList<string> CleanValues(IEnumerable<string> values)
+    {
+        return values
             .Where(value => !string.IsNullOrWhiteSpace(value))
             .Select(value => value.Trim())
             .ToArray();
-
-        return clean.Length == 0 ? emptyText : string.Join(", ", clean);
     }
 }
 
@@ -210,4 +282,29 @@ public class DailyMenuDto
 
     [JsonIgnore]
     public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
+
+    [JsonIgnore]
+    public bool HasItems => DailyMenuItems.Count > 0;
+
+    [JsonIgnore]
+    public int DishCount => DailyMenuItems.Count;
+
+    [JsonIgnore]
+    public string DishCountText => DishCount switch
+    {
+        0 => "Sin platos",
+        1 => "1 plato",
+        _ => $"{DishCount} platos"
+    };
+
+    [JsonIgnore]
+    public int HighlightCount => DailyMenuItems.Sum(item => item.DietaryFlagsJson.Count);
+
+    [JsonIgnore]
+    public string HighlightCountText => HighlightCount switch
+    {
+        0 => "Sin etiquetas",
+        1 => "1 etiqueta",
+        _ => $"{HighlightCount} etiquetas"
+    };
 }

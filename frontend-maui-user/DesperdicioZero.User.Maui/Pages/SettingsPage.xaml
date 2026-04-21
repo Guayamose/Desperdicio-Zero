@@ -9,7 +9,7 @@
         <VerticalStackLayout Spacing="8">
           <Label Style="{StaticResource HeroTitleStyle}" Text="Conexion con la API" />
           <Label Style="{StaticResource HeroSubtitleStyle}"
-                 Text="Esta app publica consulta el backend Rails por la API publica. Puedes apuntarla a local, emulador o un entorno desplegado." />
+                 Text="Configura el backend, valida la conexion y deja lista la app publica para consultar comedores y menus desde cualquier entorno." />
         </VerticalStackLayout>
       </Border>
 
@@ -21,7 +21,16 @@
                  Keyboard="Url"
                  Placeholder="http://localhost:3000" />
           <Label x:Name="SavedUrlLabel" Style="{StaticResource MutedLabelStyle}" />
-          <Button Clicked="OnSaveClicked" Text="Guardar URL" />
+          <Label x:Name="ConnectionStatusLabel" Style="{StaticResource CaptionLabelStyle}" />
+
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+            <Button Grid.Column="0" Clicked="OnSaveClicked" Text="Guardar URL" />
+            <Button Grid.Column="1"
+                    Clicked="OnTestClicked"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Text="Probar conexion" />
+          </Grid>
+
           <Button BackgroundColor="{StaticResource ColorSecondary}"
                   Clicked="OnResetClicked"
                   Text="Restaurar URL por defecto" />
@@ -33,8 +42,9 @@
           <Label Style="{StaticResource SectionTitleStyle}" Text="Referencias rapidas" />
           <Label Text="Android Emulator: http://10.0.2.2:3000" />
           <Label Text="Desktop local o simulador iOS: http://localhost:3000" />
+          <Label x:Name="FavoritesCountLabel" Style="{StaticResource MutedLabelStyle}" />
           <Label Style="{StaticResource MutedLabelStyle}"
-                 Text="Si cambias la URL, vuelve a la pestaña de Comedores para refrescar los datos con el nuevo entorno." />
+                 Text="Si cambias la URL, la pestaña de Comedores volvera a sincronizar los datos cuando la abras de nuevo." />
         </VerticalStackLayout>
       </Border>
     </VerticalStackLayout>

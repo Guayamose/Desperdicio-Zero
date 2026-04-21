@@ -1,6 +1,6 @@
-# Frontend .NET MAUI Usuario - Desperdicio Zero
+# Frontend .NET MAUI Publico - Desperdicio Zero
 
-Este directorio contiene una app `.NET MAUI` separada del cliente interno, enfocada solo en la experiencia publica del usuario.
+Este directorio contiene la app `.NET MAUI` publica para usuarios finales.
 
 ## Ubicacion
 
@@ -11,9 +11,13 @@ Este directorio contiene una app `.NET MAUI` separada del cliente interno, enfoc
 
 - Directorio publico de comedores.
 - Busqueda por nombre, ciudad, region o pais.
+- Filtros rapidos por favoritos, menu publicado y disponibilidad de contacto.
+- Favoritos persistidos en el dispositivo.
 - Ficha de cada comedor con ubicacion, contacto y horario.
 - Consulta del menu publicado para hoy.
+- Acciones rapidas para llamar, enviar email o abrir la ubicacion.
 - Ajuste manual de la URL del backend.
+- Prueba de conexion desde la pantalla de ajustes.
 
 ## URL base por defecto
 
@@ -25,4 +29,10 @@ Este directorio contiene una app `.NET MAUI` separada del cliente interno, enfoc
 ```bash
 cd frontend-maui-user/DesperdicioZero.User.Maui
 dotnet build -f net8.0-android
+```
+
+Tambien puedes usar el script del repo para levantar backend, emulador e instalar la app:
+
+```bash
+./scripts/run-all-maui.sh
 ```

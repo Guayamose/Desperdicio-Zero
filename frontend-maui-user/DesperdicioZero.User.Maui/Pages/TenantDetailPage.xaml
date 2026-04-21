@@ -11,22 +11,51 @@
               <VerticalStackLayout Spacing="4">
                 <Label Style="{StaticResource HeroTitleStyle}" Text="{Binding Name}" />
                 <Label IsVisible="{Binding HasLocation}" Text="{Binding LocationText}" TextColor="{StaticResource ColorSurface}" />
+                <Label IsVisible="{Binding HasAddress}" Text="{Binding Address}" TextColor="{StaticResource ColorSurface}" />
               </VerticalStackLayout>
 
-              <Border Background="{StaticResource ColorSurface}"
-                      Padding="12,6"
-                      StrokeThickness="0"
-                      StrokeShape="RoundRectangle 999"
-                      VerticalOptions="Start">
-                <Label FontAttributes="Bold"
-                       FontSize="12"
-                       Text="{Binding StatusLabel}"
-                       TextColor="{StaticResource ColorPrimaryDark}" />
-              </Border>
+              <VerticalStackLayout Grid.Column="1" Spacing="8" HorizontalOptions="End">
+                <Border Background="{StaticResource ColorSurface}"
+                        Padding="12,6"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 999"
+                        VerticalOptions="Start">
+                  <Label FontAttributes="Bold"
+                         FontSize="12"
+                         Text="{Binding StatusLabel}"
+                         TextColor="{StaticResource ColorPrimaryDark}" />
+                </Border>
+
+                <Button x:Name="FavoriteButton"
+                        Clicked="OnToggleFavoriteClicked"
+                        Padding="14,10"
+                        Style="{StaticResource OutlineButtonStyle}"
+                        Text="Guardar" />
+              </VerticalStackLayout>
             </Grid>
 
             <Label IsVisible="{Binding HasContact}" Text="{Binding ContactText}" TextColor="{StaticResource ColorSurface}" />
-            <Label IsVisible="{Binding HasAddress}" Text="{Binding Address}" TextColor="{StaticResource ColorSurface}" />
+
+            <HorizontalStackLayout Spacing="10">
+              <Button x:Name="OpenMapButton"
+                      Clicked="OnOpenMapClicked"
+                      IsVisible="False"
+                      Padding="14,10"
+                      Style="{StaticResource SecondaryButtonStyle}"
+                      Text="Ubicacion" />
+              <Button x:Name="CallButton"
+                      Clicked="OnCallClicked"
+                      IsVisible="False"
+                      Padding="14,10"
+                      Style="{StaticResource SecondaryButtonStyle}"
+                      Text="Llamar" />
+              <Button x:Name="EmailButton"
+                      Clicked="OnEmailClicked"
+                      IsVisible="False"
+                      Padding="14,10"
+                      Style="{StaticResource SecondaryButtonStyle}"
+                      Text="Email" />
+            </HorizontalStackLayout>
           </VerticalStackLayout>
         </Border>
 
@@ -48,12 +77,44 @@
 
         <Border Style="{StaticResource CardBorderStyle}">
           <VerticalStackLayout Spacing="12">
-            <Label Style="{StaticResource SectionTitleStyle}" Text="Menu de hoy" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <Label Style="{StaticResource SectionTitleStyle}" Text="Menu de hoy" />
+              <Border Grid.Column="1"
+                      Background="{StaticResource ColorSurfaceAlt}"
+                      Padding="12,6"
+                      StrokeThickness="0"
+                      StrokeShape="RoundRectangle 999">
+                <Label x:Name="MenuStatusLabel"
+                       FontAttributes="Bold"
+                       FontSize="12"
+                       Text="Pendiente"
+                       TextColor="{StaticResource ColorPrimaryDark}" />
+              </Border>
+            </Grid>
 
             <ActivityIndicator x:Name="MenuLoadingIndicator"
                                Color="{StaticResource ColorPrimary}"
                                IsRunning="False"
                                IsVisible="False" />
+
+            <Grid x:Name="MenuStatsGrid"
+                  ColumnDefinitions="*,*"
+                  ColumnSpacing="12"
+                  IsVisible="False">
+              <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}">
+                <VerticalStackLayout Spacing="2">
+                  <Label x:Name="MenuDishCountLabel" Style="{StaticResource MetricValueStyle}" Text="0" />
+                  <Label Style="{StaticResource MetricCaptionStyle}" Text="platos" />
+                </VerticalStackLayout>
+              </Border>
+
+              <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}">
+                <VerticalStackLayout Spacing="2">
+                  <Label x:Name="MenuHighlightsLabel" Style="{StaticResource MetricValueStyle}" Text="0" />
+                  <Label Style="{StaticResource MetricCaptionStyle}" Text="etiquetas dietarias" />
+                </VerticalStackLayout>
+              </Border>
+            </Grid>
 
             <VerticalStackLayout x:Name="MenuContent" Spacing="14" IsVisible="False">
               <Label x:Name="MenuDateLabel" FontAttributes="Bold" FontSize="12" TextColor="{StaticResource ColorSecondary}" />
@@ -70,9 +131,9 @@
                       <VerticalStackLayout Spacing="8">
                         <Label FontAttributes="Bold" FontSize="16" Text="{Binding Name}" />
                         <Label IsVisible="{Binding HasDescription}" Text="{Binding Description}" TextColor="{StaticResource ColorMuted}" />
-                        <Label Text="{Binding IngredientsText}" />
-                        <Label FontSize="12" Text="{Binding AllergensText}" TextColor="{StaticResource ColorMuted}" />
-                        <Label FontSize="12" Text="{Binding DietaryFlagsText}" TextColor="{StaticResource ColorSecondary}" />
+                        <Label Text="{Binding IngredientsLabel}" />
+                        <Label FontSize="12" Text="{Binding AllergensLabel}" TextColor="{StaticResource ColorMuted}" />
+                        <Label FontSize="12" Text="{Binding DietaryFlagsLabel}" TextColor="{StaticResource ColorSecondary}" />
                       </VerticalStackLayout>
                     </Border>
                   </DataTemplate>
@@ -80,11 +141,17 @@
               </VerticalStackLayout>
             </VerticalStackLayout>
 
-            <Label x:Name="EmptyMenuLabel"
-                   HorizontalTextAlignment="Center"
-                   IsVisible="False"
-                   Text="Este comedor aun no ha publicado su menu para hoy."
-                   TextColor="{StaticResource ColorMuted}" />
+            <VerticalStackLayout x:Name="EmptyMenuState"
+                                 IsVisible="False"
+                                 Padding="8,2,8,4"
+                                 Spacing="8">
+              <Label HorizontalTextAlignment="Center"
+                     Text="Este comedor aun no ha publicado su menu para hoy."
+                     TextColor="{StaticResource ColorMuted}" />
+              <Label HorizontalTextAlignment="Center"
+                     Style="{StaticResource CaptionLabelStyle}"
+                     Text="Puedes guardar el comedor en favoritos y volver mas tarde, o usar sus datos de contacto para confirmar horario y servicio." />
+            </VerticalStackLayout>
           </VerticalStackLayout>
         </Border>
       </VerticalStackLayout>

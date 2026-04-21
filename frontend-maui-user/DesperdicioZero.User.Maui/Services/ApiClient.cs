@@ -61,35 +61,46 @@ public class ApiClient
 
     private async Task<T> SendAsync<T>(HttpMethod method, string path, object? payload = null, bool allowNotFound = false)
     {
-        using var request = new HttpRequestMessage(method, path);
-        request.Headers.Accept.ParseAdd("application/json");
-
-        if (payload is not null)
+        try
         {
-            var json = JsonSerializer.Serialize(payload, _jsonOptions);
-            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-        }
+            using var request = new HttpRequestMessage(method, path);
+            request.Headers.Accept.ParseAdd("application/json");
 
-        using var response = await _httpClient.SendAsync(request);
-        var body = await response.Content.ReadAsStringAsync();
+            if (payload is not null)
+            {
+                var json = JsonSerializer.Serialize(payload, _jsonOptions);
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            }
 
-        if (!response.IsSuccessStatusCode)
-        {
-            if (allowNotFound && response.StatusCode == HttpStatusCode.NotFound)
+            using var response = await _httpClient.SendAsync(request);
+            var body = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (allowNotFound && response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return Activator.CreateInstance<T>();
+                }
+
+                throw BuildApiException(response.StatusCode, body);
+            }
+
+            if (string.IsNullOrWhiteSpace(body))
             {
                 return Activator.CreateInstance<T>();
             }
 
-            throw BuildApiException(response.StatusCode, body);
+            var result = JsonSerializer.Deserialize<T>(body, _jsonOptions);
+            return result ?? Activator.CreateInstance<T>();
         }
-
-        if (string.IsNullOrWhiteSpace(body))
+        catch (TaskCanceledException)
         {
-            return Activator.CreateInstance<T>();
+            throw new ApiException("La conexion ha tardado demasiado. Revisa la URL del backend e intentalo de nuevo.", HttpStatusCode.RequestTimeout);
         }
-
-        var result = JsonSerializer.Deserialize<T>(body, _jsonOptions);
-        return result ?? Activator.CreateInstance<T>();
+        catch (HttpRequestException)
+        {
+            throw new ApiException("No se pudo conectar con el backend. Comprueba la URL guardada y que el servidor este disponible.", HttpStatusCode.ServiceUnavailable);
+        }
     }
 
     private static ApiException BuildApiException(HttpStatusCode statusCode, string body)
@@ -126,6 +137,12 @@ public class ApiClient
             candidate = $"http://{candidate}";
         }
 
-        return candidate.EndsWith("/") ? candidate.TrimEnd('/') : candidate;
+        if (!Uri.TryCreate(candidate, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new ArgumentException("La URL base no es valida. Usa una direccion http:// o https://.");
+        }
+
+        return uri.ToString().TrimEnd('/');
     }
 }
