@@ -8,6 +8,7 @@ JAVA_HOME_DEFAULT="${HOME}/.local/jdk-17"
 ANDROID_SDK_ROOT_DEFAULT="${HOME}/Android/Sdk"
 DOTNET_BIN="${HOME}/.dotnet/dotnet"
 AVD_NAME="${AVD_NAME:-DesperdicioZero_API34}"
+EMU_ACCEL="${EMU_ACCEL:-on}"
 APP_PACKAGE="com.socialkitchen.desperdiciozero.user"
 APP_APK="${MAUI_DIR}/bin/Debug/net8.0-android/${APP_PACKAGE}-Signed.apk"
 
@@ -25,6 +26,11 @@ wait_backend() {
     sleep 1
   done
   return 1
+}
+
+is_emulator_process_running() {
+  pgrep -f "qemu-system-x86_64 .* -avd ${AVD_NAME}" >/dev/null 2>&1 \
+    || pgrep -f "emulator .* -avd ${AVD_NAME}" >/dev/null 2>&1
 }
 
 is_android_booted() {
@@ -46,8 +52,35 @@ is_android_booted() {
   return 1
 }
 
+is_android_framework_ready() {
+  local package_path provisioned
+
+  package_path="$(adb shell pm path android 2>/dev/null | tr -d '\r')"
+  provisioned="$(adb shell settings get global device_provisioned 2>/dev/null | tr -d '\r')"
+
+  if [ -n "${package_path}" ] && [ "${provisioned}" = "1" ]; then
+    return 0
+  fi
+
+  return 1
+}
+
 is_package_installed() {
   adb shell pm path "${APP_PACKAGE}" >/dev/null 2>&1
+}
+
+wait_for_android_framework() {
+  for _ in $(seq 1 180); do
+    if is_android_framework_ready; then
+      return 0
+    fi
+    sleep 2
+  done
+  return 1
+}
+
+install_app() {
+  timeout 180s adb install --no-incremental -r "${APP_APK}"
 }
 
 echo "[1/5] Verificando backend Rails..."
@@ -61,17 +94,17 @@ if ! wait_backend; then
 fi
 
 echo "[2/5] Arrancando emulador..."
-if ! adb devices | grep -q '^emulator-'; then
+if ! adb devices | grep -q '^emulator-' && ! is_emulator_process_running; then
   # Try GUI mode with local libs.
   nohup env LD_LIBRARY_PATH="${EMU_LIBS}:${LD_LIBRARY_PATH:-}" \
-    emulator -avd "${AVD_NAME}" -no-metrics -no-snapshot-save -no-boot-anim -accel off -gpu swiftshader_indirect \
+    emulator -avd "${AVD_NAME}" -no-metrics -no-snapshot-save -no-boot-anim -accel "${EMU_ACCEL}" -gpu swiftshader_indirect \
     >/tmp/desperdicio-emulator-gui.log 2>&1 &
 
   sleep 10
 
   # Fallback to headless mode if GUI did not start.
   if ! pgrep -f "qemu-system-x86_64 .* -avd ${AVD_NAME}" >/dev/null; then
-    nohup emulator -avd "${AVD_NAME}" -no-window -no-metrics -no-snapshot-save -no-boot-anim -no-audio -accel off -gpu swiftshader_indirect \
+    nohup emulator -avd "${AVD_NAME}" -no-window -no-metrics -no-snapshot-save -no-boot-anim -no-audio -accel "${EMU_ACCEL}" -gpu swiftshader_indirect \
       >/tmp/desperdicio-emulator.log 2>&1 &
   fi
 fi
@@ -92,17 +125,38 @@ if [ "${BOOT_OK}" -ne 1 ]; then
   exit 1
 fi
 
+echo "[3b/5] Esperando servicios del sistema Android..."
+if ! wait_for_android_framework; then
+  echo "Android ha arrancado, pero Settings/PackageManager todavia no estan listos." >&2
+  echo "Abre el emulador, espera a ver la pantalla principal y vuelve a ejecutar el script." >&2
+  exit 1
+fi
+
+adb shell input keyevent KEYCODE_WAKEUP >/dev/null 2>&1 || true
+adb shell wm dismiss-keyguard >/dev/null 2>&1 || true
+
 echo "[4/5] Compilando app MAUI..."
 cd "${MAUI_DIR}"
 "${DOTNET_BIN}" build -p:TargetFramework=net8.0-android -p:JavaSdkDirectory="${JAVA_HOME}" -p:AndroidSdkDirectory="${ANDROID_SDK_ROOT}" -v minimal
 
 echo "[5/5] Instalando y abriendo app..."
-if ! timeout 180s adb install --no-incremental -r "${APP_APK}"; then
-  if is_package_installed; then
-    echo "Instalacion completada, pero adb no devolvio estado. Continuando..."
-  else
-    echo "Fallo o timeout al instalar APK." >&2
+if ! install_app; then
+  echo "Primer intento de instalacion fallido. Reintentando tras refrescar el estado del emulador..."
+  adb wait-for-device
+
+  if ! wait_for_android_framework; then
+    echo "El emulador ha perdido el estado listo para instalar apps." >&2
+    echo "Cierra el emulador, vuelve a abrirlo y espera a la pantalla principal." >&2
     exit 1
+  fi
+
+  if ! install_app; then
+    if is_package_installed; then
+      echo "Instalacion completada, pero adb no devolvio estado. Continuando..."
+    else
+      echo "Fallo o timeout al instalar APK." >&2
+      exit 1
+    fi
   fi
 fi
 
