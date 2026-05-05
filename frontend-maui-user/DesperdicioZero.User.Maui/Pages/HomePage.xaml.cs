@@ -1,5 +1,6 @@
 using DesperdicioZero.User.Maui.Models;
 using DesperdicioZero.User.Maui.Services;
+using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 
 namespace DesperdicioZero.User.Maui.Pages;
@@ -19,6 +20,8 @@ public partial class HomePage : ContentPage
     private bool _isLoading;
     private TenantFilter _activeFilter = TenantFilter.All;
     private string? _lastLoadedBaseUrl;
+    private DateTimeOffset? _lastLoadedAt;
+    private bool _usingFallbackData;
 
     public HomePage() : this(ServiceHelper.GetRequiredService<UserAppState>())
     {
@@ -57,22 +60,40 @@ public partial class HomePage : ContentPage
         {
             _isLoading = true;
             RefreshControl.IsRefreshing = true;
+            LoadingIndicator.IsVisible = true;
+            LoadingIndicator.IsRunning = true;
             HideError();
-            BaseUrlLabel.Text = $"Backend: {_state.BaseUrl}";
-            _tenants = await _state.Api.GetPublicTenantsAsync();
+
+            try
+            {
+                _tenants = await _state.Api.GetPublicTenantsAsync();
+                _usingFallbackData = false;
+            }
+            catch
+            {
+                _tenants = await _state.Api.GetBundledPublicTenantsAsync();
+                _usingFallbackData = true;
+            }
+
             _lastLoadedBaseUrl = _state.BaseUrl;
+            _lastLoadedAt = DateTimeOffset.Now;
+
             UpdateFavoriteState();
+            BuildSuggestionChips();
             RefreshSummary();
             ApplyFilter();
         }
         catch (Exception ex)
         {
+            _usingFallbackData = false;
             ShowError(ex.Message);
         }
         finally
         {
             _isLoading = false;
             RefreshControl.IsRefreshing = false;
+            LoadingIndicator.IsRunning = false;
+            LoadingIndicator.IsVisible = false;
         }
     }
 
@@ -86,7 +107,7 @@ public partial class HomePage : ContentPage
         {
             TenantFilter.Favorites => _tenants.Where(tenant => tenant.IsFavorite),
             TenantFilter.MenuToday => TenantsWithMenu(),
-            TenantFilter.Contact => _tenants.Where(tenant => tenant.HasContact),
+            TenantFilter.Contact => TenantsWithContact(),
             _ => _tenants
         };
 
@@ -111,13 +132,12 @@ public partial class HomePage : ContentPage
         {
             0 => BuildEmptyResultText(query),
             1 => BuildSingleResultText(),
-            _ => $"{ordered.Count} comedores visibles en este momento."
+            _ => $"{ordered.Count} comedores disponibles ahora."
         };
 
-        LastUpdatedLabel.Text = _tenants.Count == 0
-            ? "Aun no se ha sincronizado el directorio."
-            : $"Favoritos arriba. Ultima sincronizacion desde {_state.BaseUrl}.";
+        LastUpdatedLabel.Text = BuildLastUpdatedText();
         UpdateFilterButtons();
+        RefreshSuggestionChipState();
     }
 
     private async void OnOpenTenantClicked(object sender, EventArgs e)
@@ -127,6 +147,21 @@ public partial class HomePage : ContentPage
             return;
         }
 
+        await OpenTenantAsync(tenant);
+    }
+
+    private async void OnTenantCardTapped(object sender, TappedEventArgs e)
+    {
+        if (sender is not TapGestureRecognizer tapGesture || tapGesture.BindingContext is not TenantSummary tenant)
+        {
+            return;
+        }
+
+        await OpenTenantAsync(tenant);
+    }
+
+    private async Task OpenTenantAsync(TenantSummary tenant)
+    {
         await Shell.Current.Navigation.PushAsync(new TenantDetailPage(_state, tenant));
     }
 
@@ -196,16 +231,13 @@ public partial class HomePage : ContentPage
     {
         Dispatcher.Dispatch(() =>
         {
-            BaseUrlLabel.Text = $"Backend: {_state.BaseUrl}";
+            LastUpdatedLabel.Text = BuildLastUpdatedText();
         });
     }
 
     private void RefreshSummary()
     {
         SummaryTenantsLabel.Text = _tenants.Count.ToString();
-        SummaryMenusLabel.Text = TenantsWithMenu().Count().ToString();
-        SummaryFavoritesLabel.Text = _state.FavoriteCount.ToString();
-        BaseUrlLabel.Text = $"Backend: {_state.BaseUrl}";
     }
 
     private void UpdateFavoriteState()
@@ -228,14 +260,91 @@ public partial class HomePage : ContentPage
     {
         button.BackgroundColor = isActive
             ? Color.FromArgb("#2F6B4F")
-            : Color.FromArgb("#00000000");
+            : Colors.White;
         button.TextColor = isActive
             ? Colors.White
             : Color.FromArgb("#214A37");
         button.BorderColor = isActive
             ? Color.FromArgb("#2F6B4F")
             : Color.FromArgb("#DCCFB8");
-        button.BorderWidth = isActive ? 0 : 1;
+        button.BorderWidth = 1;
+    }
+
+    private void BuildSuggestionChips()
+    {
+        SuggestionChipsLayout.Children.Clear();
+
+        var suggestions = _tenants
+            .Select(tenant => tenant.City)
+            .Where(city => !string.IsNullOrWhiteSpace(city))
+            .Select(city => city!.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(city => city, StringComparer.OrdinalIgnoreCase)
+            .Take(6)
+            .ToList();
+
+        if (suggestions.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var suggestion in suggestions)
+        {
+            var button = new Button
+            {
+                Text = suggestion
+            };
+
+            if (Application.Current?.Resources.TryGetValue("ChipButtonStyle", out var styleResource) == true
+                && styleResource is Style chipButtonStyle)
+            {
+                button.Style = chipButtonStyle;
+            }
+
+            button.Clicked += OnSuggestionChipClicked;
+            SuggestionChipsLayout.Children.Add(button);
+        }
+
+        RefreshSuggestionChipState();
+    }
+
+    private void RefreshSuggestionChipState()
+    {
+        var query = SearchEntry.Text?.Trim() ?? string.Empty;
+
+        foreach (var child in SuggestionChipsLayout.Children)
+        {
+            if (child is not Button button)
+            {
+                continue;
+            }
+
+            var isActive = !string.IsNullOrWhiteSpace(query)
+                && string.Equals(button.Text, query, StringComparison.OrdinalIgnoreCase);
+
+            button.BackgroundColor = isActive
+                ? Color.FromArgb("#2F6B4F")
+                : Colors.White;
+            button.TextColor = isActive
+                ? Colors.White
+                : Color.FromArgb("#214A37");
+            button.BorderColor = isActive
+                ? Color.FromArgb("#2F6B4F")
+                : Color.FromArgb("#DCCFB8");
+            button.BorderWidth = 1;
+        }
+    }
+
+    private void OnSuggestionChipClicked(object? sender, EventArgs e)
+    {
+        if (sender is not Button button)
+        {
+            return;
+        }
+
+        SearchEntry.Text = string.Equals(SearchEntry.Text?.Trim(), button.Text, StringComparison.OrdinalIgnoreCase)
+            ? string.Empty
+            : button.Text;
     }
 
     private void ShowError(string message)
@@ -266,11 +375,31 @@ public partial class HomePage : ContentPage
     {
         return _activeFilter == TenantFilter.Favorites
             ? "1 favorito coincide con tu seleccion."
-            : "1 comedor visible en este momento.";
+            : "1 comedor disponible ahora.";
+    }
+
+    private string BuildLastUpdatedText()
+    {
+        if (_usingFallbackData)
+        {
+            return "Sin conexion con el backend. Mostrando la copia local del listado.";
+        }
+
+        if (_lastLoadedAt is null)
+        {
+            return "Actualizacion del listado pendiente.";
+        }
+
+        return $"Actualizado el {_lastLoadedAt.Value:dd/MM/yyyy} a las {_lastLoadedAt.Value:HH:mm}.";
     }
 
     private IEnumerable<TenantSummary> TenantsWithMenu()
     {
         return _tenants.Where(tenant => tenant.HasTodayMenu);
+    }
+
+    private IEnumerable<TenantSummary> TenantsWithContact()
+    {
+        return _tenants.Where(tenant => tenant.HasContact);
     }
 }

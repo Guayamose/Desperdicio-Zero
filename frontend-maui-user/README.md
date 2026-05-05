@@ -36,3 +36,13 @@ Tambien puedes usar el script del repo para levantar backend, emulador e instala
 ```bash
 ./scripts/run-all-maui.sh
 ```
+
+Para cerrar la app y el emulador:
+
+```bash
+./scripts/stop-all-maui.sh
+```
+
+El script de arranque detecta un `JAVA_HOME` roto y cambia automaticamente al JDK local en `~/.local/jdk-17`.
+
+La build `Debug` de Android fuerza `EmbedAssembliesIntoApk=true` y desactiva Fast Deployment para evitar cierres inmediatos al abrir la app desde el emulador.

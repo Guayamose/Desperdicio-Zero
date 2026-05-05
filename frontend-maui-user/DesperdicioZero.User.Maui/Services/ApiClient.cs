@@ -3,11 +3,13 @@ using System.Text;
 using System.Text.Json;
 using DesperdicioZero.User.Maui.Models;
 using Microsoft.Maui.Devices;
+using Microsoft.Maui.Storage;
 
 namespace DesperdicioZero.User.Maui.Services;
 
 public class ApiClient
 {
+    private const string BundledTenantsFileName = "public_tenants_seed.json";
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly HttpClient _httpClient;
 
@@ -57,6 +59,19 @@ public class ApiClient
     {
         var envelope = await SendAsync<ApiEnvelope<DailyMenuDto>>(HttpMethod.Get, $"/api/v1/public/tenants/{Uri.EscapeDataString(slug)}/menu-today", allowNotFound: true);
         return envelope.Data;
+    }
+
+    public async Task<List<TenantSummary>> GetBundledPublicTenantsAsync()
+    {
+        await using var stream = await FileSystem.OpenAppPackageFileAsync(BundledTenantsFileName);
+        var tenants = await JsonSerializer.DeserializeAsync<List<TenantSummary>>(stream, _jsonOptions);
+        return tenants ?? [];
+    }
+
+    public async Task<TenantSummary?> GetBundledPublicTenantAsync(string slug)
+    {
+        var tenants = await GetBundledPublicTenantsAsync();
+        return tenants.FirstOrDefault(tenant => string.Equals(tenant.Slug, slug, StringComparison.OrdinalIgnoreCase));
     }
 
     private async Task<T> SendAsync<T>(HttpMethod method, string path, object? payload = null, bool allowNotFound = false)

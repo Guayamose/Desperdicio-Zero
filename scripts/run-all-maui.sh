@@ -6,14 +6,60 @@ MAUI_DIR="${ROOT_DIR}/frontend-maui-user/DesperdicioZero.User.Maui"
 
 JAVA_HOME_DEFAULT="${HOME}/.local/jdk-17"
 ANDROID_SDK_ROOT_DEFAULT="${HOME}/Android/Sdk"
-DOTNET_BIN="${HOME}/.dotnet/dotnet"
 AVD_NAME="${AVD_NAME:-DesperdicioZero_API34}"
 EMU_ACCEL="${EMU_ACCEL:-on}"
+EMU_MODE="${EMU_MODE:-auto}"
 APP_PACKAGE="com.socialkitchen.desperdiciozero.user"
 APP_APK="${MAUI_DIR}/bin/Debug/net8.0-android/${APP_PACKAGE}-Signed.apk"
+AVD_DIR="${HOME}/.android/avd/${AVD_NAME}.avd"
+EMULATOR_RUNTIME_MODE=""
 
-export JAVA_HOME="${JAVA_HOME:-${JAVA_HOME_DEFAULT}}"
+is_valid_jdk_home() {
+  local jdk_home="${1:-}"
+
+  [ -n "${jdk_home}" ] \
+    && [ -x "${jdk_home}/bin/java" ] \
+    && [ -x "${jdk_home}/bin/javac" ] \
+    && [ -x "${jdk_home}/bin/jar" ]
+}
+
+resolve_java_home() {
+  if is_valid_jdk_home "${JAVA_HOME:-}"; then
+    printf '%s\n' "${JAVA_HOME}"
+    return 0
+  fi
+
+  if [ -n "${JAVA_HOME:-}" ]; then
+    echo "JAVA_HOME='${JAVA_HOME}' no apunta a un JDK valido. Usando ${JAVA_HOME_DEFAULT}." >&2
+  fi
+
+  if is_valid_jdk_home "${JAVA_HOME_DEFAULT}"; then
+    printf '%s\n' "${JAVA_HOME_DEFAULT}"
+    return 0
+  fi
+
+  echo "No se encontro un JDK valido. Revisa ${JAVA_HOME_DEFAULT}." >&2
+  exit 1
+}
+
+resolve_dotnet_bin() {
+  if [ -x "${HOME}/.dotnet/dotnet" ]; then
+    printf '%s\n' "${HOME}/.dotnet/dotnet"
+    return 0
+  fi
+
+  if command -v dotnet >/dev/null 2>&1; then
+    command -v dotnet
+    return 0
+  fi
+
+  echo "No se encontro dotnet en ~/.dotnet ni en PATH." >&2
+  exit 1
+}
+
+export JAVA_HOME="$(resolve_java_home)"
 export ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_SDK_ROOT_DEFAULT}}"
+DOTNET_BIN="$(resolve_dotnet_bin)"
 export PATH="${HOME}/.dotnet:${JAVA_HOME}/bin:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/cmdline-tools/11.0/bin:${PATH}"
 
 EMU_LIBS="${HOME}/.local/emu-libs/usr/lib/x86_64-linux-gnu:${HOME}/.local/emu-libs/usr/lib/x86_64-linux-gnu/pulseaudio:${ANDROID_SDK_ROOT}/emulator/lib64:${ANDROID_SDK_ROOT}/emulator/lib64/qt/lib:${ANDROID_SDK_ROOT}/emulator/lib64/vulkan"
@@ -29,8 +75,183 @@ wait_backend() {
 }
 
 is_emulator_process_running() {
-  pgrep -f "qemu-system-x86_64 .* -avd ${AVD_NAME}" >/dev/null 2>&1 \
+  pgrep -f "qemu-system-x86_64-headless .* -avd ${AVD_NAME}" >/dev/null 2>&1 \
+    || pgrep -f "qemu-system-x86_64 .* -avd ${AVD_NAME}" >/dev/null 2>&1 \
     || pgrep -f "emulator .* -avd ${AVD_NAME}" >/dev/null 2>&1
+}
+
+adb_has_device() {
+  adb devices 2>/dev/null | awk '$1 ~ /^emulator-/ && $2 == "device" { found=1 } END { exit found ? 0 : 1 }'
+}
+
+ensure_adb_server() {
+  adb start-server >/dev/null 2>&1 || true
+}
+
+reset_adb_server() {
+  adb kill-server >/dev/null 2>&1 || true
+  ensure_adb_server
+}
+
+kill_avd_processes() {
+  pkill -f "qemu-system-x86_64-headless .* -avd ${AVD_NAME}" >/dev/null 2>&1 || true
+  pkill -f "qemu-system-x86_64 .* -avd ${AVD_NAME}" >/dev/null 2>&1 || true
+  pkill -f "emulator .* -avd ${AVD_NAME}" >/dev/null 2>&1 || true
+}
+
+clear_stale_avd_locks() {
+  if is_emulator_process_running; then
+    return 1
+  fi
+
+  rm -f "${AVD_DIR}/hardware-qemu.ini.lock" "${AVD_DIR}/multiinstance.lock"
+}
+
+avd_images_in_use() {
+  fuser "${AVD_DIR}/cache.img.qcow2" "${AVD_DIR}/userdata-qemu.img.qcow2" >/dev/null 2>&1
+}
+
+wait_for_avd_release() {
+  local timeout_seconds="${1:-30}"
+  local started_at now
+
+  started_at="$(date +%s)"
+
+  while true; do
+    if ! is_emulator_process_running \
+      && [ ! -f "${AVD_DIR}/hardware-qemu.ini.lock" ] \
+      && [ ! -f "${AVD_DIR}/multiinstance.lock" ] \
+      && ! avd_images_in_use; then
+      return 0
+    fi
+
+    now="$(date +%s)"
+    if [ $((now - started_at)) -ge "${timeout_seconds}" ]; then
+      break
+    fi
+
+    sleep 1
+  done
+
+  kill_avd_processes
+  sleep 2
+  clear_stale_avd_locks || true
+
+  ! is_emulator_process_running
+}
+
+start_gui_emulator() {
+  EMULATOR_RUNTIME_MODE="gui"
+  env LD_LIBRARY_PATH="${EMU_LIBS}:${LD_LIBRARY_PATH:-}" \
+    setsid -f emulator -avd "${AVD_NAME}" -no-metrics -no-snapshot-save -no-boot-anim -accel "${EMU_ACCEL}" -gpu swiftshader_indirect \
+    </dev/null >/tmp/desperdicio-emulator-gui.log 2>&1
+}
+
+start_headless_emulator() {
+  EMULATOR_RUNTIME_MODE="headless"
+  setsid -f emulator -avd "${AVD_NAME}" -no-window -no-metrics -no-snapshot-save -no-boot-anim -no-audio -accel "${EMU_ACCEL}" -gpu swiftshader_indirect \
+    </dev/null >/tmp/desperdicio-emulator.log 2>&1
+}
+
+wait_for_adb_device() {
+  local timeout_seconds="${1:-90}"
+  local startup_grace_seconds=10
+  local started_at now elapsed
+
+  started_at="$(date +%s)"
+
+  while true; do
+    if adb_has_device; then
+      return 0
+    fi
+
+    now="$(date +%s)"
+    elapsed=$((now - started_at))
+
+    if [ "${elapsed}" -ge "${startup_grace_seconds}" ] && ! is_emulator_process_running; then
+      return 1
+    fi
+
+    if [ "${elapsed}" -ge "${timeout_seconds}" ]; then
+      return 1
+    fi
+
+    sleep 2
+  done
+}
+
+recover_with_headless() {
+  if [ "${EMU_MODE}" != "auto" ] || [ "${EMULATOR_RUNTIME_MODE}" != "gui" ]; then
+    return 1
+  fi
+
+  echo "El emulador con ventana se ha desconectado durante el arranque. Reintentando en modo headless..." >&2
+  kill_avd_processes
+  wait_for_avd_release 30 || true
+  reset_adb_server
+  start_headless_emulator
+  wait_for_adb_device 120
+}
+
+launch_emulator() {
+  ensure_adb_server
+
+  if adb_has_device; then
+    return 0
+  fi
+
+  if is_emulator_process_running; then
+    echo "Se ha detectado un emulador en ejecucion. Esperando conexion por adb..."
+    if wait_for_adb_device 90; then
+      return 0
+    fi
+
+    echo "El emulador existente no se ha conectado. Reiniciando intento..." >&2
+    kill_avd_processes
+    wait_for_avd_release 30 || true
+  fi
+
+  case "${EMU_MODE}" in
+    headless)
+      echo "Arrancando emulador en modo headless..."
+      reset_adb_server
+      start_headless_emulator
+      if wait_for_adb_device 120; then
+        return 0
+      fi
+      ;;
+    gui)
+      echo "Arrancando emulador con ventana..."
+      start_gui_emulator
+      if wait_for_adb_device 120; then
+        return 0
+      fi
+      ;;
+    auto)
+      echo "Intentando arrancar emulador con ventana..."
+      start_gui_emulator
+      if wait_for_adb_device 60; then
+        return 0
+      fi
+
+      echo "El emulador con ventana no ha quedado listo. Probando modo headless..." >&2
+      kill_avd_processes
+      wait_for_avd_release 30 || true
+
+      reset_adb_server
+      start_headless_emulator
+      if wait_for_adb_device 120; then
+        return 0
+      fi
+      ;;
+    *)
+      echo "EMU_MODE debe ser auto, gui o headless. Valor recibido: ${EMU_MODE}" >&2
+      exit 1
+      ;;
+  esac
+
+  echo "No se pudo conectar ningun emulador Android por adb." >&2
+  exit 1
 }
 
 is_android_booted() {
@@ -74,8 +295,29 @@ wait_for_android_framework() {
     if is_android_framework_ready; then
       return 0
     fi
+
+    if ! adb_has_device || ! is_emulator_process_running; then
+      return 1
+    fi
+
     sleep 2
   done
+  return 1
+}
+
+wait_for_android_boot() {
+  for _ in $(seq 1 300); do
+    if is_android_booted; then
+      return 0
+    fi
+
+    if ! adb_has_device || ! is_emulator_process_running; then
+      return 1
+    fi
+
+    sleep 2
+  done
+
   return 1
 }
 
@@ -94,42 +336,24 @@ if ! wait_backend; then
 fi
 
 echo "[2/5] Arrancando emulador..."
-if ! adb devices | grep -q '^emulator-' && ! is_emulator_process_running; then
-  # Try GUI mode with local libs.
-  nohup env LD_LIBRARY_PATH="${EMU_LIBS}:${LD_LIBRARY_PATH:-}" \
-    emulator -avd "${AVD_NAME}" -no-metrics -no-snapshot-save -no-boot-anim -accel "${EMU_ACCEL}" -gpu swiftshader_indirect \
-    >/tmp/desperdicio-emulator-gui.log 2>&1 &
-
-  sleep 10
-
-  # Fallback to headless mode if GUI did not start.
-  if ! pgrep -f "qemu-system-x86_64 .* -avd ${AVD_NAME}" >/dev/null; then
-    nohup emulator -avd "${AVD_NAME}" -no-window -no-metrics -no-snapshot-save -no-boot-anim -no-audio -accel "${EMU_ACCEL}" -gpu swiftshader_indirect \
-      >/tmp/desperdicio-emulator.log 2>&1 &
-  fi
-fi
+launch_emulator
 
 echo "[3/5] Esperando boot de Android..."
-adb wait-for-device
-BOOT_OK=0
-for _ in $(seq 1 300); do
-  if is_android_booted; then
-    BOOT_OK=1
-    break
+if ! wait_for_android_boot; then
+  if ! recover_with_headless || ! wait_for_android_boot; then
+    echo "No se pudo confirmar boot completo en 10 minutos." >&2
+    echo "Prueba reiniciar el emulador y volver a ejecutar este script." >&2
+    exit 1
   fi
-  sleep 2
-done
-if [ "${BOOT_OK}" -ne 1 ]; then
-  echo "No se pudo confirmar boot completo en 10 minutos." >&2
-  echo "Prueba reiniciar el emulador y volver a ejecutar este script." >&2
-  exit 1
 fi
 
 echo "[3b/5] Esperando servicios del sistema Android..."
 if ! wait_for_android_framework; then
-  echo "Android ha arrancado, pero Settings/PackageManager todavia no estan listos." >&2
-  echo "Abre el emulador, espera a ver la pantalla principal y vuelve a ejecutar el script." >&2
-  exit 1
+  if ! recover_with_headless || ! wait_for_android_boot || ! wait_for_android_framework; then
+    echo "Android ha arrancado, pero Settings/PackageManager todavia no estan listos." >&2
+    echo "Abre el emulador, espera a ver la pantalla principal y vuelve a ejecutar el script." >&2
+    exit 1
+  fi
 fi
 
 adb shell input keyevent KEYCODE_WAKEUP >/dev/null 2>&1 || true
@@ -137,7 +361,13 @@ adb shell wm dismiss-keyguard >/dev/null 2>&1 || true
 
 echo "[4/5] Compilando app MAUI..."
 cd "${MAUI_DIR}"
-"${DOTNET_BIN}" build -p:TargetFramework=net8.0-android -p:JavaSdkDirectory="${JAVA_HOME}" -p:AndroidSdkDirectory="${ANDROID_SDK_ROOT}" -v minimal
+"${DOTNET_BIN}" build \
+  -p:TargetFramework=net8.0-android \
+  -p:JavaSdkDirectory="${JAVA_HOME}" \
+  -p:AndroidSdkDirectory="${ANDROID_SDK_ROOT}" \
+  -p:EmbedAssembliesIntoApk=true \
+  -p:AndroidFastDeploymentType=None \
+  -v minimal
 
 echo "[5/5] Instalando y abriendo app..."
 if ! install_app; then

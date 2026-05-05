@@ -9,6 +9,7 @@ public partial class TenantDetailPage : ContentPage
     private readonly UserAppState _state;
     private TenantSummary _tenant;
     private bool _isLoading;
+    private bool _usingFallbackData;
 
     public TenantDetailPage(UserAppState state, TenantSummary tenant)
     {
@@ -18,8 +19,10 @@ public partial class TenantDetailPage : ContentPage
         BindingContext = _tenant;
         Title = tenant.Name;
         BindOperatingHours();
+        BindRecentMenus();
         RefreshFavoriteButton();
         RefreshActionButtons();
+        ResetMenuState();
     }
 
     protected override async void OnAppearing()
@@ -44,21 +47,45 @@ public partial class TenantDetailPage : ContentPage
             MenuLoadingIndicator.IsRunning = true;
             MenuLoadingIndicator.IsVisible = true;
 
-            var tenantTask = _state.Api.GetPublicTenantAsync(_tenant.Slug);
-            var menuTask = _state.Api.GetPublicMenuTodayAsync(_tenant.Slug);
+            try
+            {
+                var tenantTask = _state.Api.GetPublicTenantAsync(_tenant.Slug);
+                var menuTask = _state.Api.GetPublicMenuTodayAsync(_tenant.Slug);
 
-            await Task.WhenAll(tenantTask, menuTask);
+                await Task.WhenAll(tenantTask, menuTask);
 
-            _tenant = tenantTask.Result;
-            BindingContext = _tenant;
-            Title = _tenant.Name;
-            BindOperatingHours();
-            RefreshFavoriteButton();
-            RefreshActionButtons();
-            RenderMenu(menuTask.Result);
+                _tenant = tenantTask.Result;
+                _usingFallbackData = false;
+                BindingContext = _tenant;
+                Title = _tenant.Name;
+                BindOperatingHours();
+                BindRecentMenus();
+                RefreshFavoriteButton();
+                RefreshActionButtons();
+                RenderMenu(menuTask.Result);
+            }
+            catch
+            {
+                var bundledTenant = await _state.Api.GetBundledPublicTenantAsync(_tenant.Slug);
+                if (bundledTenant is null)
+                {
+                    throw;
+                }
+
+                _tenant = bundledTenant;
+                _usingFallbackData = true;
+                BindingContext = _tenant;
+                Title = _tenant.Name;
+                BindOperatingHours();
+                BindRecentMenus();
+                RefreshFavoriteButton();
+                RefreshActionButtons();
+                RenderMenu(null);
+            }
         }
         catch (Exception ex)
         {
+            _usingFallbackData = false;
             await DisplayAlert("Error", ex.Message, "OK");
         }
         finally
@@ -75,19 +102,39 @@ public partial class TenantDetailPage : ContentPage
         BindableLayout.SetItemsSource(OperatingHoursLayout, _tenant.OpeningHours);
     }
 
+    private void BindRecentMenus()
+    {
+        RecentMenusCard.IsVisible = _tenant.HasRecentMenus;
+        BindableLayout.SetItemsSource(RecentMenusLayout, _tenant.RecentMenus);
+    }
+
+    private void ResetMenuState()
+    {
+        MenuDateLabel.Text = string.Empty;
+        MenuDateLabel.IsVisible = false;
+        MenuTitleLabel.Text = _usingFallbackData ? "Menu no disponible sin backend" : "Menu pendiente";
+        MenuDescriptionLabel.Text = _usingFallbackData
+            ? "Mostrando la informacion local del seed web. Para ver el menu diario en tiempo real necesitas el backend activo."
+            : _tenant.StatusDetailText;
+        MenuDescriptionLabel.IsVisible = true;
+        MenuStatusLabel.Text = "Pendiente";
+        MenuStatsGrid.IsVisible = false;
+        MenuContent.IsVisible = false;
+        EmptyMenuState.IsVisible = false;
+        BindableLayout.SetItemsSource(MenuItemsLayout, null);
+    }
+
     private void RenderMenu(DailyMenuDto? menu)
     {
         if (menu is null)
         {
-            MenuContent.IsVisible = false;
+            ResetMenuState();
             EmptyMenuState.IsVisible = true;
-            MenuStatsGrid.IsVisible = false;
-            MenuStatusLabel.Text = "Pendiente";
-            BindableLayout.SetItemsSource(MenuItemsLayout, null);
             return;
         }
 
         MenuDateLabel.Text = menu.MenuDateText;
+        MenuDateLabel.IsVisible = !string.IsNullOrWhiteSpace(MenuDateLabel.Text);
         MenuTitleLabel.Text = menu.Title;
         MenuDescriptionLabel.Text = menu.Description;
         MenuDescriptionLabel.IsVisible = menu.HasDescription;
@@ -113,6 +160,7 @@ public partial class TenantDetailPage : ContentPage
     private void RefreshActionButtons()
     {
         OpenMapButton.IsVisible = _tenant.CanOpenMap;
+        OpenMapButton.Text = _tenant.MapActionLabel;
         CallButton.IsVisible = _tenant.CanCall;
         EmailButton.IsVisible = _tenant.CanEmail;
     }
@@ -125,13 +173,12 @@ public partial class TenantDetailPage : ContentPage
 
     private async void OnOpenMapClicked(object sender, EventArgs e)
     {
-        if (!_tenant.CanOpenMap)
+        if (string.IsNullOrWhiteSpace(_tenant.MapLink))
         {
             return;
         }
 
-        var query = Uri.EscapeDataString(_tenant.MapQuery);
-        await OpenExternalUriAsync($"https://www.google.com/maps/search/?api=1&query={query}");
+        await OpenExternalUriAsync(_tenant.MapLink);
     }
 
     private async void OnCallClicked(object sender, EventArgs e)

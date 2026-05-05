@@ -5,41 +5,66 @@
     <Setter Property="BackgroundColor" Value="{StaticResource ColorBackground}" />
   </Style>
 
+  <Style TargetType="ScrollView">
+    <Setter Property="BackgroundColor" Value="Transparent" />
+  </Style>
+
   <Style TargetType="Label">
     <Setter Property="TextColor" Value="{StaticResource ColorText}" />
     <Setter Property="FontSize" Value="14" />
+    <Setter Property="LineBreakMode" Value="WordWrap" />
   </Style>
 
   <Style TargetType="Button">
     <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimary}" />
     <Setter Property="TextColor" Value="White" />
-    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="CornerRadius" Value="16" />
     <Setter Property="Padding" Value="18,12" />
     <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="14" />
   </Style>
 
   <Style x:Key="SecondaryButtonStyle" TargetType="Button">
     <Setter Property="BackgroundColor" Value="{StaticResource ColorSurfaceAlt}" />
     <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
-    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="CornerRadius" Value="16" />
     <Setter Property="Padding" Value="18,12" />
     <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="14" />
   </Style>
 
   <Style x:Key="OutlineButtonStyle" TargetType="Button">
-    <Setter Property="BackgroundColor" Value="Transparent" />
+    <Setter Property="BackgroundColor" Value="{StaticResource ColorSurface}" />
     <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
     <Setter Property="BorderColor" Value="{StaticResource ColorLine}" />
     <Setter Property="BorderWidth" Value="1" />
-    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="CornerRadius" Value="16" />
     <Setter Property="Padding" Value="18,12" />
     <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+
+  <Style x:Key="ChipButtonStyle" TargetType="Button">
+    <Setter Property="BackgroundColor" Value="{StaticResource ColorSurface}" />
+    <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+    <Setter Property="BorderColor" Value="{StaticResource ColorLine}" />
+    <Setter Property="BorderWidth" Value="1" />
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Padding" Value="14,8" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+
+  <Style x:Key="MiniOutlineButtonStyle" TargetType="Button" BasedOn="{StaticResource OutlineButtonStyle}">
+    <Setter Property="Padding" Value="14,8" />
+    <Setter Property="FontSize" Value="12" />
   </Style>
 
   <Style TargetType="Entry">
-    <Setter Property="BackgroundColor" Value="{StaticResource ColorSurfaceAlt}" />
+    <Setter Property="BackgroundColor" Value="{StaticResource ColorSurface}" />
     <Setter Property="TextColor" Value="{StaticResource ColorText}" />
-    <Setter Property="HeightRequest" Value="50" />
+    <Setter Property="PlaceholderColor" Value="{StaticResource ColorMuted}" />
+    <Setter Property="HeightRequest" Value="52" />
   </Style>
 
   <Style x:Key="CardBorderStyle" TargetType="Border">
@@ -54,6 +79,11 @@
     </Setter>
   </Style>
 
+  <Style x:Key="KitchenCardBorderStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Stroke" Value="{StaticResource ColorLineLight}" />
+  </Style>
+
   <Style x:Key="HeroBorderStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
     <Setter Property="Background" Value="{StaticResource HeroBrush}" />
     <Setter Property="StrokeThickness" Value="0" />
@@ -65,46 +95,50 @@
     </Setter>
   </Style>
 
-  <Style x:Key="SectionTitleStyle" TargetType="Label">
-    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
-    <Setter Property="FontAttributes" Value="Bold" />
-    <Setter Property="FontSize" Value="20" />
+  <Style x:Key="SoftHeroBorderStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+    <Setter Property="Background" Value="{StaticResource SoftHeroBrush}" />
+    <Setter Property="Stroke" Value="{StaticResource ColorLineLight}" />
+    <Setter Property="Padding" Value="22" />
+    <Setter Property="StrokeShape">
+      <Setter.Value>
+        <RoundRectangle CornerRadius="30" />
+      </Setter.Value>
+    </Setter>
   </Style>
 
-  <Style x:Key="CardTitleStyle" TargetType="Label">
-    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
-    <Setter Property="FontAttributes" Value="Bold" />
-    <Setter Property="FontSize" Value="18" />
+  <Style x:Key="MetricCardBorderStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+    <Setter Property="Background" Value="{StaticResource ColorSurfaceMuted}" />
+    <Setter Property="Stroke" Value="{StaticResource ColorLineLight}" />
+    <Setter Property="Padding" Value="16" />
+    <Setter Property="StrokeShape">
+      <Setter.Value>
+        <RoundRectangle CornerRadius="20" />
+      </Setter.Value>
+    </Setter>
   </Style>
 
-  <Style x:Key="MutedLabelStyle" TargetType="Label">
-    <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
-    <Setter Property="FontSize" Value="13" />
+  <Style x:Key="HighlightBorderStyle" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+    <Setter Property="Background" Value="{StaticResource MenuHighlightBrush}" />
+    <Setter Property="Stroke" Value="{StaticResource ColorPrimaryBorder}" />
+    <Setter Property="StrokeThickness" Value="2" />
+    <Setter Property="Padding" Value="22" />
+    <Setter Property="StrokeShape">
+      <Setter.Value>
+        <RoundRectangle CornerRadius="30" />
+      </Setter.Value>
+    </Setter>
   </Style>
 
-  <Style x:Key="CaptionLabelStyle" TargetType="Label" BasedOn="{StaticResource MutedLabelStyle}">
-    <Setter Property="FontSize" Value="12" />
-  </Style>
-
-  <Style x:Key="HeroTitleStyle" TargetType="Label">
-    <Setter Property="TextColor" Value="White" />
-    <Setter Property="FontAttributes" Value="Bold" />
-    <Setter Property="FontSize" Value="26" />
-  </Style>
-
-  <Style x:Key="HeroSubtitleStyle" TargetType="Label">
-    <Setter Property="TextColor" Value="#F2F7F3" />
-    <Setter Property="FontSize" Value="14" />
-  </Style>
-
-  <Style x:Key="MetricValueStyle" TargetType="Label">
-    <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
-    <Setter Property="FontAttributes" Value="Bold" />
-    <Setter Property="FontSize" Value="24" />
-  </Style>
-
-  <Style x:Key="MetricCaptionStyle" TargetType="Label" BasedOn="{StaticResource CaptionLabelStyle}">
-    <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
+  <Style x:Key="StatusPillBorderStyle" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource ColorSurface}" />
+    <Setter Property="Stroke" Value="{StaticResource ColorPrimaryBorder}" />
+    <Setter Property="StrokeThickness" Value="1" />
+    <Setter Property="Padding" Value="12,6" />
+    <Setter Property="StrokeShape">
+      <Setter.Value>
+        <RoundRectangle CornerRadius="999" />
+      </Setter.Value>
+    </Setter>
   </Style>
 
   <Style x:Key="ChipBorderStyle" TargetType="Border">
@@ -118,9 +152,112 @@
     </Setter>
   </Style>
 
+  <Style x:Key="ChipAccentBorderStyle" TargetType="Border" BasedOn="{StaticResource ChipBorderStyle}">
+    <Setter Property="Background" Value="{StaticResource ColorPrimarySoft}" />
+    <Setter Property="Stroke" Value="{StaticResource ColorPrimaryBorder}" />
+    <Setter Property="StrokeThickness" Value="1" />
+  </Style>
+
+  <Style x:Key="ChipWarningBorderStyle" TargetType="Border" BasedOn="{StaticResource ChipBorderStyle}">
+    <Setter Property="Background" Value="{StaticResource ColorWarningSoft}" />
+  </Style>
+
+  <Style x:Key="ChipInfoBorderStyle" TargetType="Border" BasedOn="{StaticResource ChipBorderStyle}">
+    <Setter Property="Background" Value="{StaticResource ColorInfoSoft}" />
+  </Style>
+
+  <Style x:Key="DisplayTitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="30" />
+  </Style>
+
+  <Style x:Key="SectionTitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="22" />
+  </Style>
+
+  <Style x:Key="CardTitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="19" />
+  </Style>
+
+  <Style x:Key="EyebrowLabelStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorPrimary}" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="TextTransform" Value="Uppercase" />
+    <Setter Property="CharacterSpacing" Value="1.6" />
+  </Style>
+
+  <Style x:Key="HeroTitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="White" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="26" />
+  </Style>
+
+  <Style x:Key="HeroEyebrowLabelStyle" TargetType="Label" BasedOn="{StaticResource EyebrowLabelStyle}">
+    <Setter Property="TextColor" Value="#E9F6EF" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="CharacterSpacing" Value="1.8" />
+  </Style>
+
+  <Style x:Key="HeroSubtitleStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="#F2F7F3" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+
+  <Style x:Key="HomeHeroValueStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="White" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="64" />
+  </Style>
+
+  <Style x:Key="HomeHeroCaptionStyle" TargetType="Label" BasedOn="{StaticResource HeroSubtitleStyle}">
+    <Setter Property="FontSize" Value="15" />
+  </Style>
+
+  <Style x:Key="MutedLabelStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+
+  <Style x:Key="CaptionLabelStyle" TargetType="Label" BasedOn="{StaticResource MutedLabelStyle}">
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+
+  <Style x:Key="MetricValueStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="FontSize" Value="24" />
+  </Style>
+
+  <Style x:Key="MetricCaptionStyle" TargetType="Label" BasedOn="{StaticResource CaptionLabelStyle}">
+    <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
+  </Style>
+
+  <Style x:Key="MetaLabelStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontAttributes" Value="Bold" />
+    <Setter Property="TextTransform" Value="Uppercase" />
+    <Setter Property="CharacterSpacing" Value="1.2" />
+  </Style>
+
+  <Style x:Key="MetaValueStyle" TargetType="Label">
+    <Setter Property="TextColor" Value="{StaticResource ColorText}" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+
   <Style x:Key="ChipLabelStyle" TargetType="Label">
     <Setter Property="FontAttributes" Value="Bold" />
     <Setter Property="FontSize" Value="12" />
     <Setter Property="TextColor" Value="{StaticResource ColorPrimaryDark}" />
+  </Style>
+
+  <Style x:Key="ChipMutedLabelStyle" TargetType="Label" BasedOn="{StaticResource ChipLabelStyle}">
+    <Setter Property="TextColor" Value="{StaticResource ColorMuted}" />
   </Style>
 </ResourceDictionary>

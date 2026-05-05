@@ -2,19 +2,36 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
   <Color x:Key="ColorBackground">#F5EFE4</Color>
-  <Color x:Key="ColorSurface">#FFFDF8</Color>
+  <Color x:Key="ColorBackgroundSoft">#FAF7F1</Color>
+  <Color x:Key="ColorSurface">#FFFFFF</Color>
   <Color x:Key="ColorSurfaceAlt">#EFE4D1</Color>
+  <Color x:Key="ColorSurfaceMuted">#FBF8F2</Color>
   <Color x:Key="ColorPrimary">#2F6B4F</Color>
   <Color x:Key="ColorPrimaryDark">#214A37</Color>
+  <Color x:Key="ColorPrimarySoft">#E6F5EC</Color>
+  <Color x:Key="ColorPrimaryBorder">#BFDCCB</Color>
   <Color x:Key="ColorSecondary">#C46A2D</Color>
   <Color x:Key="ColorAccent">#D7B77A</Color>
+  <Color x:Key="ColorWarningSoft">#FFF5E2</Color>
+  <Color x:Key="ColorInfoSoft">#EAF3FF</Color>
   <Color x:Key="ColorDanger">#C74B4B</Color>
   <Color x:Key="ColorText">#223127</Color>
   <Color x:Key="ColorMuted">#6E746A</Color>
   <Color x:Key="ColorLine">#DCCFB8</Color>
+  <Color x:Key="ColorLineLight">#E8DEC9</Color>
 
   <LinearGradientBrush x:Key="HeroBrush" StartPoint="0,0" EndPoint="1,1">
     <GradientStop Color="#2F6B4F" Offset="0.0" />
     <GradientStop Color="#3E8764" Offset="1.0" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="SoftHeroBrush" StartPoint="0,0" EndPoint="1,1">
+    <GradientStop Color="#FFFFFF" Offset="0.0" />
+    <GradientStop Color="#F2F8F4" Offset="1.0" />
+  </LinearGradientBrush>
+
+  <LinearGradientBrush x:Key="MenuHighlightBrush" StartPoint="0,0" EndPoint="1,1">
+    <GradientStop Color="#E6F5EC" Offset="0.0" />
+    <GradientStop Color="#F7FBF8" Offset="1.0" />
   </LinearGradientBrush>
 </ResourceDictionary>

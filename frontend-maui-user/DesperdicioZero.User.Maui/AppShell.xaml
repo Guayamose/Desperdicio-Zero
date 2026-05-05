@@ -6,11 +6,12 @@
        Title="Desperdicio Zero"
        FlyoutBehavior="Disabled"
        Shell.NavBarHasShadow="False"
+       Shell.TabBarBackgroundColor="{StaticResource ColorSurface}"
        Shell.TabBarForegroundColor="{StaticResource ColorPrimaryDark}"
        Shell.TabBarTitleColor="{StaticResource ColorPrimaryDark}"
        Shell.TabBarUnselectedColor="{StaticResource ColorMuted}">
   <TabBar>
-    <ShellContent Title="Explorar" Route="explore" ContentTemplate="{DataTemplate pages:HomePage}" />
+    <ShellContent Title="Comedores" Route="explore" ContentTemplate="{DataTemplate pages:HomePage}" />
     <ShellContent Title="Ajustes" Route="settings" ContentTemplate="{DataTemplate pages:SettingsPage}" />
   </TabBar>
 </Shell>
