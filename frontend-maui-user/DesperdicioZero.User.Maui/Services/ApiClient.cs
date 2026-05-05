@@ -1,0 +1,163 @@
+using System.Net;
+using System.Text;
+using System.Text.Json;
+using DesperdicioZero.User.Maui.Models;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Storage;
+
+namespace DesperdicioZero.User.Maui.Services;
+
+public class ApiClient
+{
+    private const string BundledTenantsFileName = "public_tenants_seed.json";
+    private readonly JsonSerializerOptions _jsonOptions;
+    private readonly HttpClient _httpClient;
+
+    public static string PlatformDefaultBaseUrl => DeviceInfo.Platform == DevicePlatform.Android
+        ? "http://10.0.2.2:3000"
+        : "http://localhost:3000";
+
+    public string BaseUrl { get; private set; } = PlatformDefaultBaseUrl;
+
+    public ApiClient()
+    {
+        _httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(30)
+        };
+
+        _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+
+        SetBaseUrl(BaseUrl);
+    }
+
+    public void SetBaseUrl(string baseUrl)
+    {
+        var normalized = NormalizeBaseUrl(baseUrl);
+        BaseUrl = normalized;
+        _httpClient.BaseAddress = new Uri(normalized);
+    }
+
+    public async Task<List<TenantSummary>> GetPublicTenantsAsync()
+    {
+        var envelope = await SendAsync<ApiEnvelope<List<TenantSummary>>>(HttpMethod.Get, "/api/v1/public/tenants");
+        return envelope.Data ?? [];
+    }
+
+    public async Task<TenantSummary> GetPublicTenantAsync(string slug)
+    {
+        var envelope = await SendAsync<ApiEnvelope<TenantSummary>>(HttpMethod.Get, $"/api/v1/public/tenants/{Uri.EscapeDataString(slug)}");
+        return envelope.Data ?? throw new ApiException("No se pudo cargar el comedor", HttpStatusCode.InternalServerError);
+    }
+
+    public async Task<DailyMenuDto?> GetPublicMenuTodayAsync(string slug)
+    {
+        var envelope = await SendAsync<ApiEnvelope<DailyMenuDto>>(HttpMethod.Get, $"/api/v1/public/tenants/{Uri.EscapeDataString(slug)}/menu-today", allowNotFound: true);
+        return envelope.Data;
+    }
+
+    public async Task<List<TenantSummary>> GetBundledPublicTenantsAsync()
+    {
+        await using var stream = await FileSystem.OpenAppPackageFileAsync(BundledTenantsFileName);
+        var tenants = await JsonSerializer.DeserializeAsync<List<TenantSummary>>(stream, _jsonOptions);
+        return tenants ?? [];
+    }
+
+    public async Task<TenantSummary?> GetBundledPublicTenantAsync(string slug)
+    {
+        var tenants = await GetBundledPublicTenantsAsync();
+        return tenants.FirstOrDefault(tenant => string.Equals(tenant.Slug, slug, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private async Task<T> SendAsync<T>(HttpMethod method, string path, object? payload = null, bool allowNotFound = false)
+    {
+        try
+        {
+            using var request = new HttpRequestMessage(method, path);
+            request.Headers.Accept.ParseAdd("application/json");
+
+            if (payload is not null)
+            {
+                var json = JsonSerializer.Serialize(payload, _jsonOptions);
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            }
+
+            using var response = await _httpClient.SendAsync(request);
+            var body = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (allowNotFound && response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return Activator.CreateInstance<T>();
+                }
+
+                throw BuildApiException(response.StatusCode, body);
+            }
+
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                return Activator.CreateInstance<T>();
+            }
+
+            var result = JsonSerializer.Deserialize<T>(body, _jsonOptions);
+            return result ?? Activator.CreateInstance<T>();
+        }
+        catch (TaskCanceledException)
+        {
+            throw new ApiException("La conexion ha tardado demasiado. Revisa la URL del backend e intentalo de nuevo.", HttpStatusCode.RequestTimeout);
+        }
+        catch (HttpRequestException)
+        {
+            throw new ApiException("No se pudo conectar con el backend. Comprueba la URL guardada y que el servidor este disponible.", HttpStatusCode.ServiceUnavailable);
+        }
+    }
+
+    private static ApiException BuildApiException(HttpStatusCode statusCode, string body)
+    {
+        try
+        {
+            var error = JsonSerializer.Deserialize<ApiError>(body, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (!string.IsNullOrWhiteSpace(error?.Message))
+            {
+                return new ApiException(error.Message, statusCode, error.Code);
+            }
+        }
+        catch
+        {
+        }
+
+        var fallback = string.IsNullOrWhiteSpace(body)
+            ? $"API error ({(int)statusCode})"
+            : body;
+
+        return new ApiException(fallback, statusCode);
+    }
+
+    private static string NormalizeBaseUrl(string input)
+    {
+        var candidate = string.IsNullOrWhiteSpace(input) ? PlatformDefaultBaseUrl : input.Trim();
+        if (!candidate.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+            !candidate.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            candidate = $"http://{candidate}";
+        }
+
+        if (!Uri.TryCreate(candidate, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new ArgumentException("La URL base no es valida. Usa una direccion http:// o https://.");
+        }
+
+        return uri.ToString().TrimEnd('/');
+    }
+}

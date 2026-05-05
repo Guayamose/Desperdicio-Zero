@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.User.Maui.Pages.HomePage"
+             Title="Comedores">
+  <Grid RowDefinitions="Auto,*">
+    <Border x:Name="ErrorBanner"
+            Grid.Row="0"
+            Background="#FBE7E0"
+            IsVisible="False"
+            Margin="20,12,20,0"
+            Padding="16"
+            Stroke="#E7B6A6"
+            StrokeShape="RoundRectangle 20">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <Label x:Name="ErrorLabel"
+               FontAttributes="Bold"
+               TextColor="{StaticResource ColorDanger}"
+               VerticalOptions="Center" />
+        <Button Grid.Column="1"
+                Clicked="OnRetryClicked"
+                Padding="14,10"
+                Style="{StaticResource SecondaryButtonStyle}"
+                Text="Reintentar" />
+      </Grid>
+    </Border>
+
+    <RefreshView x:Name="RefreshControl" Grid.Row="1" Refreshing="OnRefreshing">
+      <CollectionView x:Name="TenantsList"
+                      ItemSizingStrategy="MeasureAllItems"
+                      Margin="0"
+                      SelectionMode="None">
+        <CollectionView.Header>
+          <VerticalStackLayout Padding="20,18,20,24" Spacing="18">
+            <Border Style="{StaticResource HeroBorderStyle}">
+              <VerticalStackLayout HorizontalOptions="Center" Spacing="16">
+                <Label HorizontalTextAlignment="Center"
+                       Style="{StaticResource HeroEyebrowLabelStyle}"
+                       Text="Comedores disponibles" />
+
+                <Border Background="#1FFFFFFF"
+                        Padding="28,20"
+                        Stroke="#35FFFFFF"
+                        StrokeShape="RoundRectangle 28">
+                  <VerticalStackLayout HorizontalOptions="Center" Spacing="4">
+                    <Label x:Name="SummaryTenantsLabel"
+                           HorizontalTextAlignment="Center"
+                           Style="{StaticResource HomeHeroValueStyle}"
+                           Text="0" />
+                    <Label HorizontalTextAlignment="Center"
+                           Style="{StaticResource HomeHeroCaptionStyle}"
+                           Text="disponibles ahora" />
+                  </VerticalStackLayout>
+                </Border>
+              </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource CardBorderStyle}">
+              <VerticalStackLayout Spacing="14">
+                <Label Style="{StaticResource SectionTitleStyle}" Text="Encuentra un comedor" />
+                <Label Style="{StaticResource MutedLabelStyle}"
+                       Text="Busca por nombre o ciudad y usa los filtros para ver favoritos, menu de hoy o contacto disponible." />
+
+                <Entry x:Name="SearchEntry"
+                       ClearButtonVisibility="WhileEditing"
+                       Placeholder="Nombre o ciudad..."
+                       TextChanged="OnSearchChanged" />
+
+                <ScrollView Orientation="Horizontal">
+                  <HorizontalStackLayout Spacing="8">
+                    <Button x:Name="AllFilterButton"
+                            Clicked="OnAllFilterClicked"
+                            Padding="14,8"
+                            Style="{StaticResource ChipButtonStyle}"
+                            Text="Todos" />
+                    <Button x:Name="FavoritesFilterButton"
+                            Clicked="OnFavoritesFilterClicked"
+                            Padding="14,8"
+                            Style="{StaticResource ChipButtonStyle}"
+                            Text="Favoritos" />
+                    <Button x:Name="MenuFilterButton"
+                            Clicked="OnMenuFilterClicked"
+                            Padding="14,8"
+                            Style="{StaticResource ChipButtonStyle}"
+                            Text="Con menu hoy" />
+                    <Button x:Name="ContactFilterButton"
+                            Clicked="OnContactFilterClicked"
+                            Padding="14,8"
+                            Style="{StaticResource ChipButtonStyle}"
+                            Text="Con contacto" />
+                  </HorizontalStackLayout>
+                </ScrollView>
+
+                <VerticalStackLayout Spacing="8">
+                  <Label Style="{StaticResource MetaLabelStyle}" Text="Ciudades sugeridas" />
+                  <ScrollView Orientation="Horizontal">
+                    <HorizontalStackLayout x:Name="SuggestionChipsLayout" Spacing="8" />
+                  </ScrollView>
+                </VerticalStackLayout>
+
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   Color="{StaticResource ColorPrimary}"
+                                   IsRunning="False"
+                                   IsVisible="False"
+                                   HorizontalOptions="Start" />
+
+                <Label x:Name="ResultsLabel" Style="{StaticResource MutedLabelStyle}" />
+                <Label x:Name="LastUpdatedLabel" Style="{StaticResource CaptionLabelStyle}" />
+              </VerticalStackLayout>
+            </Border>
+          </VerticalStackLayout>
+        </CollectionView.Header>
+
+        <CollectionView.EmptyView>
+          <VerticalStackLayout Padding="24,12,24,40" Spacing="10">
+            <Label FontAttributes="Bold" FontSize="20" HorizontalTextAlignment="Center" Text="No hay comedores para mostrar" />
+            <Label HorizontalTextAlignment="Center"
+                   Text="Prueba otra busqueda o cambia el filtro activo."
+                   TextColor="{StaticResource ColorMuted}" />
+          </VerticalStackLayout>
+        </CollectionView.EmptyView>
+
+        <CollectionView.ItemTemplate>
+          <DataTemplate>
+            <Border Margin="20,0,20,18" Style="{StaticResource KitchenCardBorderStyle}">
+              <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnTenantCardTapped" />
+              </Border.GestureRecognizers>
+
+              <Grid RowDefinitions="210,Auto">
+                <Grid HeightRequest="210">
+                  <Image Aspect="AspectFit"
+                         Margin="18,18,18,0"
+                         Source="{Binding VisualImageSource}" />
+
+                  <Border HorizontalOptions="End"
+                          Margin="0,0,16,16"
+                          Style="{StaticResource StatusPillBorderStyle}"
+                          VerticalOptions="End">
+                    <Label Style="{StaticResource ChipLabelStyle}" Text="{Binding StatusLabel}" />
+                  </Border>
+                </Grid>
+
+                <VerticalStackLayout Grid.Row="1" Padding="18" Spacing="14">
+                  <VerticalStackLayout Spacing="6">
+                    <Label Style="{StaticResource CardTitleStyle}" Text="{Binding Name}" />
+                    <Label IsVisible="{Binding HasAddress}" Style="{StaticResource MutedLabelStyle}" Text="{Binding HeroLocationText}" />
+                    <Label IsVisible="{Binding HasLocation}" Style="{StaticResource CaptionLabelStyle}" Text="{Binding HeroRegionText}" />
+                  </VerticalStackLayout>
+
+                  <FlexLayout AlignItems="Start" Direction="Row" Wrap="Wrap">
+                    <Border Margin="0,0,8,8" Style="{StaticResource ChipAccentBorderStyle}">
+                      <Label Style="{StaticResource ChipLabelStyle}" Text="{Binding MenuAvailabilityLabel}" />
+                    </Border>
+
+                    <Border IsVisible="{Binding HasContact}" Margin="0,0,8,8" Style="{StaticResource ChipBorderStyle}">
+                      <Label Style="{StaticResource ChipMutedLabelStyle}" Text="Contacto disponible" />
+                    </Border>
+
+                    <Border IsVisible="{Binding IsFavorite}" Margin="0,0,8,8" Style="{StaticResource ChipInfoBorderStyle}">
+                      <Label Style="{StaticResource ChipLabelStyle}" Text="Guardado" />
+                    </Border>
+                  </FlexLayout>
+
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Border Grid.Column="0" Style="{StaticResource MetricCardBorderStyle}">
+                      <VerticalStackLayout Spacing="4">
+                        <Label Style="{StaticResource MetaLabelStyle}" Text="Horario" />
+                        <Label MaxLines="2" Style="{StaticResource MetaValueStyle}" Text="{Binding ScheduleSummary}" />
+                      </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource MetricCardBorderStyle}">
+                      <VerticalStackLayout Spacing="4">
+                        <Label Style="{StaticResource MetaLabelStyle}" Text="Servicio hoy" />
+                        <Label MaxLines="2" Style="{StaticResource MetaValueStyle}" Text="{Binding MenuPreviewText}" />
+                      </VerticalStackLayout>
+                    </Border>
+                  </Grid>
+
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Button Clicked="OnOpenTenantClicked"
+                            CommandParameter="{Binding .}"
+                            Text="{Binding PrimaryActionLabel}" />
+                    <Button Grid.Column="1"
+                            Clicked="OnToggleFavoriteClicked"
+                            CommandParameter="{Binding .}"
+                            Style="{StaticResource MiniOutlineButtonStyle}"
+                            Text="{Binding FavoriteButtonText}" />
+                  </Grid>
+                </VerticalStackLayout>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </CollectionView.ItemTemplate>
+      </CollectionView>
+    </RefreshView>
+  </Grid>
+</ContentPage>

@@ -5,6 +5,7 @@ Rails 7.1 multi-tenant platform for social kitchen operations:
 - Public portal (tenants + menu of the day)
 - Tenant dashboard (inventory, scan, menu generation)
 - Global admin panel (tenants, users, metrics, audit logs)
+- Public .NET MAUI app for end users (`frontend-maui-user/DesperdicioZero.User.Maui`)
 - OpenFoodFacts integration (barcode product normalization)
 - OpenAI integration (automatic menu generation with fallback)
 
@@ -35,6 +36,21 @@ Run worker:
 
 ```bash
 bundle exec sidekiq -C config/sidekiq.yml
+```
+
+## Public MAUI app
+
+Public mobile/desktop client:
+
+```bash
+cd frontend-maui-user/DesperdicioZero.User.Maui
+dotnet build -f net8.0-android
+```
+
+Helper script for local Android emulator flow:
+
+```bash
+./scripts/run-all-maui.sh
 ```
 
 ## Environment variables

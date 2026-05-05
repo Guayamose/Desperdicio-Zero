@@ -3,16 +3,20 @@ module Api
     module Public
       class TenantsController < Api::V1::BaseController
         def index
-          render_collection(Tenant.operational.order(:name))
+          tenants = ::Tenant.operational.order(:name).to_a
+          today_menus = published_today_menus_for(tenants)
+
+          render_collection(tenants.map { |tenant| tenant_payload(tenant, today_menus[tenant.id]) })
         end
 
         def show
-          tenant = Tenant.operational.find_by!(slug: params[:slug] || params[:id])
-          render_resource(tenant)
+          tenant = ::Tenant.operational.find_by!(slug: params[:slug] || params[:id])
+          today_menu = published_today_menu_for(tenant)
+          render_resource(tenant_payload(tenant, today_menu, recent_menus_for(tenant, today_menu)))
         end
 
         def menu_today
-          tenant = Tenant.operational.find_by!(slug: params[:slug] || params[:id])
+          tenant = ::Tenant.operational.find_by!(slug: params[:slug] || params[:id])
           menu = tenant.daily_menus.published.find_by(menu_date: Date.current)
 
           if menu
@@ -20,6 +24,38 @@ module Api
           else
             render_error(code: "not_found", message: "No menu published for today", status: :not_found)
           end
+        end
+
+        private
+
+        def published_today_menus_for(tenants)
+          ::DailyMenu.published
+            .today
+            .where(tenant_id: tenants.map(&:id))
+            .select(:tenant_id, :title, :menu_date)
+            .index_by(&:tenant_id)
+        end
+
+        def published_today_menu_for(tenant)
+          tenant.daily_menus.published.today.select(:tenant_id, :title, :menu_date).first
+        end
+
+        def recent_menus_for(tenant, today_menu)
+          tenant.daily_menus.published
+            .where.not(id: today_menu&.id)
+            .order(menu_date: :desc)
+            .limit(3)
+            .select(:title, :menu_date)
+            .map { |menu| menu.as_json(only: %i[title menu_date]) }
+        end
+
+        def tenant_payload(tenant, today_menu, recent_menus = [])
+          tenant.as_json.merge(
+            today_menu_published: today_menu.present?,
+            today_menu_title: today_menu&.title,
+            today_menu_date: today_menu&.menu_date,
+            recent_menus: recent_menus
+          )
         end
       end
     end

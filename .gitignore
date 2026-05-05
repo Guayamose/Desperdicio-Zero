@@ -32,5 +32,11 @@
 
 /public/assets
 
+# Ignore MAUI build outputs.
+/frontend-maui/**/bin/
+/frontend-maui/**/obj/
+/frontend-maui-user/**/bin/
+/frontend-maui-user/**/obj/
+
 # Ignore master key for decrypting credentials and more.
 /config/master.key

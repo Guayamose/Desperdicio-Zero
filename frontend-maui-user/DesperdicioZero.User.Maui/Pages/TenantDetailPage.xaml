@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DesperdicioZero.User.Maui.Pages.TenantDetailPage">
+  <RefreshView x:Name="RefreshControl" Refreshing="OnRefreshing">
+    <ScrollView>
+      <VerticalStackLayout Padding="20,18,20,28" Spacing="18">
+        <Border Style="{StaticResource SoftHeroBorderStyle}">
+          <VerticalStackLayout Spacing="18">
+            <Label Style="{StaticResource EyebrowLabelStyle}" Text="Ficha de comedor" />
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <VerticalStackLayout Spacing="8">
+                <Label Style="{StaticResource DisplayTitleStyle}" Text="{Binding Name}" />
+                <Label IsVisible="{Binding HasAddress}" Style="{StaticResource MutedLabelStyle}" Text="{Binding HeroLocationText}" />
+                <Label IsVisible="{Binding HasLocation}" Style="{StaticResource CaptionLabelStyle}" Text="{Binding HeroRegionText}" />
+                <Label Style="{StaticResource MutedLabelStyle}" Text="{Binding StatusDetailText}" />
+              </VerticalStackLayout>
+
+              <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" Spacing="8">
+                <Border Style="{StaticResource StatusPillBorderStyle}">
+                  <Label Style="{StaticResource ChipLabelStyle}" Text="{Binding StatusLabel}" />
+                </Border>
+
+                <Button x:Name="FavoriteButton"
+                        Clicked="OnToggleFavoriteClicked"
+                        Style="{StaticResource MiniOutlineButtonStyle}"
+                        Text="Guardar" />
+              </VerticalStackLayout>
+            </Grid>
+
+            <Grid ColumnDefinitions="170,*" ColumnSpacing="14">
+              <Border Background="{StaticResource ColorBackgroundSoft}"
+                      Padding="12"
+                      StrokeThickness="0"
+                      StrokeShape="RoundRectangle 24">
+                <Image Aspect="AspectFit"
+                       HeightRequest="130"
+                       Source="{Binding VisualImageSource}" />
+              </Border>
+
+              <VerticalStackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center">
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                  <Border Grid.Column="0" Style="{StaticResource MetricCardBorderStyle}">
+                    <VerticalStackLayout Spacing="4">
+                      <Label Style="{StaticResource MetaLabelStyle}" Text="Menu de hoy" />
+                      <Label Style="{StaticResource MetaValueStyle}" Text="{Binding MenuAvailabilityLabel}" />
+                    </VerticalStackLayout>
+                  </Border>
+
+                  <Border Grid.Column="1" Style="{StaticResource MetricCardBorderStyle}">
+                    <VerticalStackLayout Spacing="4">
+                      <Label Style="{StaticResource MetaLabelStyle}" Text="Horario base" />
+                      <Label MaxLines="2" Style="{StaticResource MetaValueStyle}" Text="{Binding ScheduleSummary}" />
+                    </VerticalStackLayout>
+                  </Border>
+                </Grid>
+
+                <Label Style="{StaticResource CaptionLabelStyle}" Text="{Binding RecentMenusSummary}" />
+              </VerticalStackLayout>
+            </Grid>
+          </VerticalStackLayout>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <VerticalStackLayout Spacing="12">
+            <Label Style="{StaticResource SectionTitleStyle}" Text="Contacto" />
+            <Label Style="{StaticResource MutedLabelStyle}" Text="{Binding ContactAvailabilityText}" />
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+              <Label Style="{StaticResource MetaLabelStyle}" Text="Email" />
+              <Label Grid.Column="1" Style="{StaticResource MetaValueStyle}" Text="{Binding ContactEmail}" />
+            </Grid>
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+              <Label Style="{StaticResource MetaLabelStyle}" Text="Telefono" />
+              <Label Grid.Column="1" Style="{StaticResource MetaValueStyle}" Text="{Binding ContactPhone}" />
+            </Grid>
+
+            <HorizontalStackLayout Spacing="10">
+              <Button x:Name="CallButton"
+                      Clicked="OnCallClicked"
+                      IsVisible="False"
+                      Style="{StaticResource SecondaryButtonStyle}"
+                      Text="Llamar" />
+              <Button x:Name="EmailButton"
+                      Clicked="OnEmailClicked"
+                      IsVisible="False"
+                      Style="{StaticResource SecondaryButtonStyle}"
+                      Text="Escribir email" />
+            </HorizontalStackLayout>
+          </VerticalStackLayout>
+        </Border>
+
+        <Border IsVisible="{Binding HasOperatingHours}" Style="{StaticResource CardBorderStyle}">
+          <VerticalStackLayout Spacing="12">
+            <Label Style="{StaticResource SectionTitleStyle}" Text="Horario" />
+            <VerticalStackLayout x:Name="OperatingHoursLayout" Spacing="8">
+              <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="18">
+                    <Label FontAttributes="Bold" Text="{Binding Day}" />
+                    <Label Grid.Column="1" HorizontalTextAlignment="End" Text="{Binding Hours}" TextColor="{StaticResource ColorMuted}" />
+                  </Grid>
+                </DataTemplate>
+              </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+          </VerticalStackLayout>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <VerticalStackLayout Spacing="14">
+            <Label Style="{StaticResource SectionTitleStyle}" Text="Ubicacion" />
+            <Border Background="{StaticResource ColorBackgroundSoft}"
+                    Padding="10"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 22">
+              <Image Aspect="AspectFit"
+                     HeightRequest="160"
+                     Source="map_placeholder.svg" />
+            </Border>
+            <Label IsVisible="{Binding HasAddress}" Style="{StaticResource MetaValueStyle}" Text="{Binding AddressText}" />
+            <Label Style="{StaticResource CaptionLabelStyle}" Text="{Binding CoordinatesText}" />
+            <Button x:Name="OpenMapButton"
+                    Clicked="OnOpenMapClicked"
+                    IsVisible="False"
+                    Style="{StaticResource OutlineButtonStyle}"
+                    Text="Abrir ubicacion" />
+          </VerticalStackLayout>
+        </Border>
+
+        <Border Style="{StaticResource HighlightBorderStyle}">
+          <VerticalStackLayout Spacing="16">
+            <Label Style="{StaticResource EyebrowLabelStyle}" Text="Plato principal para hoy" />
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <VerticalStackLayout Spacing="8">
+                <Label x:Name="MenuDateLabel"
+                       FontAttributes="Bold"
+                       FontSize="12"
+                       TextColor="{StaticResource ColorPrimary}" />
+                <Label x:Name="MenuTitleLabel" Style="{StaticResource DisplayTitleStyle}" />
+                <Label x:Name="MenuDescriptionLabel" Style="{StaticResource MutedLabelStyle}" />
+              </VerticalStackLayout>
+
+              <Border Grid.Column="1"
+                      Background="{StaticResource ColorSurface}"
+                      Padding="12,6"
+                      Stroke="{StaticResource ColorPrimaryBorder}"
+                      StrokeShape="RoundRectangle 999"
+                      VerticalOptions="Start">
+                <Label x:Name="MenuStatusLabel"
+                       FontAttributes="Bold"
+                       FontSize="12"
+                       Text="Pendiente"
+                       TextColor="{StaticResource ColorPrimaryDark}" />
+              </Border>
+            </Grid>
+
+            <ActivityIndicator x:Name="MenuLoadingIndicator"
+                               Color="{StaticResource ColorPrimary}"
+                               IsRunning="False"
+                               IsVisible="False" />
+
+            <Grid x:Name="MenuStatsGrid"
+                  ColumnDefinitions="*,*"
+                  ColumnSpacing="12"
+                  IsVisible="False">
+              <Border Grid.Column="0" Style="{StaticResource MetricCardBorderStyle}">
+                <VerticalStackLayout Spacing="2">
+                  <Label x:Name="MenuDishCountLabel" Style="{StaticResource MetricValueStyle}" Text="0" />
+                  <Label Style="{StaticResource MetricCaptionStyle}" Text="platos" />
+                </VerticalStackLayout>
+              </Border>
+
+              <Border Grid.Column="1" Style="{StaticResource MetricCardBorderStyle}">
+                <VerticalStackLayout Spacing="2">
+                  <Label x:Name="MenuHighlightsLabel" Style="{StaticResource MetricValueStyle}" Text="0" />
+                  <Label Style="{StaticResource MetricCaptionStyle}" Text="etiquetas dietarias" />
+                </VerticalStackLayout>
+              </Border>
+            </Grid>
+
+            <VerticalStackLayout x:Name="MenuContent" IsVisible="False" Spacing="14">
+              <VerticalStackLayout x:Name="MenuItemsLayout" Spacing="12">
+                <BindableLayout.ItemTemplate>
+                  <DataTemplate>
+                    <Border Style="{StaticResource CardBorderStyle}">
+                      <VerticalStackLayout Spacing="10">
+                        <Label Style="{StaticResource CardTitleStyle}" Text="{Binding Name}" />
+                        <Label IsVisible="{Binding HasDescription}" Style="{StaticResource MutedLabelStyle}" Text="{Binding Description}" />
+                        <Label Text="{Binding IngredientsLabel}" />
+
+                        <FlexLayout IsVisible="{Binding HasAllergens}" AlignItems="Start" Direction="Row" Wrap="Wrap">
+                          <BindableLayout.ItemsSource>
+                            <Binding Path="Allergens" />
+                          </BindableLayout.ItemsSource>
+                          <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                              <Border Margin="0,0,8,8" Style="{StaticResource ChipWarningBorderStyle}">
+                                <Label Style="{StaticResource ChipLabelStyle}" Text="{Binding .}" />
+                              </Border>
+                            </DataTemplate>
+                          </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+
+                        <FlexLayout IsVisible="{Binding HasDietaryFlags}" AlignItems="Start" Direction="Row" Wrap="Wrap">
+                          <BindableLayout.ItemsSource>
+                            <Binding Path="DietaryFlags" />
+                          </BindableLayout.ItemsSource>
+                          <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                              <Border Margin="0,0,8,8" Style="{StaticResource ChipInfoBorderStyle}">
+                                <Label Style="{StaticResource ChipLabelStyle}" Text="{Binding .}" />
+                              </Border>
+                            </DataTemplate>
+                          </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                      </VerticalStackLayout>
+                    </Border>
+                  </DataTemplate>
+                </BindableLayout.ItemTemplate>
+              </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout x:Name="EmptyMenuState"
+                                 IsVisible="False"
+                                 Padding="8,2,8,4"
+                                 Spacing="8">
+              <Label HorizontalTextAlignment="Center"
+                     Text="Este comedor aun no ha publicado su menu para hoy."
+                     TextColor="{StaticResource ColorMuted}" />
+              <Label HorizontalTextAlignment="Center"
+                     Style="{StaticResource CaptionLabelStyle}"
+                     Text="La informacion del comedor ya viene de la seed y del portal web; el menu aparecera aqui en cuanto se publique." />
+            </VerticalStackLayout>
+          </VerticalStackLayout>
+        </Border>
+
+        <Border x:Name="RecentMenusCard" IsVisible="False" Style="{StaticResource CardBorderStyle}">
+          <VerticalStackLayout Spacing="12">
+            <Label Style="{StaticResource SectionTitleStyle}" Text="Historial reciente" />
+            <VerticalStackLayout x:Name="RecentMenusLayout" Spacing="10">
+              <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                  <Border Style="{StaticResource MetricCardBorderStyle}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                      <Border Background="{StaticResource ColorPrimarySoft}"
+                              Padding="10"
+                              Stroke="{StaticResource ColorPrimaryBorder}"
+                              StrokeShape="RoundRectangle 18"
+                              VerticalOptions="Start">
+                        <Label Style="{StaticResource ChipLabelStyle}" Text="{Binding MenuDateText}" />
+                      </Border>
+
+                      <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Style="{StaticResource CardTitleStyle}" Text="{Binding Title}" />
+                        <Label Style="{StaticResource CaptionLabelStyle}" Text="Publicado recientemente en el portal web" />
+                      </VerticalStackLayout>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+          </VerticalStackLayout>
+        </Border>
+      </VerticalStackLayout>
+    </ScrollView>
+  </RefreshView>
+</ContentPage>
